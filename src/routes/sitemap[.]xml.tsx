@@ -1,0 +1,43 @@
+import { createFileRoute } from "@tanstack/react-router";
+
+const STATIC_PATHS = [
+  "/",
+  "/sila",
+  "/setupy",
+  "/sentyment",
+  "/przeplyw",
+  "/alerty",
+  "/likwidacja",
+  "/asystent",
+  "/slownik",
+];
+
+const POPULAR_COINS = [
+  "BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "AVAX", "DOT", "MATIC",
+  "LINK", "TRX", "LTC", "ARB", "OP", "ATOM", "NEAR", "APT", "SUI", "FIL",
+];
+
+export const Route = createFileRoute("/sitemap.xml")({
+  server: {
+    handlers: {
+      GET: () => {
+        const base = "https://cryptopuls.lovable.app";
+        const lastmod = new Date().toISOString().slice(0, 10);
+        const urls = [
+          ...STATIC_PATHS.map((p) => `${base}${p}`),
+          ...POPULAR_COINS.map((s) => `${base}/coin/${s}`),
+        ];
+        const body = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map((u) => `  <url><loc>${u}</loc><lastmod>${lastmod}</lastmod></url>`).join("\n")}
+</urlset>`;
+        return new Response(body, {
+          headers: {
+            "Content-Type": "application/xml; charset=utf-8",
+            "Cache-Control": "public, max-age=3600",
+          },
+        });
+      },
+    },
+  },
+});

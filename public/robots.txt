@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /ustawienia
+Disallow: /historia-alertow
+
+Sitemap: https://cryptopuls.lovable.app/sitemap.xml
