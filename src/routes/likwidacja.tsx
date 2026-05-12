@@ -23,6 +23,7 @@ import {
   Scale,
   Waves,
 } from "lucide-react";
+import { DataBadge } from "@/components/DataBadge";
 
 import { buildSeo } from "@/lib/seo";
 
@@ -136,7 +137,10 @@ function LiquidityPage() {
               <Droplets className="h-3.5 w-3.5 text-primary" />
               Mapa płynności · struktura mikro-rynku
             </div>
-            <h1 className="mt-1 text-2xl font-bold">Liquidity Heatmap</h1>
+            <div className="mt-1 flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl font-bold">Liquidity Heatmap</h1>
+              <DataBadge kind="proxy" />
+            </div>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
               Zobacz, gdzie ukryte są lewarowane pozycje i ściany kapitału. Dane szacunkowe
               wyprowadzone z wolumenu i zmienności — pokazują strukturę, nie dokładne kwoty.
