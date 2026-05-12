@@ -32,7 +32,7 @@ import {
 
 import { seoHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/asystent")({
+export const Route = createFileRoute("/_authenticated/asystent")({
   head: () => ({
     ...seoHead({
       title: "AI Asystent rynku krypto",

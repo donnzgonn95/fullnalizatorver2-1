@@ -8,7 +8,7 @@ import { seoHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { openCommandPalette } from "@/lib/command-palette-bus";
 
-export const Route = createFileRoute("/ulubione")({
+export const Route = createFileRoute("/_authenticated/ulubione")({
   head: () => ({
     ...seoHead({
       title: "Ulubione krypto — Twoja watchlista",

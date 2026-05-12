@@ -9,32 +9,30 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UstawieniaRouteImport } from './routes/ustawienia'
-import { Route as UlubioneRouteImport } from './routes/ulubione'
 import { Route as SqueezeRouteImport } from './routes/squeeze'
 import { Route as SlownikRouteImport } from './routes/slownik'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SilaRouteImport } from './routes/sila'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SetupyRouteImport } from './routes/setupy'
 import { Route as SentymentRouteImport } from './routes/sentyment'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegulaminRouteImport } from './routes/regulamin'
 import { Route as PrzeplywRouteImport } from './routes/przeplyw'
+import { Route as PolitykaPrywatnosciRouteImport } from './routes/polityka-prywatnosci'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
-import { Route as HistoriaAlertowRouteImport } from './routes/historia-alertow'
-import { Route as AsystentRouteImport } from './routes/asystent'
-import { Route as AlertyRouteImport } from './routes/alerty'
+import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoinSymbolRouteImport } from './routes/coin.$symbol'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthenticatedUstawieniaRouteImport } from './routes/_authenticated/ustawienia'
+import { Route as AuthenticatedUlubioneRouteImport } from './routes/_authenticated/ulubione'
+import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_authenticated/historia-alertow'
+import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
+import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
 
-const UstawieniaRoute = UstawieniaRouteImport.update({
-  id: '/ustawienia',
-  path: '/ustawienia',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UlubioneRoute = UlubioneRouteImport.update({
-  id: '/ulubione',
-  path: '/ulubione',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SqueezeRoute = SqueezeRouteImport.update({
   id: '/squeeze',
   path: '/squeeze',
@@ -55,6 +53,11 @@ const SilaRoute = SilaRouteImport.update({
   path: '/sila',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SetupyRoute = SetupyRouteImport.update({
   id: '/setupy',
   path: '/setupy',
@@ -65,9 +68,29 @@ const SentymentRoute = SentymentRouteImport.update({
   path: '/sentyment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegulaminRoute = RegulaminRouteImport.update({
+  id: '/regulamin',
+  path: '/regulamin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrzeplywRoute = PrzeplywRouteImport.update({
   id: '/przeplyw',
   path: '/przeplyw',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PolitykaPrywatnosciRoute = PolitykaPrywatnosciRouteImport.update({
+  id: '/polityka-prywatnosci',
+  path: '/polityka-prywatnosci',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LikwidacjaRoute = LikwidacjaRouteImport.update({
@@ -75,19 +98,13 @@ const LikwidacjaRoute = LikwidacjaRouteImport.update({
   path: '/likwidacja',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HistoriaAlertowRoute = HistoriaAlertowRouteImport.update({
-  id: '/historia-alertow',
-  path: '/historia-alertow',
+const DisclaimerRoute = DisclaimerRouteImport.update({
+  id: '/disclaimer',
+  path: '/disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AsystentRoute = AsystentRouteImport.update({
-  id: '/asystent',
-  path: '/asystent',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AlertyRoute = AlertyRouteImport.update({
-  id: '/alerty',
-  path: '/alerty',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -100,147 +117,211 @@ const CoinSymbolRoute = CoinSymbolRouteImport.update({
   path: '/coin/$symbol',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedUstawieniaRoute = AuthenticatedUstawieniaRouteImport.update({
+  id: '/ustawienia',
+  path: '/ustawienia',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedUlubioneRoute = AuthenticatedUlubioneRouteImport.update({
+  id: '/ulubione',
+  path: '/ulubione',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHistoriaAlertowRoute =
+  AuthenticatedHistoriaAlertowRouteImport.update({
+    id: '/historia-alertow',
+    path: '/historia-alertow',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAsystentRoute = AuthenticatedAsystentRouteImport.update({
+  id: '/asystent',
+  path: '/asystent',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAlertyRoute = AuthenticatedAlertyRouteImport.update({
+  id: '/alerty',
+  path: '/alerty',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/alerty': typeof AlertyRoute
-  '/asystent': typeof AsystentRoute
-  '/historia-alertow': typeof HistoriaAlertowRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/likwidacja': typeof LikwidacjaRoute
+  '/login': typeof LoginRoute
+  '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
   '/przeplyw': typeof PrzeplywRoute
+  '/regulamin': typeof RegulaminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sentyment': typeof SentymentRoute
   '/setupy': typeof SetupyRoute
+  '/signup': typeof SignupRoute
   '/sila': typeof SilaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/slownik': typeof SlownikRoute
   '/squeeze': typeof SqueezeRoute
-  '/ulubione': typeof UlubioneRoute
-  '/ustawienia': typeof UstawieniaRoute
+  '/alerty': typeof AuthenticatedAlertyRoute
+  '/asystent': typeof AuthenticatedAsystentRoute
+  '/historia-alertow': typeof AuthenticatedHistoriaAlertowRoute
+  '/ulubione': typeof AuthenticatedUlubioneRoute
+  '/ustawienia': typeof AuthenticatedUstawieniaRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/alerty': typeof AlertyRoute
-  '/asystent': typeof AsystentRoute
-  '/historia-alertow': typeof HistoriaAlertowRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/likwidacja': typeof LikwidacjaRoute
+  '/login': typeof LoginRoute
+  '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
   '/przeplyw': typeof PrzeplywRoute
+  '/regulamin': typeof RegulaminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sentyment': typeof SentymentRoute
   '/setupy': typeof SetupyRoute
+  '/signup': typeof SignupRoute
   '/sila': typeof SilaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/slownik': typeof SlownikRoute
   '/squeeze': typeof SqueezeRoute
-  '/ulubione': typeof UlubioneRoute
-  '/ustawienia': typeof UstawieniaRoute
+  '/alerty': typeof AuthenticatedAlertyRoute
+  '/asystent': typeof AuthenticatedAsystentRoute
+  '/historia-alertow': typeof AuthenticatedHistoriaAlertowRoute
+  '/ulubione': typeof AuthenticatedUlubioneRoute
+  '/ustawienia': typeof AuthenticatedUstawieniaRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/alerty': typeof AlertyRoute
-  '/asystent': typeof AsystentRoute
-  '/historia-alertow': typeof HistoriaAlertowRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/disclaimer': typeof DisclaimerRoute
   '/likwidacja': typeof LikwidacjaRoute
+  '/login': typeof LoginRoute
+  '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
   '/przeplyw': typeof PrzeplywRoute
+  '/regulamin': typeof RegulaminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sentyment': typeof SentymentRoute
   '/setupy': typeof SetupyRoute
+  '/signup': typeof SignupRoute
   '/sila': typeof SilaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/slownik': typeof SlownikRoute
   '/squeeze': typeof SqueezeRoute
-  '/ulubione': typeof UlubioneRoute
-  '/ustawienia': typeof UstawieniaRoute
+  '/_authenticated/alerty': typeof AuthenticatedAlertyRoute
+  '/_authenticated/asystent': typeof AuthenticatedAsystentRoute
+  '/_authenticated/historia-alertow': typeof AuthenticatedHistoriaAlertowRoute
+  '/_authenticated/ulubione': typeof AuthenticatedUlubioneRoute
+  '/_authenticated/ustawienia': typeof AuthenticatedUstawieniaRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/alerty'
-    | '/asystent'
-    | '/historia-alertow'
+    | '/disclaimer'
     | '/likwidacja'
+    | '/login'
+    | '/polityka-prywatnosci'
     | '/przeplyw'
+    | '/regulamin'
+    | '/reset-password'
     | '/sentyment'
     | '/setupy'
+    | '/signup'
     | '/sila'
     | '/sitemap.xml'
     | '/slownik'
     | '/squeeze'
+    | '/alerty'
+    | '/asystent'
+    | '/historia-alertow'
     | '/ulubione'
     | '/ustawienia'
+    | '/auth/callback'
     | '/coin/$symbol'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/alerty'
-    | '/asystent'
-    | '/historia-alertow'
+    | '/disclaimer'
     | '/likwidacja'
+    | '/login'
+    | '/polityka-prywatnosci'
     | '/przeplyw'
+    | '/regulamin'
+    | '/reset-password'
     | '/sentyment'
     | '/setupy'
+    | '/signup'
     | '/sila'
     | '/sitemap.xml'
     | '/slownik'
     | '/squeeze'
+    | '/alerty'
+    | '/asystent'
+    | '/historia-alertow'
     | '/ulubione'
     | '/ustawienia'
+    | '/auth/callback'
     | '/coin/$symbol'
   id:
     | '__root__'
     | '/'
-    | '/alerty'
-    | '/asystent'
-    | '/historia-alertow'
+    | '/_authenticated'
+    | '/disclaimer'
     | '/likwidacja'
+    | '/login'
+    | '/polityka-prywatnosci'
     | '/przeplyw'
+    | '/regulamin'
+    | '/reset-password'
     | '/sentyment'
     | '/setupy'
+    | '/signup'
     | '/sila'
     | '/sitemap.xml'
     | '/slownik'
     | '/squeeze'
-    | '/ulubione'
-    | '/ustawienia'
+    | '/_authenticated/alerty'
+    | '/_authenticated/asystent'
+    | '/_authenticated/historia-alertow'
+    | '/_authenticated/ulubione'
+    | '/_authenticated/ustawienia'
+    | '/auth/callback'
     | '/coin/$symbol'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AlertyRoute: typeof AlertyRoute
-  AsystentRoute: typeof AsystentRoute
-  HistoriaAlertowRoute: typeof HistoriaAlertowRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  DisclaimerRoute: typeof DisclaimerRoute
   LikwidacjaRoute: typeof LikwidacjaRoute
+  LoginRoute: typeof LoginRoute
+  PolitykaPrywatnosciRoute: typeof PolitykaPrywatnosciRoute
   PrzeplywRoute: typeof PrzeplywRoute
+  RegulaminRoute: typeof RegulaminRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SentymentRoute: typeof SentymentRoute
   SetupyRoute: typeof SetupyRoute
+  SignupRoute: typeof SignupRoute
   SilaRoute: typeof SilaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SlownikRoute: typeof SlownikRoute
   SqueezeRoute: typeof SqueezeRoute
-  UlubioneRoute: typeof UlubioneRoute
-  UstawieniaRoute: typeof UstawieniaRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   CoinSymbolRoute: typeof CoinSymbolRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/ustawienia': {
-      id: '/ustawienia'
-      path: '/ustawienia'
-      fullPath: '/ustawienia'
-      preLoaderRoute: typeof UstawieniaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ulubione': {
-      id: '/ulubione'
-      path: '/ulubione'
-      fullPath: '/ulubione'
-      preLoaderRoute: typeof UlubioneRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/squeeze': {
       id: '/squeeze'
       path: '/squeeze'
@@ -269,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SilaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/setupy': {
       id: '/setupy'
       path: '/setupy'
@@ -283,11 +371,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SentymentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/regulamin': {
+      id: '/regulamin'
+      path: '/regulamin'
+      fullPath: '/regulamin'
+      preLoaderRoute: typeof RegulaminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/przeplyw': {
       id: '/przeplyw'
       path: '/przeplyw'
       fullPath: '/przeplyw'
       preLoaderRoute: typeof PrzeplywRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/polityka-prywatnosci': {
+      id: '/polityka-prywatnosci'
+      path: '/polityka-prywatnosci'
+      fullPath: '/polityka-prywatnosci'
+      preLoaderRoute: typeof PolitykaPrywatnosciRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/likwidacja': {
@@ -297,25 +413,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LikwidacjaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/historia-alertow': {
-      id: '/historia-alertow'
-      path: '/historia-alertow'
-      fullPath: '/historia-alertow'
-      preLoaderRoute: typeof HistoriaAlertowRouteImport
+    '/disclaimer': {
+      id: '/disclaimer'
+      path: '/disclaimer'
+      fullPath: '/disclaimer'
+      preLoaderRoute: typeof DisclaimerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/asystent': {
-      id: '/asystent'
-      path: '/asystent'
-      fullPath: '/asystent'
-      preLoaderRoute: typeof AsystentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/alerty': {
-      id: '/alerty'
-      path: '/alerty'
-      fullPath: '/alerty'
-      preLoaderRoute: typeof AlertyRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -332,24 +441,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoinSymbolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/ustawienia': {
+      id: '/_authenticated/ustawienia'
+      path: '/ustawienia'
+      fullPath: '/ustawienia'
+      preLoaderRoute: typeof AuthenticatedUstawieniaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ulubione': {
+      id: '/_authenticated/ulubione'
+      path: '/ulubione'
+      fullPath: '/ulubione'
+      preLoaderRoute: typeof AuthenticatedUlubioneRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/historia-alertow': {
+      id: '/_authenticated/historia-alertow'
+      path: '/historia-alertow'
+      fullPath: '/historia-alertow'
+      preLoaderRoute: typeof AuthenticatedHistoriaAlertowRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/asystent': {
+      id: '/_authenticated/asystent'
+      path: '/asystent'
+      fullPath: '/asystent'
+      preLoaderRoute: typeof AuthenticatedAsystentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/alerty': {
+      id: '/_authenticated/alerty'
+      path: '/alerty'
+      fullPath: '/alerty'
+      preLoaderRoute: typeof AuthenticatedAlertyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAlertyRoute: typeof AuthenticatedAlertyRoute
+  AuthenticatedAsystentRoute: typeof AuthenticatedAsystentRoute
+  AuthenticatedHistoriaAlertowRoute: typeof AuthenticatedHistoriaAlertowRoute
+  AuthenticatedUlubioneRoute: typeof AuthenticatedUlubioneRoute
+  AuthenticatedUstawieniaRoute: typeof AuthenticatedUstawieniaRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAlertyRoute: AuthenticatedAlertyRoute,
+  AuthenticatedAsystentRoute: AuthenticatedAsystentRoute,
+  AuthenticatedHistoriaAlertowRoute: AuthenticatedHistoriaAlertowRoute,
+  AuthenticatedUlubioneRoute: AuthenticatedUlubioneRoute,
+  AuthenticatedUstawieniaRoute: AuthenticatedUstawieniaRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AlertyRoute: AlertyRoute,
-  AsystentRoute: AsystentRoute,
-  HistoriaAlertowRoute: HistoriaAlertowRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  DisclaimerRoute: DisclaimerRoute,
   LikwidacjaRoute: LikwidacjaRoute,
+  LoginRoute: LoginRoute,
+  PolitykaPrywatnosciRoute: PolitykaPrywatnosciRoute,
   PrzeplywRoute: PrzeplywRoute,
+  RegulaminRoute: RegulaminRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SentymentRoute: SentymentRoute,
   SetupyRoute: SetupyRoute,
+  SignupRoute: SignupRoute,
   SilaRoute: SilaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SlownikRoute: SlownikRoute,
   SqueezeRoute: SqueezeRoute,
-  UlubioneRoute: UlubioneRoute,
-  UstawieniaRoute: UstawieniaRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   CoinSymbolRoute: CoinSymbolRoute,
 }
 export const routeTree = rootRouteImport
