@@ -24,7 +24,7 @@ export function QuietHoursPreview({ qh }: { qh: QuietHours }) {
 
   return (
     <div className="space-y-2" data-testid="quiet-preview">
-      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+      <div className="num flex items-center justify-between text-[10px] tracking-wider text-muted-foreground">
         <span>00:00</span>
         <span>06:00</span>
         <span>12:00</span>
