@@ -146,3 +146,11 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+@utility surface-glass {
+  background: var(--surface-glass);
+  border: 1px solid var(--surface-glass-border);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: var(--shadow-premium);
+}
