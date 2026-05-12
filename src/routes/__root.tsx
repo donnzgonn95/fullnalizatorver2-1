@@ -79,7 +79,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "canonical", href: "https://cryptopuls.lovable.app/" },
       { rel: "preconnect", href: "https://api.coingecko.com" },
       { rel: "preconnect", href: "https://stream.binance.com" },
       { rel: "dns-prefetch", href: "https://api.binance.com" },
@@ -93,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pl">
       <head>
         <HeadContent />
       </head>
