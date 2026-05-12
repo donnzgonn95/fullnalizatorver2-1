@@ -63,14 +63,34 @@ const META: Record<DataSource, { desc: string; pros: string; klines: boolean }> 
 
 function SettingsPage() {
   const source = useDataSource();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate({ to: "/" });
+  };
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold">Ustawienia</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Wybierz źródło danych rynkowych. Wybór zapisuje się lokalnie w przeglądarce.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Ustawienia</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Wybierz źródło danych rynkowych. Wybór zapisuje się lokalnie w przeglądarce.
+          </p>
+        </div>
+        {user && (
+          <div className="flex items-center gap-3 text-xs">
+            <span className="text-muted-foreground">{user.email}</span>
+            <button
+              onClick={handleSignOut}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 font-medium hover:bg-secondary"
+            >
+              Wyloguj
+            </button>
+          </div>
+        )}
       </header>
 
       <section className="space-y-3">
