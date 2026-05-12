@@ -8,7 +8,7 @@ import { alerts as demoAlerts } from "@/lib/demo-data";
 
 import { seoHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/alerty")({
+export const Route = createFileRoute("/_authenticated/alerty")({
   head: () => ({
     ...seoHead({
       title: "Alerty techniczne na żywo",

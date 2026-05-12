@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 
 import { seoHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/ustawienia")({
+export const Route = createFileRoute("/_authenticated/ustawienia")({
   head: () => ({
     ...seoHead({
       title: "Ustawienia",

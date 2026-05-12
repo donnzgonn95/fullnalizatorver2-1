@@ -12,7 +12,7 @@ import { useWatchlist } from "@/lib/watchlist";
 
 import { seoHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/historia-alertow")({
+export const Route = createFileRoute("/_authenticated/historia-alertow")({
   head: () => ({
     ...seoHead({
       title: "Historia wystrzelonych alertów",
