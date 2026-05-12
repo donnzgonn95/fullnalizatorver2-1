@@ -71,7 +71,7 @@ export function WatchlistPanel() {
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
         {items.map(({ sym, c }) => (
-          <div key={sym} className="group relative rounded-lg border border-border bg-background/40 p-3">
+          <div key={sym} className="group relative rounded-lg border border-[var(--surface-glass-border)] bg-background/30 p-3 transition-all hover:border-[color-mix(in_oklab,var(--accent-mint)_35%,transparent)] hover:bg-background/50 hover:shadow-[var(--shadow-glow)]">
             <button
               type="button"
               onClick={() => remove(sym)}
