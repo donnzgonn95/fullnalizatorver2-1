@@ -44,17 +44,31 @@ export const Route = createFileRoute("/asystent")({
 });
 
 const FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/market-ai`;
+
+import { supabase } from "@/integrations/supabase/client";
+
+/** Returns the current user's JWT (not the anon key). Throws if not signed in. */
+async function getUserAccessToken(): Promise<string> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) {
+    throw new Error("Zaloguj się, aby korzystać z asystenta AI.");
+  }
+  return token;
+}
 type Mode = "analyze" | "summary" | "report";
 
 async function callAI(mode: Mode, payload: unknown, model: string): Promise<{ content: string; usage?: any }> {
   const gate = checkLimit();
   if (!gate.ok) throw new Error(`${gate.reason}. Spróbuj za ~${gate.retryInSec}s.`);
 
+  const token = await getUserAccessToken();
   const res = await fetch(FN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      Authorization: `Bearer ${token}`,
+      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     },
     body: JSON.stringify({ mode, payload, model }),
   });
