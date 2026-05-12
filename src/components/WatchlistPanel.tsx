@@ -45,7 +45,7 @@ export function WatchlistPanel() {
   });
 
   return (
-    <section className="rounded-xl border border-border bg-card p-5" data-testid="watchlist-panel">
+    <section className="surface-glass rounded-xl p-5" data-testid="watchlist-panel">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Star className="h-4 w-4 text-warning" />
