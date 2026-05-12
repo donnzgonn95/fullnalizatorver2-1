@@ -6,6 +6,15 @@
 
 @theme inline {
   --font-display: "JetBrains Mono", ui-monospace, monospace;
+  --color-surface-glass: var(--surface-glass);
+  --color-surface-glass-border: var(--surface-glass-border);
+  --color-accent-mint: var(--accent-mint);
+  --color-accent-coral: var(--accent-coral);
+  --color-accent-warning: var(--accent-warning);
+  --color-accent-neutral: var(--accent-neutral);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
