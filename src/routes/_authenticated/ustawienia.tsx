@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { Activity, Bell, BellOff, Check, Download, Radio, Send, Trash2 } from "lucide-react";
 import { clearUsage, setLimits, useAiUsage, DEFAULT_LIMITS } from "@/lib/ai-usage";
