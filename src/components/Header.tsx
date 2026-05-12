@@ -62,7 +62,8 @@ export function Header() {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-[var(--surface-glass-border)] bg-background/70 backdrop-blur-xl backdrop-saturate-150">
+      <div className="pointer-events-none absolute inset-0 -z-10 [background:var(--gradient-mesh)] opacity-60" />
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <Link to="/" className="flex items-center gap-3">
           <img

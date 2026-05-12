@@ -18,7 +18,7 @@ export function WatchlistPanel() {
     return (
       <section
         data-testid="watchlist-empty-card"
-        className="rounded-xl border border-dashed border-border bg-card/50 p-5"
+        className="surface-glass rounded-xl border-dashed p-5"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -45,7 +45,7 @@ export function WatchlistPanel() {
   });
 
   return (
-    <section className="rounded-xl border border-border bg-card p-5" data-testid="watchlist-panel">
+    <section className="surface-glass rounded-xl p-5" data-testid="watchlist-panel">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Star className="h-4 w-4 text-warning" />
@@ -71,7 +71,7 @@ export function WatchlistPanel() {
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
         {items.map(({ sym, c }) => (
-          <div key={sym} className="group relative rounded-lg border border-border bg-background/40 p-3">
+          <div key={sym} className="group relative rounded-lg border border-[var(--surface-glass-border)] bg-background/30 p-3 transition-all hover:border-[color-mix(in_oklab,var(--accent-mint)_35%,transparent)] hover:bg-background/50 hover:shadow-[var(--shadow-glow)]">
             <button
               type="button"
               onClick={() => remove(sym)}

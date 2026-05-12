@@ -254,10 +254,18 @@ function StatCard({
   accent?: "bull" | "bear";
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={cn("num mt-1 text-2xl font-bold", accent === "bull" && "text-bull", accent === "bear" && "text-bear")}>{value}</div>
-      <div className="mt-1 text-xs text-muted-foreground">{sub}</div>
+    <div className="surface-glass relative overflow-hidden rounded-xl p-4 transition-colors hover:border-[color-mix(in_oklab,var(--accent-mint)_30%,transparent)]">
+      <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+      <div
+        className={cn(
+          "num mt-1.5 text-[1.65rem] font-semibold leading-none tracking-tight text-foreground",
+          accent === "bull" && "text-bull",
+          accent === "bear" && "text-bear",
+        )}
+      >
+        {value}
+      </div>
+      <div className="mt-1.5 text-xs text-muted-foreground/90">{sub}</div>
     </div>
   );
 }
