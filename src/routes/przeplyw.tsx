@@ -3,11 +3,11 @@ import { capitalFlow } from "@/lib/demo-data";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { DataBadge } from "@/components/DataBadge";
 
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/przeplyw")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Przepływ kapitału BTC → ETH → SOL → alty",
       description: "Wizualizacja rotacji kapitału między Bitcoinem, Ethereum, Solaną i altcoinami w ostatnich 14 dniach.",
       path: "/przeplyw",

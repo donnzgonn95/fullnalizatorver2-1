@@ -4,13 +4,13 @@ import { Star, X, Plus, Search, LayoutGrid, List as ListIcon, ArrowUpDown } from
 import { useWatchlist } from "@/lib/watchlist";
 import { useTopCoins } from "@/lib/top-coins";
 import { ChangePill, formatMoney } from "@/components/StatPill";
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { openCommandPalette } from "@/lib/command-palette-bus";
 
 export const Route = createFileRoute("/ulubione")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Ulubione krypto — Twoja watchlista",
       description: "Twoja lista obserwowanych kryptowalut: ceny na żywo, zmiana 24h, sortowanie i wyszukiwanie.",
       path: "/ulubione",

@@ -25,11 +25,11 @@ import {
 } from "lucide-react";
 import { DataBadge } from "@/components/DataBadge";
 
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/likwidacja")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Liquidity Heatmap: klastry, POC, ściany order booka",
       description: "Heatmapa likwidacji, klastry wolumenu (POC), detektor sweepów, strefy spoofingu i nierównowaga księgi zleceń na świecach.",
       path: "/likwidacja",

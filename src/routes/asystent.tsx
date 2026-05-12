@@ -30,11 +30,11 @@ import {
   type Conversation,
 } from "@/lib/chat-history";
 
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/asystent")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "AI Asystent rynku krypto",
       description: "Chat z asystentem AI, podsumowanie alertów i raport inwestorski. Wybór modelu (Gemini/GPT-5), historia rozmów, limity i koszty.",
       path: "/asystent",

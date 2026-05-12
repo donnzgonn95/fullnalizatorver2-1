@@ -10,11 +10,11 @@ import {
 } from "@/lib/notifications";
 import { useWatchlist } from "@/lib/watchlist";
 
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/historia-alertow")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Historia wystrzelonych alertów",
       description: "Audyt wszystkich wystrzelonych alertów dla ulubionych krypto z filtrami po symbolu i statusie (przeczytane/nieprzeczytane).",
       path: "/historia-alertow",

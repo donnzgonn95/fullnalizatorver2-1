@@ -4,11 +4,11 @@ import { ChangePill, formatMoney } from "@/components/StatPill";
 import { cn } from "@/lib/utils";
 import { DataBadge } from "@/components/DataBadge";
 
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/sentyment")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Sentyment rynku krypto: Fear & Greed, dominacja BTC",
       description: "Indeks Strachu i Chciwości, dominacja BTC/ETH, kapitalizacja całego rynku — agregat nastrojów rynkowych.",
       path: "/sentyment",
