@@ -19,11 +19,12 @@ const TWO_MIN = 2 * 60 * 1000;
 const FIVE_MIN = 5 * 60 * 1000;
 const TEN_MIN = 10 * 60 * 1000;
 
-export function useTopCoins() {
+export function useTopCoins(enabled: boolean = true) {
   return useQuery({
     queryKey: ["coins", "top100"],
     queryFn: fetchTop100Coins,
-    refetchInterval: TWO_MIN,
+    enabled,
+    refetchInterval: enabled ? TWO_MIN : false,
     staleTime: TWO_MIN,
     gcTime: TEN_MIN,
     retry: 1,

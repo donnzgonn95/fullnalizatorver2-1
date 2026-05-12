@@ -8,6 +8,7 @@ import { buildSqueezeRows, type SqueezeMode, type SqueezeRow } from "@/lib/squee
 import { SqueezeScale } from "@/components/SqueezeScale";
 import { ChangePill } from "@/components/StatPill";
 import { buildSeo } from "@/lib/seo";
+import { DataBadge } from "@/components/DataBadge";
 
 export const Route = createFileRoute("/squeeze")({
   head: () => ({
@@ -33,7 +34,10 @@ function SqueezePage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Squeeze Radar</h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold">Squeeze Radar</h1>
+            <DataBadge kind="proxy" />
+          </div>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             Heurystyczny scoring 0–100 dla setupów squeezowych. 6 składowych: funding, OI, L/S, klastry likwidacji, struktura,
             reżim rynku. Tryby działają lustrzanie — short szuka uwięzionych shortów, long ostrzega przed kaskadą longów.

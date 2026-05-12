@@ -13,6 +13,7 @@ import {
 import { useTopCoins } from "@/lib/top-coins";
 import { useWatchlist } from "@/lib/watchlist";
 import { getRecentCoins } from "@/lib/recent-coins";
+import { COMMAND_PALETTE_OPEN_EVENT } from "@/lib/command-palette-bus";
 
 const PAGES = [
   { to: "/", label: "Panel", icon: Sparkles },
@@ -34,7 +35,7 @@ const PAGE_STEP = 30;
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { data: coins } = useTopCoins();
+  const { data: coins } = useTopCoins(open);
   const { list: watchlist } = useWatchlist();
   const [recent, setRecent] = useState<string[]>([]);
   const [search, setSearch] = useState("");
@@ -50,6 +51,15 @@ export function CommandPalette() {
     }
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
+  }, []);
+
+  // Programowe otwieranie z dowolnego miejsca w UI (Header, WatchlistPanel, /ulubione).
+  useEffect(() => {
+    function onOpen() {
+      setOpen(true);
+    }
+    window.addEventListener(COMMAND_PALETTE_OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(COMMAND_PALETTE_OPEN_EVENT, onOpen);
   }, []);
 
   // Refresh recents and reset paging when (re)opened.

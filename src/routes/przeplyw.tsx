@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { capitalFlow } from "@/lib/demo-data";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
+import { DataBadge } from "@/components/DataBadge";
 
 import { buildSeo } from "@/lib/seo";
 
@@ -19,7 +20,10 @@ function PrzeplywPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-bold">Przepływ kapitału</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-bold">Przepływ kapitału</h1>
+          <DataBadge kind="demo" />
+        </div>
         <p className="mt-1 text-sm text-muted-foreground">
           Klasyczna rotacja w cyklu byczym: <strong>BTC → ETH → SOL → alty</strong>. Im wyżej krzywa, tym silniejszy napływ.
         </p>

@@ -4,11 +4,7 @@ import { Plus, Search, Star, X } from "lucide-react";
 import { useWatchlist } from "@/lib/watchlist";
 import { useTopCoins } from "@/lib/top-coins";
 import { ChangePill, formatMoney } from "@/components/StatPill";
-
-function openPalette() {
-  if (typeof window === "undefined") return;
-  window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }));
-}
+import { openCommandPalette as openPalette } from "@/lib/command-palette-bus";
 
 export function WatchlistPanel() {
   const { list, remove } = useWatchlist();

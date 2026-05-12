@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useLiveCoins } from "@/lib/binance";
 import { CoinSearch } from "@/components/CoinSearch";
 import { WatchlistMenu } from "@/components/WatchlistMenu";
+import { openCommandPalette } from "@/lib/command-palette-bus";
 import eljotLogo from "@/assets/eljot-logo.png";
 
 const nav = [
@@ -85,9 +86,7 @@ export function Header() {
           <CoinSearch className="hidden md:block" />
           <button
             type="button"
-            onClick={() => {
-              window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }));
-            }}
+            onClick={openCommandPalette}
             title="Otwórz wyszukiwarkę globalną (Ctrl/Cmd + K)"
             aria-label="Otwórz wyszukiwarkę globalną"
             className="hidden h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground lg:inline-flex"

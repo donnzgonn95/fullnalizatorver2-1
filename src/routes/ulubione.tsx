@@ -6,6 +6,7 @@ import { useTopCoins } from "@/lib/top-coins";
 import { ChangePill, formatMoney } from "@/components/StatPill";
 import { buildSeo } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import { openCommandPalette } from "@/lib/command-palette-bus";
 
 export const Route = createFileRoute("/ulubione")({
   head: () => ({
@@ -17,11 +18,6 @@ export const Route = createFileRoute("/ulubione")({
   }),
   component: UlubionePage,
 });
-
-function openCommandPalette() {
-  if (typeof window === "undefined") return;
-  window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }));
-}
 
 const VIEW_KEY = "eljot-watchlist-view-v1";
 const SORT_KEY = "eljot-watchlist-sort-v1";

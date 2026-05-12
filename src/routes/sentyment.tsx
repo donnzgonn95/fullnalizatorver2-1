@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { sentiment } from "@/lib/demo-data";
 import { ChangePill, formatMoney } from "@/components/StatPill";
 import { cn } from "@/lib/utils";
+import { DataBadge } from "@/components/DataBadge";
 
 import { buildSeo } from "@/lib/seo";
 
@@ -22,7 +23,10 @@ function SentymentPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-bold">Sentyment rynku</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-bold">Sentyment rynku</h1>
+          <DataBadge kind="demo" />
+        </div>
         <p className="mt-1 text-sm text-muted-foreground">
           Co czują inwestorzy? Skrajna chciwość = ostrożność. Skrajny strach = okazje.
         </p>
