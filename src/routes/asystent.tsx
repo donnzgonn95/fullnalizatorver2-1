@@ -372,11 +372,13 @@ function ChatSection({ contextHint }: { contextHint: unknown }) {
     setLoading(true);
 
     try {
+      const token = await getUserAccessToken();
       const res = await fetch(FN_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({
           mode: "chat",
