@@ -8,6 +8,8 @@ const STATIC_PATHS = [
   "/przeplyw",
   "/alerty",
   "/likwidacja",
+  "/squeeze",
+  "/ulubione",
   "/asystent",
   "/slownik",
 ];
