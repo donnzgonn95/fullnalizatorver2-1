@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
     return json({ content, usage, model: useModel });
   } catch (e) {
     console.error("market-ai error:", e);
-    return json({ error: e instanceof Error ? e.message : "Unknown error" }, 500);
+    return json({ error: "Wewnętrzny błąd serwera." }, 500);
   }
 });
 

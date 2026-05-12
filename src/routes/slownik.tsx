@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { glossary } from "@/lib/demo-data";
-import { buildSeo, jsonLd } from "@/lib/seo";
+import { seoHead, jsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/slownik")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Słownik tradera krypto po polsku",
       description: "Polskie tłumaczenia angielskich pojęć tradingowych: long, short, RSI, breakout, funding rate, likwidacja, POC i więcej.",
       path: "/slownik",

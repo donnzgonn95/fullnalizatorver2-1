@@ -7,12 +7,12 @@ import { coins as demoCoins } from "@/lib/demo-data";
 import { buildSqueezeRows, type SqueezeMode, type SqueezeRow } from "@/lib/squeeze";
 import { SqueezeScale } from "@/components/SqueezeScale";
 import { ChangePill } from "@/components/StatPill";
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 import { DataBadge } from "@/components/DataBadge";
 
 export const Route = createFileRoute("/squeeze")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Squeeze Radar — long & short",
       description: "Skanuje rynek pod kątem ryzyka long squeeze i szansy short squeeze. Scoring 0–100 z wizualną skalą i progami kolorystycznymi.",
       path: "/squeeze",

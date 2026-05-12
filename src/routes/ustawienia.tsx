@@ -30,11 +30,11 @@ import { QuietHoursPreview } from "@/components/QuietHoursPreview";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-import { buildSeo } from "@/lib/seo";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/ustawienia")({
   head: () => ({
-    meta: buildSeo({
+    ...seoHead({
       title: "Ustawienia",
       description: "Źródło danych, godziny ciszy, limity AI, powiadomienia push i preferencje wykresu.",
       path: "/ustawienia",

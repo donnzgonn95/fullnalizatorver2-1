@@ -8,7 +8,8 @@ import { openCommandPalette as openPalette } from "@/lib/command-palette-bus";
 
 export function WatchlistPanel() {
   const { list, remove } = useWatchlist();
-  const { data: coins } = useTopCoins();
+  // Lazy: only fetch the heavy top-100 list when the user actually has favourites to enrich.
+  const { data: coins } = useTopCoins(list.length > 0);
 
   if (!list.length) {
     return (

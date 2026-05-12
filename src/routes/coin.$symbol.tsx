@@ -31,13 +31,13 @@ function loadPrefs(): Prefs {
   }
 }
 
-import { buildSeo, jsonLd } from "@/lib/seo";
+import { seoHead, jsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/coin/$symbol")({
   head: ({ params }) => {
     const sym = params.symbol.toUpperCase();
     return {
-      meta: buildSeo({
+      ...seoHead({
         title: `${sym} — cena, wykres świecowy, RSI`,
         description: `Szczegółowe statystyki ${sym}: świece OHLC, SMA/EMA, RSI 14, wolumen, alerty cenowe i analiza AI. Dane z CoinGecko / Binance.`,
         path: `/coin/${sym}`,
