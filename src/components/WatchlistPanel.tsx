@@ -18,7 +18,7 @@ export function WatchlistPanel() {
     return (
       <section
         data-testid="watchlist-empty-card"
-        className="rounded-xl border border-dashed border-border bg-card/50 p-5"
+        className="surface-glass rounded-xl border-dashed p-5"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
