@@ -35,7 +35,7 @@ export function RegimeHistoryPanel() {
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-muted-foreground" />
           <h2 className="text-lg font-bold">Historia reżimów</h2>
-          <span className="num text-xs text-muted-foreground">({history.length})</span>
+          <span className="num text-xs tabular-nums text-muted-foreground">({history.length})</span>
         </div>
         {history.length > 0 && (
           <button
@@ -63,12 +63,12 @@ export function RegimeHistoryPanel() {
                   {h.label}
                 </span>
                 <span className="text-muted-foreground">{h.pl}</span>
-                <span className="num text-xs text-muted-foreground">pewność {h.confidence}%</span>
+                <span className="num text-xs tabular-nums text-muted-foreground">pewność {h.confidence}%</span>
                 <span className={cn("rounded px-1.5 py-0.5 text-[10px] uppercase",
                   h.source === "manual" ? "bg-warning/20 text-warning" : "bg-muted text-muted-foreground")}>
                   {h.source === "manual" ? "ręcznie" : "auto"}
                 </span>
-                <span className="ml-auto num text-xs text-muted-foreground">
+                <span className="ml-auto num text-xs tabular-nums tracking-tight text-muted-foreground">
                   {fmtTime(h.at)} <span className="text-foreground/60">· {fmtDuration(duration)}{i === 0 ? " (trwa)" : ""}</span>
                 </span>
               </li>
