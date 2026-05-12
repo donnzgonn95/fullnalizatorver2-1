@@ -5,6 +5,7 @@ import { useDataSource, DATA_SOURCE_LABELS } from "@/lib/data-source";
 import { ChangePill, formatMoney } from "@/components/StatPill";
 import { cn } from "@/lib/utils";
 import { Radio, Settings } from "lucide-react";
+import { DataBadge } from "@/components/DataBadge";
 
 import { buildSeo } from "@/lib/seo";
 
@@ -30,7 +31,10 @@ function SilaPage() {
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Ranking siły</h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold">Ranking siły</h1>
+            <DataBadge kind={liveCoins && !isError ? "real" : "demo"} />
+          </div>
           <p className="mt-1 text-sm text-muted-foreground">
             Wynik 0–100: 50% trend 7D + 25% momentum 24h + 25% wolumen względny.
           </p>
