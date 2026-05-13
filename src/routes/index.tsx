@@ -78,6 +78,9 @@ function Index() {
         <FeedStatusBadge />
       </div>
 
+      {/* 4 kolorowe ramki — quick pulse */}
+      <QuickFrames sentiment={sentiment} />
+
       {/* 1. TRYB RYNKU */}
       <FeatureCard
         variant={activeRegime.tone === "bull" ? "mint" : activeRegime.tone === "bear" ? "bear" : "warning"}
@@ -371,5 +374,69 @@ function CapitalFlowCard() {
         ))}
       </ul>
     </FeatureCard>
+  );
+}
+
+function QuickFrames({ sentiment }: { sentiment: { fearGreedIndex: number; fearGreedLabel: string; btcDominance: number; marketCapChange24h: number } }) {
+  const frames = [
+    {
+      label: "Sentyment",
+      value: `${sentiment.fearGreedIndex}`,
+      sub: sentiment.fearGreedLabel,
+      desc: "Fear & Greed Index — czy tłum boi się, czy chciwie kupuje. <30 strefa kupna, >75 strefa ostrożności.",
+      color: "var(--accent-warning)",
+      icon: Gauge,
+    },
+    {
+      label: "BTC Dominacja",
+      value: `${sentiment.btcDominance}%`,
+      sub: sentiment.btcDominance > 55 ? "kapitał w BTC" : "rotacja w alty",
+      desc: "Udział BTC w kapitalizacji rynku. Spadek = sezon altów. Wzrost = ucieczka do bezpieczeństwa.",
+      color: "var(--accent-orange)",
+      icon: Compass,
+    },
+    {
+      label: "Δ Market Cap 24h",
+      value: `${sentiment.marketCapChange24h > 0 ? "+" : ""}${sentiment.marketCapChange24h.toFixed(2)}%`,
+      sub: sentiment.marketCapChange24h >= 0 ? "byczo" : "niedźwiedzio",
+      desc: "Zmiana całkowitej kapitalizacji krypto w ostatnich 24 h. Filtr siły momentum całego rynku.",
+      color: sentiment.marketCapChange24h >= 0 ? "var(--accent-mint)" : "var(--accent-coral)",
+      icon: Activity,
+    },
+    {
+      label: "Tryb skanera",
+      value: "LIVE 24/7",
+      sub: "globalny worker",
+      desc: "Skaner setupów działa w tle — wykrywa BB-bounce i Elliott na 5 interwałach co 5 min, niezależnie od Twojej karty.",
+      color: "var(--accent-cyan)",
+      icon: Radar,
+    },
+  ];
+  return (
+    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+      {frames.map((f) => {
+        const Icon = f.icon;
+        return (
+          <div
+            key={f.label}
+            className="quant-card relative overflow-hidden p-4 transition-all hover:-translate-y-0.5"
+            style={{ borderTop: `3px solid ${f.color}`, boxShadow: `0 0 0 1px var(--border), 0 8px 24px -16px ${f.color}` }}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <span
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md"
+                style={{ background: `color-mix(in oklab, ${f.color} 18%, transparent)`, color: f.color }}
+              >
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{f.sub}</span>
+            </div>
+            <div className="mt-2 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{f.label}</div>
+            <div className="num mt-0.5 text-2xl font-bold" style={{ color: f.color }}>{f.value}</div>
+            <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{f.desc}</p>
+          </div>
+        );
+      })}
+    </div>
   );
 }

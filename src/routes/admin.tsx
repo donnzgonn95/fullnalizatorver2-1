@@ -1,11 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { FeatureCard } from "@/components/FeatureCard";
-import { Settings, ListChecks, Bell, X, Plus, RefreshCw } from "lucide-react";
+import { Settings, ListChecks, Bell, X, Plus, RefreshCw, Play, ShieldCheck, Send, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { testWebhook } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
@@ -42,8 +44,10 @@ function AdminPage() {
       const { data } = await supabase.from("cron_run_logs").select("*").order("started_at", { ascending: false }).limit(50);
       return data ?? [];
     },
-    refetchInterval: 15_000,
+    refetchInterval: 5_000,
   });
+
+  const refreshLogs = () => qc.invalidateQueries({ queryKey: ["cron_run_logs"] });
 
   return (
     <div className="space-y-6">
@@ -54,13 +58,15 @@ function AdminPage() {
 
       {isAdmin === false && (
         <div className="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
-          Nie masz roli <code>admin</code>. Edycja konfiguracji skanera jest niedostępna. Możesz nadal konfigurować swoje powiadomienia.
+          Nie masz roli <code>admin</code>. Edycja konfiguracji skanera i ręczne uruchamianie jest niedostępne.
         </div>
       )}
 
+      <ManualTriggersCard canRun={!!isAdmin} onRan={refreshLogs} />
       <ScannerConfigCard cfg={cfg} canEdit={!!isAdmin} onSaved={() => qc.invalidateQueries({ queryKey: ["scanner_config"] })} />
       <NotificationsCard />
-      <CronLogsCard logs={logs ?? []} />
+      <WebhookTestCard />
+      <CronLogsCard logs={logs ?? []} onRefresh={refreshLogs} />
     </div>
   );
 }
@@ -84,6 +90,58 @@ function Chips({ items, onRemove, onAdd, placeholder }: { items: string[]; onRem
           className="inline-flex items-center gap-1 rounded-md bg-primary px-2 text-xs font-bold text-primary-foreground"><Plus className="h-3 w-3" /></button>
       </div>
     </div>
+  );
+}
+
+function ManualTriggersCard({ canRun, onRan }: { canRun: boolean; onRan: () => void }) {
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const run = async (path: string, label: string) => {
+    setBusy(path);
+    try {
+      const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" } });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok) toast.success(`${label}: OK`, { description: JSON.stringify(json).slice(0, 200) });
+      else toast.error(`${label}: błąd ${res.status}`);
+    } catch (e) {
+      toast.error(`${label}: ${e instanceof Error ? e.message : "błąd sieci"}`);
+    } finally {
+      setBusy(null);
+      // pokaż nowy wpis w logach od razu
+      setTimeout(onRan, 600);
+      setTimeout(onRan, 2500);
+    }
+  };
+
+  const Btn = ({ path, label, icon: Icon, color }: { path: string; label: string; icon: typeof Play; color: string }) => (
+    <button
+      onClick={() => run(path, label)}
+      disabled={!canRun || !!busy}
+      className={cn(
+        "group flex items-center justify-between gap-3 rounded-lg border p-3 text-left text-sm font-bold transition-all disabled:opacity-40",
+        color,
+      )}
+    >
+      <span className="flex items-center gap-2">
+        <Icon className={cn("h-4 w-4", busy === path && "animate-spin")} />
+        {label}
+      </span>
+      <span className="text-[10px] uppercase tracking-widest opacity-70">{busy === path ? "RUN..." : "RUN"}</span>
+    </button>
+  );
+
+  return (
+    <FeatureCard variant="mint" icon={Zap} title="Ręczne uruchamianie"
+      description="Uruchom natychmiast dowolny cron globalny. Nowe wpisy pojawią się w logach poniżej w ciągu kilku sekund.">
+      <div className="grid gap-2 md:grid-cols-3">
+        <Btn path="/api/public/hooks/scan-setups" label="Skan setupów" icon={Play}
+          color="border-[var(--accent-mint)]/40 bg-[var(--accent-mint)]/10 text-[var(--accent-mint)] hover:bg-[var(--accent-mint)]/20" />
+        <Btn path="/api/public/hooks/verify-setups" label="Weryfikacja PnL" icon={ShieldCheck}
+          color="border-[var(--accent-warning)]/40 bg-[var(--accent-warning)]/10 text-[var(--accent-warning)] hover:bg-[var(--accent-warning)]/20" />
+        <Btn path="/api/public/hooks/notify-setups" label="Wyślij powiadomienia" icon={Send}
+          color="border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)] hover:bg-[var(--accent-cyan)]/20" />
+      </div>
+    </FeatureCard>
   );
 }
 
@@ -199,14 +257,86 @@ function NotificationsCard() {
   );
 }
 
-function CronLogsCard({ logs }: { logs: any[] }) {
+function WebhookTestCard() {
+  const [url, setUrl] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const callTest = useServerFn(testWebhook);
+
+  useEffect(() => {
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const { data } = await supabase.from("notification_settings").select("webhook_url").eq("user_id", u.user.id).maybeSingle();
+      if (data?.webhook_url) setUrl(data.webhook_url);
+    })();
+  }, []);
+
+  const send = async () => {
+    if (!url) { toast.error("Podaj URL webhooka"); return; }
+    setBusy(true); setResult(null);
+    try {
+      const res = await callTest({ data: { url } });
+      setResult(res);
+      if (res.ok) toast.success(`Webhook ${res.status} ${res.statusText} · ${res.durationMs} ms`);
+      else toast.error(`Webhook ${res.status || "FAIL"}: ${res.statusText}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Błąd");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <FeatureCard variant="bear" icon={Send} title="Test webhooka"
+      description="Wyślij przykładowy payload setupu na podany URL i zobacz odpowiedź serwera. Działa z Discord, Slack, IFTTT, Make, n8n itp.">
+      <div className="flex flex-col gap-2 md:flex-row">
+        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://discord.com/api/webhooks/..."
+          className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm" />
+        <button onClick={send} disabled={busy || !url}
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-[var(--accent-coral)] px-4 py-2 text-xs font-bold text-background disabled:opacity-40">
+          <Send className={cn("h-3 w-3", busy && "animate-pulse")} /> {busy ? "Wysyłam..." : "Wyślij test"}
+        </button>
+      </div>
+
+      {result && (
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <div className="rounded-lg border border-border bg-background/40 p-3">
+            <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+              Status
+              <span className={cn("rounded px-1.5 py-0.5 font-bold",
+                result.ok ? "bg-bull/20 text-bull" : "bg-bear/20 text-bear")}>
+                {result.ok ? "OK" : "FAIL"}
+              </span>
+            </div>
+            <div className="num text-sm">{result.status || "—"} {result.statusText}</div>
+            <div className="mt-1 text-[10px] text-muted-foreground">Czas: {result.durationMs} ms</div>
+            {result.responseSnippet && (
+              <pre className="mt-2 max-h-40 overflow-auto rounded bg-background/60 p-2 text-[10px] text-muted-foreground">{result.responseSnippet}</pre>
+            )}
+          </div>
+          <div className="rounded-lg border border-border bg-background/40 p-3">
+            <div className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Wysłany payload</div>
+            <pre className="max-h-40 overflow-auto rounded bg-background/60 p-2 text-[10px] text-muted-foreground">{JSON.stringify(result.sentPayload, null, 2)}</pre>
+          </div>
+        </div>
+      )}
+    </FeatureCard>
+  );
+}
+
+function CronLogsCard({ logs, onRefresh }: { logs: any[]; onRefresh: () => void }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <FeatureCard variant="warning" icon={ListChecks} title="Logi cronów"
-      description="Każde wykonanie skanera, weryfikacji i powiadomień. Kliknij wiersz, żeby zobaczyć szczegóły JSON."
-      action={<RefreshCw className="h-4 w-4 text-muted-foreground" />}>
+      description="Każde wykonanie skanera, weryfikacji i powiadomień. Auto-odświeżanie co 5 s. Kliknij wiersz, żeby zobaczyć szczegóły JSON."
+      action={
+        <button onClick={onRefresh} className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+          <RefreshCw className="h-3 w-3" /> Odśwież
+        </button>
+      }>
       <ul className="divide-y divide-border text-xs">
-        {logs.length === 0 && <li className="py-2 text-muted-foreground">Brak wpisów. Pierwsze pojawią się w ciągu kilku minut.</li>}
+        {logs.length === 0 && <li className="py-2 text-muted-foreground">Brak wpisów. Pierwsze pojawią się w ciągu kilku minut lub po ręcznym uruchomieniu.</li>}
         {logs.map((l) => (
           <li key={l.id}>
             <button onClick={() => setOpen(open === l.id ? null : l.id)}
