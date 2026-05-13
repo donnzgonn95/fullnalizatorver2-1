@@ -58,6 +58,7 @@ import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_auth
 import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
 import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/public/hooks/verify-setups'
+import { Route as ApiPublicHooksScanSetupsRouteImport } from './routes/api/public/hooks/scan-setups'
 import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
 
 const SqueezeRoute = SqueezeRouteImport.update({
@@ -306,6 +307,12 @@ const ApiPublicHooksVerifySetupsRoute =
     path: '/api/public/hooks/verify-setups',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksScanSetupsRoute =
+  ApiPublicHooksScanSetupsRouteImport.update({
+    id: '/api/public/hooks/scan-setups',
+    path: '/api/public/hooks/scan-setups',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksLabReportsRoute =
   ApiPublicHooksLabReportsRouteImport.update({
     id: '/api/public/hooks/lab-reports',
@@ -362,6 +369,7 @@ export interface FileRoutesByFullPath {
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRoutesByTo {
@@ -411,6 +419,7 @@ export interface FileRoutesByTo {
   '/gielda': typeof GieldaIndexRoute
   '/lab': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRoutesById {
@@ -464,6 +473,7 @@ export interface FileRoutesById {
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRouteTypes {
@@ -517,6 +527,7 @@ export interface FileRouteTypes {
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -566,6 +577,7 @@ export interface FileRouteTypes {
     | '/gielda'
     | '/lab'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   id:
     | '__root__'
@@ -618,6 +630,7 @@ export interface FileRouteTypes {
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   fileRoutesById: FileRoutesById
 }
@@ -643,6 +656,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   CoinSymbolRoute: typeof CoinSymbolRoute
   ApiPublicHooksLabReportsRoute: typeof ApiPublicHooksLabReportsRoute
+  ApiPublicHooksScanSetupsRoute: typeof ApiPublicHooksScanSetupsRoute
   ApiPublicHooksVerifySetupsRoute: typeof ApiPublicHooksVerifySetupsRoute
 }
 
@@ -991,6 +1005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksVerifySetupsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/scan-setups': {
+      id: '/api/public/hooks/scan-setups'
+      path: '/api/public/hooks/scan-setups'
+      fullPath: '/api/public/hooks/scan-setups'
+      preLoaderRoute: typeof ApiPublicHooksScanSetupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/lab-reports': {
       id: '/api/public/hooks/lab-reports'
       path: '/api/public/hooks/lab-reports'
@@ -1115,6 +1136,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   CoinSymbolRoute: CoinSymbolRoute,
   ApiPublicHooksLabReportsRoute: ApiPublicHooksLabReportsRoute,
+  ApiPublicHooksScanSetupsRoute: ApiPublicHooksScanSetupsRoute,
   ApiPublicHooksVerifySetupsRoute: ApiPublicHooksVerifySetupsRoute,
 }
 export const routeTree = rootRouteImport
