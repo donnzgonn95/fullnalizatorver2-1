@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { FeatureCard } from "@/components/FeatureCard";
-import { Settings, ListChecks, Bell, X, Plus, RefreshCw, Play, ShieldCheck, Send, Zap } from "lucide-react";
+import { Settings, ListChecks, Bell, X, Plus, RefreshCw, Play, ShieldCheck, Send, Zap, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { testWebhook } from "@/lib/admin.functions";
