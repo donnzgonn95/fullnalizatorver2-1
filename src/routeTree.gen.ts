@@ -25,6 +25,7 @@ import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
 import { Route as LabRouteImport } from './routes/lab'
 import { Route as GieldaRouteImport } from './routes/gielda'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LabIndexRouteImport } from './routes/lab.index'
@@ -140,6 +141,11 @@ const GieldaRoute = GieldaRouteImport.update({
 const DisclaimerRoute = DisclaimerRouteImport.update({
   id: '/disclaimer',
   path: '/disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -329,6 +335,7 @@ const ApiPublicHooksLabReportsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/disclaimer': typeof DisclaimerRoute
   '/gielda': typeof GieldaRouteWithChildren
   '/lab': typeof LabRouteWithChildren
@@ -382,6 +389,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/disclaimer': typeof DisclaimerRoute
   '/likwidacja': typeof LikwidacjaRoute
   '/login': typeof LoginRoute
@@ -435,6 +443,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/admin': typeof AdminRoute
   '/disclaimer': typeof DisclaimerRoute
   '/gielda': typeof GieldaRouteWithChildren
   '/lab': typeof LabRouteWithChildren
@@ -490,6 +499,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/disclaimer'
     | '/gielda'
     | '/lab'
@@ -543,6 +553,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/disclaimer'
     | '/likwidacja'
     | '/login'
@@ -595,6 +606,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/disclaimer'
     | '/gielda'
     | '/lab'
@@ -650,6 +662,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AdminRoute: typeof AdminRoute
   DisclaimerRoute: typeof DisclaimerRoute
   GieldaRoute: typeof GieldaRouteWithChildren
   LabRoute: typeof LabRouteWithChildren
@@ -786,6 +799,13 @@ declare module '@tanstack/react-router' {
       path: '/disclaimer'
       fullPath: '/disclaimer'
       preLoaderRoute: typeof DisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1138,6 +1158,7 @@ const SetupyRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AdminRoute: AdminRoute,
   DisclaimerRoute: DisclaimerRoute,
   GieldaRoute: GieldaRouteWithChildren,
   LabRoute: LabRouteWithChildren,
