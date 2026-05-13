@@ -55,6 +55,8 @@ function RaportyPage() {
   const [filter, setFilter] = useState<"all" | "morning" | "evening">("all");
   const [openId, setOpenId] = useState<string | null>(null);
 
+  const [search, setSearch] = useState("");
+
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -69,13 +71,12 @@ function RaportyPage() {
           .limit(200),
         supabase
           .from("lab_backtest_runs")
-          .select("id, started_at, finished_at, summary")
+          .select("id, strategy_name, started_at, finished_at, summary, params")
           .order("started_at", { ascending: false })
           .limit(500),
         supabase
           .from("lab_paper_trades")
-          .select("closed_at, result_pnl, status")
-          .eq("status", "closed"),
+          .select("id, instrument, side, entry_price, quantity, opened_at, closed_at, result_pnl, status, rationale"),
       ]);
       if (cancelled) return;
       setReports((r.data ?? []) as LabReport[]);
@@ -103,6 +104,40 @@ function RaportyPage() {
     }
     return m;
   }, [trades, runs]);
+
+  // Lookup poprzedniego raportu tego samego typu (do porównania)
+  const prevByReportId = useMemo(() => {
+    const map = new Map<string, LabReport | null>();
+    const sortedAsc = [...reports].sort((a, b) => a.report_date.localeCompare(b.report_date));
+    const lastByType = new Map<string, LabReport>();
+    for (const r of sortedAsc) {
+      map.set(r.id, lastByType.get(r.report_type) ?? null);
+      lastByType.set(r.report_type, r);
+    }
+    return map;
+  }, [reports]);
+
+  // Backtesty i trade'y dla danego dnia (do rozwijanych szczegółów)
+  const runsByDate = useMemo(() => {
+    const m = new Map<string, BacktestRun[]>();
+    for (const r of runs) {
+      const d = (r.finished_at ?? r.started_at).slice(0, 10);
+      if (!m.has(d)) m.set(d, []);
+      m.get(d)!.push(r);
+    }
+    return m;
+  }, [runs]);
+
+  const tradesByDate = useMemo(() => {
+    const m = new Map<string, PaperTrade[]>();
+    for (const t of trades) {
+      const d = (t.closed_at ?? t.opened_at)?.slice(0, 10);
+      if (!d) continue;
+      if (!m.has(d)) m.set(d, []);
+      m.get(d)!.push(t);
+    }
+    return m;
+  }, [trades]);
 
   const filtered = filter === "all" ? reports : reports.filter((r) => r.report_type === filter);
 
