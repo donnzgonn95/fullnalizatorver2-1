@@ -23,7 +23,7 @@ const ALLOWED_MODELS = new Set([
   "openai/gpt-5.2",
 ]);
 
-type Mode = "analyze" | "summary" | "chat" | "report";
+type Mode = "analyze" | "summary" | "chat" | "report" | "stocks";
 
 const SYSTEM_PROMPTS: Record<Mode, string> = {
   analyze:
@@ -34,6 +34,16 @@ const SYSTEM_PROMPTS: Record<Mode, string> = {
     "Jesteś przyjaznym asystentem rynkowym 'eL Jot' dla aplikacji Kukomy co w rynkach piszczy. Odpowiadasz po polsku, zwięźle, konkretnie, w Markdown. Bazujesz na danych z kontekstu jeśli zostały podane. Nigdy nie udzielasz porad inwestycyjnych — informuj edukacyjnie.",
   report:
     "Jesteś analitykiem przygotowującym profesjonalny raport inwestorski (Markdown, po polsku). Struktura: # Raport inwestorski / data, ## Streszczenie zarządcze, ## Stan rynku, ## Top setupy (Long/Short), ## Najważniejsze alerty, ## Ryzyka, ## Rekomendacje taktyczne (1-2 tyg.), ## Disclaimer. Bądź konkretny, używaj liczb z dostarczonych danych.",
+  stocks:
+    `Jesteś doradcą analityczno-edukacyjnym dla rynków akcji USA i Europy oraz ETF-ów. Piszesz po polsku, w Markdown.
+Nie składasz zleceń ani nie wykonujesz realnych transakcji. Bazujesz na dostarczonym kontekście makro/technicznym.
+Każdą rekomendację formatujesz w sekcjach:
+1. **Werdykt** — jedno z: czekaj | obserwuj | akumuluj | redukuj | zabezpieczaj (+ horyzont: krótki/średni/długi)
+2. **Plan** — cel, ramy czasowe, instrumenty (np. SPY/QQQ/XLF/IWM/EURUSD)
+3. **Scenariusze** — bazowy / byczy / niedźwiedzi z konkretnymi poziomami
+4. **Ryzyka i czerwone flagi**
+5. **Checklista decyzyjna** — punkty do akceptacji przez użytkownika
+Treści edukacyjne, NIE stanowią porady inwestycyjnej.`,
 };
 
 Deno.serve(async (req) => {
@@ -72,21 +82,20 @@ Deno.serve(async (req) => {
 
     const useModel = model && ALLOWED_MODELS.has(model) ? model : DEFAULT_MODEL;
 
+    const isChatLike = mode === "chat" || mode === "stocks";
     const system = SYSTEM_PROMPTS[mode];
-    const userContent =
-      mode === "chat"
-        ? null
-        : `Dane wejściowe (JSON):\n\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``;
+    const userContent = isChatLike
+      ? null
+      : `Dane wejściowe (JSON):\n\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``;
 
-    const reqMessages =
-      mode === "chat"
-        ? [{ role: "system", content: system }, ...(messages ?? [])]
-        : [
-            { role: "system", content: system },
-            { role: "user", content: userContent! },
-          ];
+    const reqMessages = isChatLike
+      ? [{ role: "system", content: system }, ...(messages ?? [])]
+      : [
+          { role: "system", content: system },
+          { role: "user", content: userContent! },
+        ];
 
-    const stream = mode === "chat";
+    const stream = isChatLike;
     const upstream = await fetch(GATEWAY, {
       method: "POST",
       headers: {

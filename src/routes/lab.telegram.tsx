@@ -33,7 +33,27 @@ function TelegramPage() {
       user_id: user.id, bot_token: token || null, chat_id: chatId || null, enabled,
     }, { onConflict: "user_id" });
     if (error) toast.error(error.message);
-    else toast.success("Konfiguracja zapisana. (Wysyłka wiadomości nie jest aktywna w trybie paper.)");
+    else toast.success("Konfiguracja zapisana.");
+  };
+
+  const sendTest = async () => {
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const tk = sess.session?.access_token;
+      if (!tk) return toast.error("Zaloguj się.");
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tk}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ text: "[PAPER] Test wiadomości z CryptoPuls Lab ✅" }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Błąd Telegram");
+      toast.success(`Wysłano (id ${json.message_id ?? "?"}).`);
+    } catch (e: any) { toast.error(e.message); }
   };
 
   return (
@@ -41,7 +61,7 @@ function TelegramPage() {
       <header>
         <div className="text-xs uppercase tracking-widest text-muted-foreground">Lab · Telegram Alerts</div>
         <h1 className="mt-1 text-2xl font-bold flex items-center gap-2"><Send className="h-5 w-5" /> Konfiguracja i preview</h1>
-        <p className="mt-1 text-xs text-warning">⚠ W tym etapie wiadomości NIE są wysyłane — tylko podgląd formatowania.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Wiadomości wysyłane są przez Twojego bota Telegram (token zapisany per-user). Tryb PAPER — żadne zlecenia nie są realizowane.</p>
       </header>
 
       <section className="rounded-xl border border-border bg-card p-5 space-y-3">
@@ -60,9 +80,14 @@ function TelegramPage() {
           <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />
           Włączone (preview only)
         </label>
-        <button onClick={save} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-          <Save className="h-4 w-4" /> Zapisz
-        </button>
+        <div className="flex gap-2">
+          <button onClick={save} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <Save className="h-4 w-4" /> Zapisz
+          </button>
+          <button onClick={sendTest} disabled={!enabled || !token || !chatId} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-secondary disabled:opacity-50">
+            <Send className="h-4 w-4" /> Wyślij test
+          </button>
+        </div>
       </section>
 
       <section className="rounded-xl border border-border bg-card p-5">

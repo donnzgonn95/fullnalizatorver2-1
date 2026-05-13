@@ -55,6 +55,7 @@ import { Route as AuthenticatedUlubioneRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_authenticated/historia-alertow'
 import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
+import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
 
 const SqueezeRoute = SqueezeRouteImport.update({
   id: '/squeeze',
@@ -286,6 +287,12 @@ const AuthenticatedAlertyRoute = AuthenticatedAlertyRouteImport.update({
   path: '/alerty',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicHooksLabReportsRoute =
+  ApiPublicHooksLabReportsRouteImport.update({
+    id: '/api/public/hooks/lab-reports',
+    path: '/api/public/hooks/lab-reports',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -333,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/lab/telegram': typeof LabTelegramRoute
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
+  '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -378,6 +386,7 @@ export interface FileRoutesByTo {
   '/lab/telegram': typeof LabTelegramRoute
   '/gielda': typeof GieldaIndexRoute
   '/lab': typeof LabIndexRoute
+  '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -427,6 +436,7 @@ export interface FileRoutesById {
   '/lab/telegram': typeof LabTelegramRoute
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
+  '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/lab/telegram'
     | '/gielda/'
     | '/lab/'
+    | '/api/public/hooks/lab-reports'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -521,6 +532,7 @@ export interface FileRouteTypes {
     | '/lab/telegram'
     | '/gielda'
     | '/lab'
+    | '/api/public/hooks/lab-reports'
   id:
     | '__root__'
     | '/'
@@ -569,6 +581,7 @@ export interface FileRouteTypes {
     | '/lab/telegram'
     | '/gielda/'
     | '/lab/'
+    | '/api/public/hooks/lab-reports'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -592,6 +605,7 @@ export interface RootRouteChildren {
   SqueezeRoute: typeof SqueezeRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   CoinSymbolRoute: typeof CoinSymbolRoute
+  ApiPublicHooksLabReportsRoute: typeof ApiPublicHooksLabReportsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -918,6 +932,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlertyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/hooks/lab-reports': {
+      id: '/api/public/hooks/lab-reports'
+      path: '/api/public/hooks/lab-reports'
+      fullPath: '/api/public/hooks/lab-reports'
+      preLoaderRoute: typeof ApiPublicHooksLabReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1021,6 +1042,7 @@ const rootRouteChildren: RootRouteChildren = {
   SqueezeRoute: SqueezeRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   CoinSymbolRoute: CoinSymbolRoute,
+  ApiPublicHooksLabReportsRoute: ApiPublicHooksLabReportsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
