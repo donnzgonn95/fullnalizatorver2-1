@@ -94,7 +94,7 @@ export const macroIndicators: MacroIndicator[] = [
     region: "USA", value: 14.8, unit: "pkt", change: -0.6, asOf: "2025-05-13", interpretation: "positive",
     note: "Rynek spokojny, brak strachu.",
     category: "Sentyment", trend: "falling",
-    description: "Indeks zmienności S&P 500 oparty o opcje 30-dniowe — „indeks strachu".",
+    description: "Indeks zmienności S&P 500 oparty o opcje 30-dniowe — indeks strachu.",
     whyItMatters: "Niski VIX = optymizm i ryzyko samozadowolenia. Wysoki = panika i okazje.",
     impact: "VIX <15: faza spokoju. >25: alert. >35: panika.",
   },
