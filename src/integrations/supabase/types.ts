@@ -121,6 +121,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_run_logs: {
+        Row: {
+          details: Json
+          duration_ms: number | null
+          finished_at: string | null
+          id: string
+          job_name: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          details?: Json
+          duration_ms?: number | null
+          finished_at?: string | null
+          id?: string
+          job_name: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          details?: Json
+          duration_ms?: number | null
+          finished_at?: string | null
+          id?: string
+          job_name?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       decision_logs: {
         Row: {
           approved: boolean | null
@@ -510,6 +540,78 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          channel: string
+          error: string | null
+          id: string
+          sent_at: string
+          setup_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          error?: string | null
+          id?: string
+          sent_at?: string
+          setup_id: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          error?: string | null
+          id?: string
+          sent_at?: string
+          setup_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          created_at: string
+          email_address: string | null
+          email_enabled: boolean
+          id: string
+          intervals_filter: string[]
+          min_signal_strength: number
+          setup_types_filter: string[]
+          symbols_filter: string[]
+          updated_at: string
+          user_id: string
+          webhook_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_address?: string | null
+          email_enabled?: boolean
+          id?: string
+          intervals_filter?: string[]
+          min_signal_strength?: number
+          setup_types_filter?: string[]
+          symbols_filter?: string[]
+          updated_at?: string
+          user_id: string
+          webhook_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_address?: string | null
+          email_enabled?: boolean
+          id?: string
+          intervals_filter?: string[]
+          min_signal_strength?: number
+          setup_types_filter?: string[]
+          symbols_filter?: string[]
+          updated_at?: string
+          user_id?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       portfolio_journal: {
         Row: {
           closed_at: string | null
@@ -582,6 +684,33 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      scanner_config: {
+        Row: {
+          enabled: boolean
+          id: string
+          intervals: string[]
+          symbols: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          id?: string
+          intervals?: string[]
+          symbols?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          id?: string
+          intervals?: string[]
+          symbols?: string[]
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
