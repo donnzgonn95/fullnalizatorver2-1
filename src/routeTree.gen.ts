@@ -34,6 +34,9 @@ import { Route as GieldaSektoryRouteImport } from './routes/gielda.sektory'
 import { Route as GieldaMakroRouteImport } from './routes/gielda.makro'
 import { Route as GieldaEuropaRouteImport } from './routes/gielda.europa'
 import { Route as GieldaEtfRouteImport } from './routes/gielda.etf'
+import { Route as GieldaDziennikRouteImport } from './routes/gielda.dziennik'
+import { Route as GieldaBajtlikRouteImport } from './routes/gielda.bajtlik'
+import { Route as GieldaAgentRouteImport } from './routes/gielda.agent'
 import { Route as CoinSymbolRouteImport } from './routes/coin.$symbol'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedUstawieniaRouteImport } from './routes/_authenticated/ustawienia'
@@ -166,6 +169,21 @@ const GieldaEtfRoute = GieldaEtfRouteImport.update({
   path: '/etf',
   getParentRoute: () => GieldaRoute,
 } as any)
+const GieldaDziennikRoute = GieldaDziennikRouteImport.update({
+  id: '/dziennik',
+  path: '/dziennik',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaBajtlikRoute = GieldaBajtlikRouteImport.update({
+  id: '/bajtlik',
+  path: '/bajtlik',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaAgentRoute = GieldaAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => GieldaRoute,
+} as any)
 const CoinSymbolRoute = CoinSymbolRouteImport.update({
   id: '/coin/$symbol',
   path: '/coin/$symbol',
@@ -227,6 +245,9 @@ export interface FileRoutesByFullPath {
   '/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
+  '/gielda/agent': typeof GieldaAgentRoute
+  '/gielda/bajtlik': typeof GieldaBajtlikRoute
+  '/gielda/dziennik': typeof GieldaDziennikRoute
   '/gielda/etf': typeof GieldaEtfRoute
   '/gielda/europa': typeof GieldaEuropaRoute
   '/gielda/makro': typeof GieldaMakroRoute
@@ -259,6 +280,9 @@ export interface FileRoutesByTo {
   '/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
+  '/gielda/agent': typeof GieldaAgentRoute
+  '/gielda/bajtlik': typeof GieldaBajtlikRoute
+  '/gielda/dziennik': typeof GieldaDziennikRoute
   '/gielda/etf': typeof GieldaEtfRoute
   '/gielda/europa': typeof GieldaEuropaRoute
   '/gielda/makro': typeof GieldaMakroRoute
@@ -294,6 +318,9 @@ export interface FileRoutesById {
   '/_authenticated/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
+  '/gielda/agent': typeof GieldaAgentRoute
+  '/gielda/bajtlik': typeof GieldaBajtlikRoute
+  '/gielda/dziennik': typeof GieldaDziennikRoute
   '/gielda/etf': typeof GieldaEtfRoute
   '/gielda/europa': typeof GieldaEuropaRoute
   '/gielda/makro': typeof GieldaMakroRoute
@@ -329,6 +356,9 @@ export interface FileRouteTypes {
     | '/ustawienia'
     | '/auth/callback'
     | '/coin/$symbol'
+    | '/gielda/agent'
+    | '/gielda/bajtlik'
+    | '/gielda/dziennik'
     | '/gielda/etf'
     | '/gielda/europa'
     | '/gielda/makro'
@@ -361,6 +391,9 @@ export interface FileRouteTypes {
     | '/ustawienia'
     | '/auth/callback'
     | '/coin/$symbol'
+    | '/gielda/agent'
+    | '/gielda/bajtlik'
+    | '/gielda/dziennik'
     | '/gielda/etf'
     | '/gielda/europa'
     | '/gielda/makro'
@@ -395,6 +428,9 @@ export interface FileRouteTypes {
     | '/_authenticated/ustawienia'
     | '/auth/callback'
     | '/coin/$symbol'
+    | '/gielda/agent'
+    | '/gielda/bajtlik'
+    | '/gielda/dziennik'
     | '/gielda/etf'
     | '/gielda/europa'
     | '/gielda/makro'
@@ -604,6 +640,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GieldaEtfRouteImport
       parentRoute: typeof GieldaRoute
     }
+    '/gielda/dziennik': {
+      id: '/gielda/dziennik'
+      path: '/dziennik'
+      fullPath: '/gielda/dziennik'
+      preLoaderRoute: typeof GieldaDziennikRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/bajtlik': {
+      id: '/gielda/bajtlik'
+      path: '/bajtlik'
+      fullPath: '/gielda/bajtlik'
+      preLoaderRoute: typeof GieldaBajtlikRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/agent': {
+      id: '/gielda/agent'
+      path: '/agent'
+      fullPath: '/gielda/agent'
+      preLoaderRoute: typeof GieldaAgentRouteImport
+      parentRoute: typeof GieldaRoute
+    }
     '/coin/$symbol': {
       id: '/coin/$symbol'
       path: '/coin/$symbol'
@@ -677,6 +734,9 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface GieldaRouteChildren {
+  GieldaAgentRoute: typeof GieldaAgentRoute
+  GieldaBajtlikRoute: typeof GieldaBajtlikRoute
+  GieldaDziennikRoute: typeof GieldaDziennikRoute
   GieldaEtfRoute: typeof GieldaEtfRoute
   GieldaEuropaRoute: typeof GieldaEuropaRoute
   GieldaMakroRoute: typeof GieldaMakroRoute
@@ -688,6 +748,9 @@ interface GieldaRouteChildren {
 }
 
 const GieldaRouteChildren: GieldaRouteChildren = {
+  GieldaAgentRoute: GieldaAgentRoute,
+  GieldaBajtlikRoute: GieldaBajtlikRoute,
+  GieldaDziennikRoute: GieldaDziennikRoute,
   GieldaEtfRoute: GieldaEtfRoute,
   GieldaEuropaRoute: GieldaEuropaRoute,
   GieldaMakroRoute: GieldaMakroRoute,
