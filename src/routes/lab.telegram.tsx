@@ -61,7 +61,7 @@ function TelegramPage() {
       <header>
         <div className="text-xs uppercase tracking-widest text-muted-foreground">Lab · Telegram Alerts</div>
         <h1 className="mt-1 text-2xl font-bold flex items-center gap-2"><Send className="h-5 w-5" /> Konfiguracja i preview</h1>
-        <p className="mt-1 text-xs text-warning">⚠ W tym etapie wiadomości NIE są wysyłane — tylko podgląd formatowania.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Wiadomości wysyłane są przez Twojego bota Telegram (token zapisany per-user). Tryb PAPER — żadne zlecenia nie są realizowane.</p>
       </header>
 
       <section className="rounded-xl border border-border bg-card p-5 space-y-3">
