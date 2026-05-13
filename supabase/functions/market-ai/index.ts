@@ -82,21 +82,20 @@ Deno.serve(async (req) => {
 
     const useModel = model && ALLOWED_MODELS.has(model) ? model : DEFAULT_MODEL;
 
+    const isChatLike = mode === "chat" || mode === "stocks";
     const system = SYSTEM_PROMPTS[mode];
-    const userContent =
-      mode === "chat"
-        ? null
-        : `Dane wejściowe (JSON):\n\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``;
+    const userContent = isChatLike
+      ? null
+      : `Dane wejściowe (JSON):\n\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``;
 
-    const reqMessages =
-      mode === "chat"
-        ? [{ role: "system", content: system }, ...(messages ?? [])]
-        : [
-            { role: "system", content: system },
-            { role: "user", content: userContent! },
-          ];
+    const reqMessages = isChatLike
+      ? [{ role: "system", content: system }, ...(messages ?? [])]
+      : [
+          { role: "system", content: system },
+          { role: "user", content: userContent! },
+        ];
 
-    const stream = mode === "chat";
+    const stream = isChatLike;
     const upstream = await fetch(GATEWAY, {
       method: "POST",
       headers: {
