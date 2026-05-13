@@ -111,6 +111,7 @@ export function Header() {
           >
             <RefreshCw className={cn("h-3.5 w-3.5", isFetching && "animate-spin")} />
           </button>
+          <ThemeToggle />
           <button
             type="button"
             onClick={() => setCollapsed((v) => !v)}
