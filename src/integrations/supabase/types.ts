@@ -157,6 +157,66 @@ export type Database = {
         }
         Relationships: []
       }
+      detected_setups: {
+        Row: {
+          details: Json
+          detected_at: string
+          direction: string
+          entry_price: number
+          entry_time: string
+          id: string
+          interval: string
+          result: string | null
+          result_checked_at: string | null
+          setup_type: string
+          signal_strength: number
+          status: string
+          stop_loss: number
+          symbol: string
+          take_profit: number
+          user_id: string | null
+          wave_label: string | null
+        }
+        Insert: {
+          details?: Json
+          detected_at?: string
+          direction: string
+          entry_price: number
+          entry_time?: string
+          id?: string
+          interval: string
+          result?: string | null
+          result_checked_at?: string | null
+          setup_type: string
+          signal_strength?: number
+          status?: string
+          stop_loss: number
+          symbol: string
+          take_profit: number
+          user_id?: string | null
+          wave_label?: string | null
+        }
+        Update: {
+          details?: Json
+          detected_at?: string
+          direction?: string
+          entry_price?: number
+          entry_time?: string
+          id?: string
+          interval?: string
+          result?: string | null
+          result_checked_at?: string | null
+          setup_type?: string
+          signal_strength?: number
+          status?: string
+          stop_loss?: number
+          symbol?: string
+          take_profit?: number
+          user_id?: string | null
+          wave_label?: string | null
+        }
+        Relationships: []
+      }
       investment_tactics: {
         Row: {
           created_at: string
