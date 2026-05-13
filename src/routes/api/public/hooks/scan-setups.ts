@@ -269,7 +269,7 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
               errorMessages: errorMessages.slice(0, 20),
               runs: cappedRuns,
               diff: { vsRunId: prevLog?.id ?? null, changed: diff },
-            },
+            } as never,
           }).eq("id", logId);
         }
 
