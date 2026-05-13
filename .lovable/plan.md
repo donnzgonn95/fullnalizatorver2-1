@@ -1,83 +1,93 @@
-# Plan: Admin Panel, Cron Logs, Notifications & Dashboard Redesign
+## Cel
 
-To olbrzymi zakres pracy — proponuję podzielić na **4 fazy**, które dostarczają osobno działające kawałki. Każdą fazę mogę zrobić w osobnej iteracji po Twojej akceptacji.
+Dziś `cron_run_logs.details` zawiera tylko liczniki (`detected`, `inserted`, `errors`, lista `errorMessages`). Po kliknięciu wpisu w `/admin` widać tylko surowy JSON z agregatami — nie wiadomo **co** detektor dostał na wejściu i **dlaczego** wypluł (lub nie wypluł) setup.
 
----
+Rozbudowa ma dać pełną „ścieżkę audytu" dla każdego ręcznego (i automatycznego) skanu:
+- ile świec wczytano, z jakiego zakresu czasowego, ostatni close
+- co każdy detektor zwrócił (setup albo powód odrzucenia)
+- czy setup był nowy, czy duplikat (deduplikacja po 30 min)
+- diff względem poprzedniego runu tej samej pary symbol/interwał
 
-## FAZA 1 — Backend: Admin config + cron logs + notyfikacje
-
-### 1.1 Nowe tabele (migracja)
-- `scanner_config` — `id`, `symbols text[]`, `intervals text[]`, `enabled bool`, `updated_at`, `updated_by` (single-row config)
-- `cron_run_logs` — `id`, `job_name` (scan-setups / verify-setups), `started_at`, `finished_at`, `status` (success/error/partial), `details jsonb` (detected, inserted, errors, error_messages), `duration_ms`
-- `notification_settings` — `user_id`, `email_enabled bool`, `webhook_url text`, `min_signal_strength numeric`, `symbols_filter text[]`, `intervals_filter text[]`
-- `notification_log` — `id`, `setup_id`, `user_id`, `channel` (email/webhook), `sent_at`, `status`, `error`
-
-RLS:
-- `scanner_config` — public read; insert/update tylko admin (`has_role(auth.uid(),'admin')`)
-- `cron_run_logs` — public read; insert tylko service role
-- `notification_settings` — własne wiersze
-- `notification_log` — własne wiersze
-
-### 1.2 Hooki cron (modyfikacje)
-- `scan-setups.ts` — czytaj `scanner_config` (fallback do hardcoded list); na końcu zapisuj wpis w `cron_run_logs`
-- `verify-setups.ts` — analogicznie loguj wykonanie
-- Nowy hook `notify-setups.ts` — co 5 min: znajdź nowe `detected_setups` (user_id NULL, status pending/active, niewysłane), dla każdego usera z `notification_settings` dopasuj filtry, wyślij email (Lovable Email) + webhook (POST JSON), zapisz do `notification_log`
-
-### 1.3 Scheduling
-- pg_cron job `notify-setups-global` co 1 min
+Bez zmian w logice detektorów ani w cronach automatycznych — tylko więcej telemetrii + nowy widok w `/admin`.
 
 ---
 
-## FAZA 2 — UI Admin
+## Zakres
 
-Nowa trasa `/admin` (gated `has_role admin`):
-- **Symbols & Intervals** — edytowalna lista chips z + / x, toggle enabled, zapis bez restartu
-- **Cron Logs** — tabela ostatnich 100 wykonań, kolory statusów, expand → JSON details
-- **Notifications config** (per user, dostępne też poza adminem) — email on/off, webhook URL, min siła sygnału, filtry symboli/interwałów
+### 1. Backend — bogatszy payload w `cron_run_logs.details`
+
+**Plik:** `src/routes/api/public/hooks/scan-setups.ts`
+
+Dorzucam wewnątrz pętli `for symbol → for interval` zbieranie obiektu:
+
+```text
+runs: [
+  {
+    symbol, interval,
+    candles: { count, firstOpenTime, lastCloseTime, lastClose, lastVolume },
+    detectors: [
+      {
+        name: "bb-bounce" | "elliott",
+        outcome: "setup" | "no-signal" | "duplicate" | "error",
+        reason?: string,           // np. "RSI 62 > próg 30", "brak fali 5"
+        setup?: { direction, entry_price, stop_loss, take_profit, signal_strength, wave_label },
+        durationMs: number,
+      }
+    ],
+  }
+]
+```
+
+Detektory (`detectBBBounce`, `detectElliott`) zwracają obecnie `DetectedSetup | null` — dodaję cienki wrapper w hooku, który łapie `null` i zapisuje `outcome: "no-signal"` z krótkim opisem powodu pobranym z ostatniej świecy (BB%, RSI, fale). To NIE wymaga zmian w samych detektorach.
+
+Limity rozmiaru: górny cap 200 wpisów `runs` w jednym logu (więcej i tak nie zmieści się sensownie w UI), świece nie są zapisywane (tylko meta), `errorMessages` zostaje.
+
+### 2. Backend — diff vs poprzedni run
+
+W tym samym hooku, **przed** insertem nowego loga, czytam ostatni `cron_run_logs` o `job_name='scan-setups'` i `status IN ('success','partial')`. Dla każdego klucza `symbol/interval` porównuję `lastClose` i listę wykrytych typów setupów. Wynik trafia do `details.diff`:
+
+```text
+diff: {
+  vsRunId: "...",
+  changed: [
+    { symbol, interval, lastCloseDelta: +0.42, newSetups: ["bb-bounce-long"], goneSetups: [] }
+  ]
+}
+```
+
+To samo dla `verify-setups` (diff: które setupy zmieniły status `active → win/loss/expired`).
+
+### 3. UI — rozbudowany `CronLogsCard`
+
+**Plik:** `src/routes/admin.tsx` (sekcja `CronLogsCard`)
+
+Po rozwinięciu wiersza, zamiast surowego `<pre>{JSON.stringify(details)}</pre>`, renderuję trzy zakładki (lokalny `useState`, bez Radix Tabs — proste przyciski):
+
+1. **Podsumowanie** — kafelki: detected, inserted, errors, czas trwania, użyta lista symboli/interwałów (z `cfg`).
+2. **Runs** — tabela: symbol · interwał · #świec · lastClose · wynik każdego detektora (kolorowy chip: zielony=setup, szary=no-signal, żółty=duplicate, czerwony=error). Klik wiersza → drawer z pełnym `setup` JSON i `reason`.
+3. **Diff** — lista zmian względem poprzedniego runu, z kolorowymi delta (↑/↓ ceny, „NOWY: bb-bounce-long").
+
+Na poziomie samej listy logów dorzucam mini-wskaźnik nad numerem `det:X ins:Y` (np. „+2 NEW" jeśli `diff.changed` zawiera nowe setupy) — od razu widać który skan coś znalazł.
+
+### 4. Bez zmian
+
+- Schemat tabeli `cron_run_logs` — `details jsonb` już to udźwignie.
+- Cron pg_cron i jego harmonogram.
+- Detektory, deduplikacja, RLS.
+- `verify-setups` i `notify-setups` dostają tylko bogatsze `details` w analogicznym stylu (per-setup `pnl_pct`, dlaczego status się zmienił).
 
 ---
 
-## FAZA 3 — Redesign Dashboardu: Orange Institutional Quant
+## Pliki do edycji
 
-### Design tokens (`src/styles.css`)
-- Nowy primary: warm orange `oklch(0.74 0.17 55)` + glow accent
-- Dark: matte deep navy/charcoal background, soft orange accent only
-- Light: off-white `oklch(0.98 0.005 80)`, soft gray cards `oklch(0.96 0.005 80)`, warm orange accent, subtle shadows zamiast glow
-- Smooth theme transition (`transition-colors duration-300`)
-- ThemeProvider + toggle w headerze, `localStorage`
+- `src/routes/api/public/hooks/scan-setups.ts` — bogatszy `details`, diff, wrapper na detektory.
+- `src/routes/api/public/hooks/verify-setups.ts` — bogatszy `details` per setup + diff statusów.
+- `src/routes/admin.tsx` — `CronLogsCard` z 3 zakładkami, kolorowe chipy outcome'ów, drawer JSON.
 
-### Nowy układ `src/routes/index.tsx` — 6 kart hierarchii:
-1. **TRYB RYNKU** — kompaktowa karta z reżimem
-2. **BEST SETUP NOW** — największa karta (full-width hero), mini-wykres, entry/SL/TP1/TP2, RR, jakość, akcje
-3. **RYZYKO** — duża karta z liczbami i progress barami (dzienna strata, limit, trade count, max risk, auto-entry toggle)
-4. **AI MYŚLI** — feed live reasoning, timeline timestamps, monospace operator vibe
-5. **PRZEPŁYW KAPITAŁU** — flow visualization (BTC dominance, sector rotation, animated bars)
-6. **AKTYWNE SYGNAŁY** — kompaktowa lista (skrót obecnego TopSetupsWidget)
-
-Zasady:
-- Większe spacingi (`gap-6`, `p-6`)
-- Mniej mikrotekstów (text-xs → text-sm/base)
-- Każda karta z opisem/znaczeniem (tooltip + krótki podtytuł)
-- Kolorowe akcent-ramki per funkcja (orange dla setupów, mint dla ryzyka OK, bear dla ryzyka high, cyan dla AI, neutral dla flow)
-- Premium feel: `surface-glass`, soft shadows, brak gęstych tabel
-
-### Sekcje pomocnicze
-- Stary układ (`tickers`, `stats`, `alerts`, `history`, `watchlist`) → przesunięte niżej, opcjonalne, w `<details>` lub osobnej trasie `/dashboard-classic`
+Brak migracji bazy. Brak nowych zależności.
 
 ---
 
-## FAZA 4 — Kolorowe ramki + opisy w całym projekcie
+## Pytanie pomocnicze
 
-- Wspólny komponent `<FeatureCard variant="orange|mint|cyan|bear|warning" title icon description>` 
-- Zastosowanie w sekcjach: Giełda (Taktyki, Sektory, ETF, Makro), Lab (Raporty, Backtest, Paper, Risk, Telegram), Setupy
-- Każda funkcja zyskuje krótki opis "co to robi / kiedy używać"
-
----
-
-## Co potrzebuję od Ciebie zanim zacznę
-
-1. **Email do notyfikacji** — Lovable Email wymaga skonfigurowanej domeny. Mam to ustawić teraz, czy webhook wystarczy na start?
-2. **Admin user** — czy masz już rolę `admin` w `user_roles`? Jeśli nie, dodam Twoje konto po Twoim potwierdzeniu (powiedz email).
-3. **Czy zaczynamy od Fazy 1+2 (backend + admin), a redesign w drugiej iteracji?** Czy wolisz odwrotnie (najpierw dashboard, potem admin)?
-
-Po Twojej decyzji ruszam.
+Czy chcesz też zapisywać **snapshot ostatnich N świec (np. ostatnie 5 OHLCV)** na detektor — żeby móc po fakcie ręcznie odtworzyć decyzję? To zwiększy wagę logów (~3–5 KB/run zamiast ~500 B), ale daje pełną reprodukcję bez ponownego strzału w Binance. Domyślnie **NIE robię** tego — tylko meta świec.

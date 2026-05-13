@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { FeatureCard } from "@/components/FeatureCard";
-import { Settings, ListChecks, Bell, X, Plus, RefreshCw, Play, ShieldCheck, Send, Zap } from "lucide-react";
+import { Settings, ListChecks, Bell, X, Plus, RefreshCw, Play, ShieldCheck, Send, Zap, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { testWebhook } from "@/lib/admin.functions";
@@ -325,11 +325,196 @@ function WebhookTestCard() {
   );
 }
 
+function OutcomeChip({ outcome }: { outcome: string }) {
+  const map: Record<string, string> = {
+    setup: "bg-bull/20 text-bull",
+    "no-signal": "bg-muted/30 text-muted-foreground",
+    duplicate: "bg-warning/20 text-warning",
+    error: "bg-bear/20 text-bear",
+  };
+  return <span className={cn("rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest", map[outcome] ?? "bg-muted/20")}>{outcome}</span>;
+}
+
+function LogDetailTabs({ details }: { details: any }) {
+  const [tab, setTab] = useState<"summary" | "runs" | "diff" | "raw">("summary");
+  const [openRun, setOpenRun] = useState<string | null>(null);
+  const runs: any[] = details?.runs ?? [];
+  const checks: any[] = details?.checks ?? [];
+  const diff: any[] = details?.diff?.changed ?? [];
+
+  const TabBtn = ({ id, label, count }: { id: typeof tab; label: string; count?: number }) => (
+    <button onClick={() => setTab(id)}
+      className={cn("rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-widest",
+        tab === id ? "bg-primary text-primary-foreground" : "bg-background/40 text-muted-foreground hover:text-foreground")}>
+      {label}{count != null && <span className="ml-1 opacity-70">({count})</span>}
+    </button>
+  );
+
+  return (
+    <div className="space-y-3 pb-3">
+      <div className="flex flex-wrap gap-1">
+        <TabBtn id="summary" label="Podsumowanie" />
+        {runs.length > 0 && <TabBtn id="runs" label="Runs" count={runs.length} />}
+        {checks.length > 0 && <TabBtn id="runs" label="Setupy" count={checks.length} />}
+        {diff.length > 0 && <TabBtn id="diff" label="Diff" count={diff.length} />}
+        <TabBtn id="raw" label="JSON" />
+      </div>
+
+      {tab === "summary" && (
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+          {Object.entries(details ?? {})
+            .filter(([k, v]) => typeof v === "number" || typeof v === "boolean")
+            .map(([k, v]) => (
+              <div key={k} className="rounded-md border border-border bg-background/40 p-2">
+                <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{k}</div>
+                <div className="num text-sm font-bold">{String(v)}</div>
+              </div>
+            ))}
+          {Array.isArray(details?.symbols) && (
+            <div className="col-span-2 rounded-md border border-border bg-background/40 p-2 md:col-span-4">
+              <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Symbols</div>
+              <div className="text-[11px]">{details.symbols.join(", ")}</div>
+            </div>
+          )}
+          {Array.isArray(details?.intervals) && (
+            <div className="col-span-2 rounded-md border border-border bg-background/40 p-2 md:col-span-4">
+              <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Intervals</div>
+              <div className="text-[11px]">{details.intervals.join(", ")}</div>
+            </div>
+          )}
+          {Array.isArray(details?.errorMessages) && details.errorMessages.length > 0 && (
+            <div className="col-span-2 rounded-md border border-bear/40 bg-bear/10 p-2 md:col-span-4">
+              <div className="mb-1 text-[9px] uppercase tracking-widest text-bear">Błędy</div>
+              <ul className="space-y-0.5 text-[10px] text-bear/90">
+                {details.errorMessages.map((e: string, i: number) => <li key={i}>• {e}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === "runs" && runs.length > 0 && (
+        <div className="overflow-hidden rounded-md border border-border">
+          <div className="grid grid-cols-12 gap-2 bg-background/60 px-2 py-1 text-[9px] uppercase tracking-widest text-muted-foreground">
+            <span className="col-span-2">Symbol/Itv</span>
+            <span className="col-span-2">Świece</span>
+            <span className="col-span-2 text-right">Last close</span>
+            <span className="col-span-6">Detektory</span>
+          </div>
+          <div className="divide-y divide-border text-[11px]">
+            {runs.map((r) => {
+              const key = `${r.symbol}-${r.interval}`;
+              const isOpen = openRun === key;
+              return (
+                <div key={key}>
+                  <button onClick={() => setOpenRun(isOpen ? null : key)} className="grid w-full grid-cols-12 items-center gap-2 px-2 py-1.5 text-left hover:bg-background/30">
+                    <span className="col-span-2 font-bold">{r.symbol} <span className="text-muted-foreground">/{r.interval}</span></span>
+                    <span className="col-span-2 num text-muted-foreground">{r.candles?.count ?? 0}</span>
+                    <span className="col-span-2 num text-right">{r.candles?.lastClose != null ? Number(r.candles.lastClose).toFixed(2) : "—"}</span>
+                    <span className="col-span-6 flex flex-wrap items-center gap-1">
+                      {r.detectors?.map((d: any, i: number) => (
+                        <span key={i} className="inline-flex items-center gap-1">
+                          <span className="text-muted-foreground">{d.name}</span>
+                          <OutcomeChip outcome={d.outcome} />
+                        </span>
+                      ))}
+                      <ChevronRight className={cn("ml-auto h-3 w-3 transition-transform", isOpen && "rotate-90")} />
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="space-y-1.5 bg-background/40 px-3 py-2 text-[10px]">
+                      <div className="text-muted-foreground">
+                        Świece: {r.candles?.firstOpenTime?.slice(0, 16)?.replace("T", " ")} → {r.candles?.lastCloseTime?.slice(0, 16)?.replace("T", " ")}
+                        {" · "}vol {r.candles?.lastVolume?.toFixed?.(2) ?? "—"}
+                      </div>
+                      {r.detectors?.map((d: any, i: number) => (
+                        <div key={i} className="rounded border border-border bg-background/60 p-2">
+                          <div className="mb-1 flex items-center gap-2"><span className="font-bold">{d.name}</span><OutcomeChip outcome={d.outcome} /><span className="text-muted-foreground">· {d.durationMs} ms</span></div>
+                          {d.reason && <div className="text-muted-foreground">{d.reason}</div>}
+                          {d.setup && (
+                            <div className="mt-1 grid grid-cols-2 gap-1 md:grid-cols-4">
+                              <Mini label="dir" v={d.setup.direction} />
+                              <Mini label="entry" v={Number(d.setup.entry_price).toFixed(2)} />
+                              <Mini label="SL" v={Number(d.setup.stop_loss).toFixed(2)} />
+                              <Mini label="TP" v={Number(d.setup.take_profit).toFixed(2)} />
+                              <Mini label="strength" v={d.setup.signal_strength} />
+                              {d.setup.wave_label && <Mini label="wave" v={d.setup.wave_label} />}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {tab === "runs" && checks.length > 0 && (
+        <div className="overflow-hidden rounded-md border border-border">
+          <div className="grid grid-cols-12 gap-2 bg-background/60 px-2 py-1 text-[9px] uppercase tracking-widest text-muted-foreground">
+            <span className="col-span-3">Symbol/Itv</span>
+            <span className="col-span-2">Typ</span>
+            <span className="col-span-2">Status</span>
+            <span className="col-span-5">Powód</span>
+          </div>
+          <ul className="divide-y divide-border text-[11px]">
+            {checks.map((c) => (
+              <li key={c.id} className="grid grid-cols-12 gap-2 px-2 py-1.5">
+                <span className="col-span-3 font-bold">{c.symbol} <span className="text-muted-foreground">/{c.interval}</span></span>
+                <span className="col-span-2 text-muted-foreground">{c.setup_type} {c.direction}</span>
+                <span className="col-span-2"><OutcomeChip outcome={c.newStatus === "win" ? "setup" : c.newStatus === "loss" ? "error" : "no-signal"} /></span>
+                <span className="col-span-5 truncate text-muted-foreground" title={c.reason}>{c.reason}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {tab === "diff" && (
+        <div className="space-y-1 text-[11px]">
+          {diff.length === 0 && <div className="text-muted-foreground">Brak zmian względem poprzedniego runu.</div>}
+          {diff.map((d, i) => (
+            <div key={i} className="flex items-center justify-between rounded-md border border-border bg-background/40 px-2 py-1.5">
+              <span className="font-bold">{d.symbol} <span className="text-muted-foreground">/{d.interval}</span></span>
+              <span className="num text-muted-foreground">
+                {d.lastClosePrev?.toFixed?.(2) ?? "—"} →{" "}
+                <span className={cn(d.lastCloseDelta > 0 && "text-bull", d.lastCloseDelta < 0 && "text-bear")}>
+                  {d.lastCloseNow?.toFixed?.(2) ?? "—"} ({d.lastCloseDelta > 0 ? "+" : ""}{d.lastCloseDelta?.toFixed?.(2) ?? "—"})
+                </span>
+              </span>
+              <span className="flex gap-1">
+                {d.newSetups?.map((s: string) => <span key={s} className="rounded bg-bull/20 px-1.5 py-0.5 text-[9px] font-bold text-bull">+{s}</span>)}
+                {d.goneSetups?.map((s: string) => <span key={s} className="rounded bg-bear/20 px-1.5 py-0.5 text-[9px] font-bold text-bear">-{s}</span>)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === "raw" && (
+        <pre className="max-h-96 overflow-auto rounded-md bg-background/60 p-3 text-[10px] text-muted-foreground">{JSON.stringify(details, null, 2)}</pre>
+      )}
+    </div>
+  );
+}
+
+function Mini({ label, v }: { label: string; v: any }) {
+  return (
+    <div className="rounded bg-background/60 px-1.5 py-1">
+      <div className="text-[8px] uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="num text-[11px] font-bold">{String(v)}</div>
+    </div>
+  );
+}
+
 function CronLogsCard({ logs, onRefresh }: { logs: any[]; onRefresh: () => void }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <FeatureCard variant="warning" icon={ListChecks} title="Logi cronów"
-      description="Każde wykonanie skanera, weryfikacji i powiadomień. Auto-odświeżanie co 5 s. Kliknij wiersz, żeby zobaczyć szczegóły JSON."
+      description="Każde wykonanie skanera, weryfikacji i powiadomień. Auto-odświeżanie co 5 s. Kliknij wiersz, żeby zobaczyć podgląd: świece → detektory → diff."
       action={
         <button onClick={onRefresh} className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
           <RefreshCw className="h-3 w-3" /> Odśwież
@@ -337,26 +522,31 @@ function CronLogsCard({ logs, onRefresh }: { logs: any[]; onRefresh: () => void 
       }>
       <ul className="divide-y divide-border text-xs">
         {logs.length === 0 && <li className="py-2 text-muted-foreground">Brak wpisów. Pierwsze pojawią się w ciągu kilku minut lub po ręcznym uruchomieniu.</li>}
-        {logs.map((l) => (
-          <li key={l.id}>
-            <button onClick={() => setOpen(open === l.id ? null : l.id)}
-              className="grid w-full grid-cols-12 items-center gap-2 py-2 text-left hover:bg-background/30">
-              <span className="col-span-3 font-bold">{l.job_name}</span>
-              <span className={cn("col-span-2 rounded px-1.5 py-0.5 text-center text-[10px] font-bold uppercase",
-                l.status === "success" && "bg-bull/20 text-bull",
-                l.status === "partial" && "bg-warning/20 text-warning",
-                l.status === "error" && "bg-bear/20 text-bear",
-                l.status === "running" && "bg-cyan-500/20 text-cyan-300")}>{l.status}</span>
-              <span className="col-span-3 num text-muted-foreground">{new Date(l.started_at).toLocaleString("pl-PL")}</span>
-              <span className="col-span-2 num text-muted-foreground">{l.duration_ms ? `${l.duration_ms} ms` : "—"}</span>
-              <span className="col-span-2 truncate text-muted-foreground">{l.details?.detected != null ? `det:${l.details.detected} ins:${l.details.inserted}` : l.details?.updated != null ? `upd:${l.details.updated}` : l.details?.sent != null ? `sent:${l.details.sent}` : ""}</span>
-            </button>
-            {open === l.id && (
-              <pre className="mb-2 overflow-x-auto rounded-md bg-background/60 p-3 text-[10px] text-muted-foreground">{JSON.stringify(l.details, null, 2)}</pre>
-            )}
-          </li>
-        ))}
+        {logs.map((l) => {
+          const newCount = l.details?.diff?.changed?.reduce((acc: number, c: any) => acc + (c.newSetups?.length ?? 0), 0) ?? 0;
+          return (
+            <li key={l.id}>
+              <button onClick={() => setOpen(open === l.id ? null : l.id)}
+                className="grid w-full grid-cols-12 items-center gap-2 py-2 text-left hover:bg-background/30">
+                <span className="col-span-3 font-bold">{l.job_name}</span>
+                <span className={cn("col-span-2 rounded px-1.5 py-0.5 text-center text-[10px] font-bold uppercase",
+                  l.status === "success" && "bg-bull/20 text-bull",
+                  l.status === "partial" && "bg-warning/20 text-warning",
+                  l.status === "error" && "bg-bear/20 text-bear",
+                  l.status === "running" && "bg-cyan-500/20 text-cyan-300")}>{l.status}</span>
+                <span className="col-span-3 num text-muted-foreground">{new Date(l.started_at).toLocaleString("pl-PL")}</span>
+                <span className="col-span-2 num text-muted-foreground">{l.duration_ms ? `${l.duration_ms} ms` : "—"}</span>
+                <span className="col-span-2 truncate text-muted-foreground">
+                  {l.details?.detected != null ? `det:${l.details.detected} ins:${l.details.inserted}` : l.details?.updated != null ? `upd:${l.details.updated}` : l.details?.sent != null ? `sent:${l.details.sent}` : ""}
+                  {newCount > 0 && <span className="ml-1 rounded bg-bull/20 px-1 text-[9px] font-bold text-bull">+{newCount} NEW</span>}
+                </span>
+              </button>
+              {open === l.id && <LogDetailTabs details={l.details} />}
+            </li>
+          );
+        })}
       </ul>
     </FeatureCard>
   );
 }
+
