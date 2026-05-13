@@ -105,6 +105,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { useAlertNotifications } from "@/lib/notifications";
 import { CommandPalette } from "@/components/CommandPalette";
@@ -122,11 +123,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="min-h-screen bg-background">
+        <div className="flex min-h-screen flex-col bg-background">
           <Header />
-          <main className="mx-auto max-w-6xl px-4 pb-32 pt-32 md:pb-24 md:pt-24">
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-32 pt-32 md:pb-24 md:pt-24">
             <Outlet />
           </main>
+          <Footer />
           <MobileBottomNav />
           <CommandPalette />
           <NotificationsBridge />

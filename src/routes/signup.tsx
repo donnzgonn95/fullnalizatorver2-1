@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { seoHead } from "@/lib/seo";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -94,6 +95,11 @@ function SignupPage() {
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           Załóż konto
         </button>
+        <div className="relative my-2 text-center text-[11px] uppercase tracking-widest text-muted-foreground">
+          <span className="bg-card px-2">lub</span>
+          <div className="absolute inset-x-0 top-1/2 -z-10 h-px bg-border" />
+        </div>
+        <GoogleButton label="Załóż konto przez Google" />
         <p className="text-center text-xs text-muted-foreground">
           Masz już konto? <Link to="/login" className="underline hover:text-foreground">Zaloguj się</Link>
         </p>
