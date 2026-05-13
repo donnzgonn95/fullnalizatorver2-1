@@ -61,11 +61,10 @@ function AgentPage() {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({
-          mode: "chat",
+          mode: "stocks",
           model: "google/gemini-2.5-flash",
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            { role: "user", content: `Kontekst (skrócony): ${JSON.stringify(verdict)}\n\nPytanie: ${question}` },
+            { role: "user", content: `Kontekst makro/techniczny (heurystyka): ${JSON.stringify(verdict)}\n\nPytanie: ${question}` },
           ],
         }),
       });
