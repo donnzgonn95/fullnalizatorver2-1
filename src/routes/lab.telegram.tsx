@@ -33,7 +33,27 @@ function TelegramPage() {
       user_id: user.id, bot_token: token || null, chat_id: chatId || null, enabled,
     }, { onConflict: "user_id" });
     if (error) toast.error(error.message);
-    else toast.success("Konfiguracja zapisana. (Wysyłka wiadomości nie jest aktywna w trybie paper.)");
+    else toast.success("Konfiguracja zapisana.");
+  };
+
+  const sendTest = async () => {
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const tk = sess.session?.access_token;
+      if (!tk) return toast.error("Zaloguj się.");
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tk}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ text: "[PAPER] Test wiadomości z CryptoPuls Lab ✅" }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Błąd Telegram");
+      toast.success(`Wysłano (id ${json.message_id ?? "?"}).`);
+    } catch (e: any) { toast.error(e.message); }
   };
 
   return (
