@@ -159,15 +159,178 @@ function RaportyPage() {
                 </button>
                 {open && (
                   <div className="border-t border-border px-4 py-3">
-                    <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-md bg-background p-3 text-xs text-muted-foreground">
-{JSON.stringify(r.content, null, 2)}
-                    </pre>
+                    <ReportView content={r.content} type={isMorning ? "morning" : "evening"} stats={stats} />
                   </div>
                 )}
               </li>
             );
           })}
         </ul>
+      )}
+    </div>
+  );
+}
+
+// ---- Słowniczek pojęć (EN → PL + krótki opis) ----
+const GLOSSARY: Record<string, { pl: string; desc: string }> = {
+  pnl: { pl: "Wynik (PnL)", desc: "Zysk lub strata — różnica między ceną wejścia a wyjścia." },
+  daily_pnl: { pl: "Dzienny wynik", desc: "Suma zysków i strat z zamkniętych pozycji w danym dniu." },
+  wins: { pl: "Trafione", desc: "Liczba zamkniętych pozycji z zyskiem." },
+  losses: { pl: "Stratne", desc: "Liczba zamkniętych pozycji ze stratą." },
+  winrate: { pl: "Skuteczność", desc: "Odsetek transakcji zakończonych zyskiem." },
+  closed_trades: { pl: "Zamknięte pozycje", desc: "Liczba pozycji zamkniętych w tym dniu." },
+  open_positions: { pl: "Otwarte pozycje", desc: "Pozycje aktualnie utrzymywane na rynku." },
+  planned_setups: { pl: "Zaplanowane setupy", desc: "Pomysły handlowe oczekujące na sygnał wejścia." },
+  backtest_runs_today: { pl: "Backtesty dziś", desc: "Symulacje strategii na danych historycznych uruchomione dziś." },
+  backtests: { pl: "Backtesty", desc: "Testy strategii na danych historycznych." },
+  watchlist: { pl: "Lista obserwowanych", desc: "Instrumenty pod szczególną obserwacją." },
+  risks: { pl: "Ryzyka", desc: "Zagrożenia dla planu sesji." },
+  notes: { pl: "Notatki", desc: "Uwagi i przypomnienia agenta." },
+  headline: { pl: "Nagłówek", desc: "Najważniejsze zdanie podsumowujące." },
+  summary: { pl: "Podsumowanie", desc: "Skrót sytuacji rynkowej." },
+  key_events: { pl: "Kluczowe wydarzenia", desc: "Publikacje makro i wydarzenia spółkowe wpływające na ceny." },
+  leading_signals: { pl: "Sygnały wyprzedzające", desc: "Wskaźniki pojawiające się przed głównym ruchem rynku." },
+  preferred_tactics: { pl: "Preferowane taktyki", desc: "Strategie najlepiej dopasowane do bieżącego reżimu rynku." },
+  last5to7: { pl: "Ostatnie 5–7 dni", desc: "Krótkie podsumowanie ostatniego tygodnia." },
+  sector_rotation: { pl: "Rotacja sektorów", desc: "Przepływ kapitału między sektorami giełdy." },
+  flows: { pl: "Przepływy kapitału", desc: "Napływy i odpływy środków z funduszy/ETF-ów." },
+  agent_performance: { pl: "Wyniki agenta", desc: "Statystyki decyzji agenta-analityka." },
+  setups_for_tomorrow: { pl: "Setupy na jutro", desc: "Pomysły handlowe przygotowane na kolejną sesję." },
+  decisions: { pl: "Decyzje", desc: "Liczba decyzji wydanych przez agenta." },
+  approved: { pl: "Zatwierdzone", desc: "Decyzje zaakceptowane przez Ciebie." },
+  hit: { pl: "Trafione", desc: "Decyzje, które okazały się skuteczne." },
+  miss: { pl: "Chybione", desc: "Decyzje, które okazały się błędne." },
+  date: { pl: "Data", desc: "Data raportu." },
+};
+
+function tr(key: string): { pl: string; desc?: string } {
+  const g = GLOSSARY[key];
+  if (g) return g;
+  return { pl: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) };
+}
+
+function fmtNum(v: unknown): string {
+  if (typeof v === "number") return v.toLocaleString("pl-PL", { maximumFractionDigits: 2 });
+  return String(v);
+}
+
+function ReportView({
+  content,
+  type,
+  stats,
+}: {
+  content: Record<string, unknown>;
+  type: "morning" | "evening";
+  stats: { pnl: number; backtests: number };
+}) {
+  const c = content ?? {};
+  const headline = (c.headline as string) ?? (c.summary as string) ?? "";
+
+  // Kluczowe metryki — różne dla porannego vs wieczornego
+  const metrics: Array<{ key: string; value: unknown; tone?: "bull" | "bear" | "neutral" }> = [];
+  if (type === "evening") {
+    const pnl = (c.daily_pnl as number) ?? stats.pnl;
+    metrics.push({ key: "daily_pnl", value: (pnl >= 0 ? "+" : "") + fmtNum(pnl), tone: pnl >= 0 ? "bull" : "bear" });
+    if (c.wins != null) metrics.push({ key: "wins", value: c.wins, tone: "bull" });
+    if (c.losses != null) metrics.push({ key: "losses", value: c.losses, tone: "bear" });
+    if (c.closed_trades != null) metrics.push({ key: "closed_trades", value: c.closed_trades });
+    if (c.backtest_runs_today != null) metrics.push({ key: "backtest_runs_today", value: c.backtest_runs_today });
+  } else {
+    if (c.open_positions != null) metrics.push({ key: "open_positions", value: c.open_positions });
+    if (c.planned_setups != null) metrics.push({ key: "planned_setups", value: c.planned_setups });
+    metrics.push({ key: "backtests", value: stats.backtests });
+  }
+
+  // Pozostałe znane sekcje listowe
+  const listKeys = [
+    "notes", "key_events", "leading_signals", "preferred_tactics",
+    "watchlist", "risks", "last5to7", "sector_rotation", "flows", "setups_for_tomorrow",
+  ];
+  const lists = listKeys
+    .filter((k) => Array.isArray((c as any)[k]) && ((c as any)[k] as unknown[]).length > 0)
+    .map((k) => ({ key: k, items: (c as any)[k] as unknown[] }));
+
+  // Specjalna obróbka agent_performance (obiekt)
+  const ap = c.agent_performance as Record<string, unknown> | undefined;
+
+  // Zbierz nieobsłużone klucze dla fallbacku
+  const handled = new Set<string>([
+    "headline", "summary", "date",
+    "daily_pnl", "wins", "losses", "closed_trades", "backtest_runs_today",
+    "open_positions", "planned_setups", "agent_performance",
+    ...listKeys,
+  ]);
+  const extra = Object.keys(c).filter((k) => !handled.has(k));
+
+  return (
+    <div className="space-y-4">
+      {headline && (
+        <div className="rounded-md bg-background/60 p-3 text-sm">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Nagłówek</div>
+          <div className="mt-1">{headline}</div>
+        </div>
+      )}
+
+      {metrics.length > 0 && (
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-5">
+          {metrics.map((m) => {
+            const t = tr(m.key);
+            const toneCls = m.tone === "bull" ? "text-bull" : m.tone === "bear" ? "text-bear" : "text-foreground";
+            return (
+              <div key={m.key} className="rounded-md border border-border bg-background/40 p-3" title={t.desc}>
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.pl}</div>
+                <div className={`mt-1 text-lg font-bold ${toneCls}`}>{fmtNum(m.value)}</div>
+                {t.desc && <div className="mt-1 text-[10px] text-muted-foreground/80 leading-snug">{t.desc}</div>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {ap && (
+        <div className="rounded-md border border-border bg-background/40 p-3">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{tr("agent_performance").pl}</div>
+          <div className="mt-1 text-[10px] text-muted-foreground/80">{tr("agent_performance").desc}</div>
+          <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
+            {Object.entries(ap).map(([k, v]) => {
+              const t = tr(k);
+              const val = k === "winrate" && typeof v === "number" ? `${Math.round(v * 100)}%` : fmtNum(v);
+              return (
+                <div key={k} className="rounded bg-background/60 p-2" title={t.desc}>
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.pl}</div>
+                  <div className="text-sm font-bold">{val}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {lists.map(({ key, items }) => {
+        const t = tr(key);
+        const mono = key === "watchlist";
+        return (
+          <section key={key} className="rounded-md border border-border bg-background/40 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.pl}</div>
+            {t.desc && <div className="mt-0.5 text-[10px] text-muted-foreground/80">{t.desc}</div>}
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
+              {items.map((it, i) => (
+                <li key={i} className={mono ? "font-mono text-xs" : ""}>{typeof it === "string" ? it : JSON.stringify(it)}</li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+
+      {extra.length > 0 && (
+        <details className="rounded-md border border-border bg-background/40 p-3">
+          <summary className="cursor-pointer text-[10px] uppercase tracking-widest text-muted-foreground">
+            Dodatkowe pola ({extra.length})
+          </summary>
+          <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-words rounded bg-background p-2 text-xs text-muted-foreground">
+{JSON.stringify(Object.fromEntries(extra.map((k) => [k, (c as any)[k]])), null, 2)}
+          </pre>
+        </details>
       )}
     </div>
   );
