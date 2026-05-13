@@ -22,11 +22,22 @@ import { Route as PrzeplywRouteImport } from './routes/przeplyw'
 import { Route as PolitykaPrywatnosciRouteImport } from './routes/polityka-prywatnosci'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
+import { Route as LabRouteImport } from './routes/lab'
 import { Route as GieldaRouteImport } from './routes/gielda'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LabIndexRouteImport } from './routes/lab.index'
 import { Route as GieldaIndexRouteImport } from './routes/gielda.index'
+import { Route as LabTelegramRouteImport } from './routes/lab.telegram'
+import { Route as LabScannerRouteImport } from './routes/lab.scanner'
+import { Route as LabRiskRouteImport } from './routes/lab.risk'
+import { Route as LabPaperRouteImport } from './routes/lab.paper'
+import { Route as LabMorningRouteImport } from './routes/lab.morning'
+import { Route as LabLedgerRouteImport } from './routes/lab.ledger'
+import { Route as LabJournalRouteImport } from './routes/lab.journal'
+import { Route as LabEveningRouteImport } from './routes/lab.evening'
+import { Route as LabBacktestRouteImport } from './routes/lab.backtest'
 import { Route as GieldaWatchlistaRouteImport } from './routes/gielda.watchlista'
 import { Route as GieldaUsaRouteImport } from './routes/gielda.usa'
 import { Route as GieldaTaktykiRouteImport } from './routes/gielda.taktyki'
@@ -110,6 +121,11 @@ const LikwidacjaRoute = LikwidacjaRouteImport.update({
   path: '/likwidacja',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabRoute = LabRouteImport.update({
+  id: '/lab',
+  path: '/lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GieldaRoute = GieldaRouteImport.update({
   id: '/gielda',
   path: '/gielda',
@@ -129,10 +145,60 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabIndexRoute = LabIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LabRoute,
+} as any)
 const GieldaIndexRoute = GieldaIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => GieldaRoute,
+} as any)
+const LabTelegramRoute = LabTelegramRouteImport.update({
+  id: '/telegram',
+  path: '/telegram',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabScannerRoute = LabScannerRouteImport.update({
+  id: '/scanner',
+  path: '/scanner',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabRiskRoute = LabRiskRouteImport.update({
+  id: '/risk',
+  path: '/risk',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabPaperRoute = LabPaperRouteImport.update({
+  id: '/paper',
+  path: '/paper',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabMorningRoute = LabMorningRouteImport.update({
+  id: '/morning',
+  path: '/morning',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabLedgerRoute = LabLedgerRouteImport.update({
+  id: '/ledger',
+  path: '/ledger',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabJournalRoute = LabJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabEveningRoute = LabEveningRouteImport.update({
+  id: '/evening',
+  path: '/evening',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabBacktestRoute = LabBacktestRouteImport.update({
+  id: '/backtest',
+  path: '/backtest',
+  getParentRoute: () => LabRoute,
 } as any)
 const GieldaWatchlistaRoute = GieldaWatchlistaRouteImport.update({
   id: '/watchlista',
@@ -225,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/disclaimer': typeof DisclaimerRoute
   '/gielda': typeof GieldaRouteWithChildren
+  '/lab': typeof LabRouteWithChildren
   '/likwidacja': typeof LikwidacjaRoute
   '/login': typeof LoginRoute
   '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
@@ -255,7 +322,17 @@ export interface FileRoutesByFullPath {
   '/gielda/taktyki': typeof GieldaTaktykiRoute
   '/gielda/usa': typeof GieldaUsaRoute
   '/gielda/watchlista': typeof GieldaWatchlistaRoute
+  '/lab/backtest': typeof LabBacktestRoute
+  '/lab/evening': typeof LabEveningRoute
+  '/lab/journal': typeof LabJournalRoute
+  '/lab/ledger': typeof LabLedgerRoute
+  '/lab/morning': typeof LabMorningRoute
+  '/lab/paper': typeof LabPaperRoute
+  '/lab/risk': typeof LabRiskRoute
+  '/lab/scanner': typeof LabScannerRoute
+  '/lab/telegram': typeof LabTelegramRoute
   '/gielda/': typeof GieldaIndexRoute
+  '/lab/': typeof LabIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -290,7 +367,17 @@ export interface FileRoutesByTo {
   '/gielda/taktyki': typeof GieldaTaktykiRoute
   '/gielda/usa': typeof GieldaUsaRoute
   '/gielda/watchlista': typeof GieldaWatchlistaRoute
+  '/lab/backtest': typeof LabBacktestRoute
+  '/lab/evening': typeof LabEveningRoute
+  '/lab/journal': typeof LabJournalRoute
+  '/lab/ledger': typeof LabLedgerRoute
+  '/lab/morning': typeof LabMorningRoute
+  '/lab/paper': typeof LabPaperRoute
+  '/lab/risk': typeof LabRiskRoute
+  '/lab/scanner': typeof LabScannerRoute
+  '/lab/telegram': typeof LabTelegramRoute
   '/gielda': typeof GieldaIndexRoute
+  '/lab': typeof LabIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -298,6 +385,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/disclaimer': typeof DisclaimerRoute
   '/gielda': typeof GieldaRouteWithChildren
+  '/lab': typeof LabRouteWithChildren
   '/likwidacja': typeof LikwidacjaRoute
   '/login': typeof LoginRoute
   '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
@@ -328,7 +416,17 @@ export interface FileRoutesById {
   '/gielda/taktyki': typeof GieldaTaktykiRoute
   '/gielda/usa': typeof GieldaUsaRoute
   '/gielda/watchlista': typeof GieldaWatchlistaRoute
+  '/lab/backtest': typeof LabBacktestRoute
+  '/lab/evening': typeof LabEveningRoute
+  '/lab/journal': typeof LabJournalRoute
+  '/lab/ledger': typeof LabLedgerRoute
+  '/lab/morning': typeof LabMorningRoute
+  '/lab/paper': typeof LabPaperRoute
+  '/lab/risk': typeof LabRiskRoute
+  '/lab/scanner': typeof LabScannerRoute
+  '/lab/telegram': typeof LabTelegramRoute
   '/gielda/': typeof GieldaIndexRoute
+  '/lab/': typeof LabIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -336,6 +434,7 @@ export interface FileRouteTypes {
     | '/'
     | '/disclaimer'
     | '/gielda'
+    | '/lab'
     | '/likwidacja'
     | '/login'
     | '/polityka-prywatnosci'
@@ -366,7 +465,17 @@ export interface FileRouteTypes {
     | '/gielda/taktyki'
     | '/gielda/usa'
     | '/gielda/watchlista'
+    | '/lab/backtest'
+    | '/lab/evening'
+    | '/lab/journal'
+    | '/lab/ledger'
+    | '/lab/morning'
+    | '/lab/paper'
+    | '/lab/risk'
+    | '/lab/scanner'
+    | '/lab/telegram'
     | '/gielda/'
+    | '/lab/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -401,13 +510,24 @@ export interface FileRouteTypes {
     | '/gielda/taktyki'
     | '/gielda/usa'
     | '/gielda/watchlista'
+    | '/lab/backtest'
+    | '/lab/evening'
+    | '/lab/journal'
+    | '/lab/ledger'
+    | '/lab/morning'
+    | '/lab/paper'
+    | '/lab/risk'
+    | '/lab/scanner'
+    | '/lab/telegram'
     | '/gielda'
+    | '/lab'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/disclaimer'
     | '/gielda'
+    | '/lab'
     | '/likwidacja'
     | '/login'
     | '/polityka-prywatnosci'
@@ -438,7 +558,17 @@ export interface FileRouteTypes {
     | '/gielda/taktyki'
     | '/gielda/usa'
     | '/gielda/watchlista'
+    | '/lab/backtest'
+    | '/lab/evening'
+    | '/lab/journal'
+    | '/lab/ledger'
+    | '/lab/morning'
+    | '/lab/paper'
+    | '/lab/risk'
+    | '/lab/scanner'
+    | '/lab/telegram'
     | '/gielda/'
+    | '/lab/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -446,6 +576,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   DisclaimerRoute: typeof DisclaimerRoute
   GieldaRoute: typeof GieldaRouteWithChildren
+  LabRoute: typeof LabRouteWithChildren
   LikwidacjaRoute: typeof LikwidacjaRoute
   LoginRoute: typeof LoginRoute
   PolitykaPrywatnosciRoute: typeof PolitykaPrywatnosciRoute
@@ -556,6 +687,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LikwidacjaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lab': {
+      id: '/lab'
+      path: '/lab'
+      fullPath: '/lab'
+      preLoaderRoute: typeof LabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gielda': {
       id: '/gielda'
       path: '/gielda'
@@ -584,12 +722,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lab/': {
+      id: '/lab/'
+      path: '/'
+      fullPath: '/lab/'
+      preLoaderRoute: typeof LabIndexRouteImport
+      parentRoute: typeof LabRoute
+    }
     '/gielda/': {
       id: '/gielda/'
       path: '/'
       fullPath: '/gielda/'
       preLoaderRoute: typeof GieldaIndexRouteImport
       parentRoute: typeof GieldaRoute
+    }
+    '/lab/telegram': {
+      id: '/lab/telegram'
+      path: '/telegram'
+      fullPath: '/lab/telegram'
+      preLoaderRoute: typeof LabTelegramRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/scanner': {
+      id: '/lab/scanner'
+      path: '/scanner'
+      fullPath: '/lab/scanner'
+      preLoaderRoute: typeof LabScannerRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/risk': {
+      id: '/lab/risk'
+      path: '/risk'
+      fullPath: '/lab/risk'
+      preLoaderRoute: typeof LabRiskRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/paper': {
+      id: '/lab/paper'
+      path: '/paper'
+      fullPath: '/lab/paper'
+      preLoaderRoute: typeof LabPaperRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/morning': {
+      id: '/lab/morning'
+      path: '/morning'
+      fullPath: '/lab/morning'
+      preLoaderRoute: typeof LabMorningRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/ledger': {
+      id: '/lab/ledger'
+      path: '/ledger'
+      fullPath: '/lab/ledger'
+      preLoaderRoute: typeof LabLedgerRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/journal': {
+      id: '/lab/journal'
+      path: '/journal'
+      fullPath: '/lab/journal'
+      preLoaderRoute: typeof LabJournalRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/evening': {
+      id: '/lab/evening'
+      path: '/evening'
+      fullPath: '/lab/evening'
+      preLoaderRoute: typeof LabEveningRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/backtest': {
+      id: '/lab/backtest'
+      path: '/backtest'
+      fullPath: '/lab/backtest'
+      preLoaderRoute: typeof LabBacktestRouteImport
+      parentRoute: typeof LabRoute
     }
     '/gielda/watchlista': {
       id: '/gielda/watchlista'
@@ -764,11 +972,40 @@ const GieldaRouteChildren: GieldaRouteChildren = {
 const GieldaRouteWithChildren =
   GieldaRoute._addFileChildren(GieldaRouteChildren)
 
+interface LabRouteChildren {
+  LabBacktestRoute: typeof LabBacktestRoute
+  LabEveningRoute: typeof LabEveningRoute
+  LabJournalRoute: typeof LabJournalRoute
+  LabLedgerRoute: typeof LabLedgerRoute
+  LabMorningRoute: typeof LabMorningRoute
+  LabPaperRoute: typeof LabPaperRoute
+  LabRiskRoute: typeof LabRiskRoute
+  LabScannerRoute: typeof LabScannerRoute
+  LabTelegramRoute: typeof LabTelegramRoute
+  LabIndexRoute: typeof LabIndexRoute
+}
+
+const LabRouteChildren: LabRouteChildren = {
+  LabBacktestRoute: LabBacktestRoute,
+  LabEveningRoute: LabEveningRoute,
+  LabJournalRoute: LabJournalRoute,
+  LabLedgerRoute: LabLedgerRoute,
+  LabMorningRoute: LabMorningRoute,
+  LabPaperRoute: LabPaperRoute,
+  LabRiskRoute: LabRiskRoute,
+  LabScannerRoute: LabScannerRoute,
+  LabTelegramRoute: LabTelegramRoute,
+  LabIndexRoute: LabIndexRoute,
+}
+
+const LabRouteWithChildren = LabRoute._addFileChildren(LabRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   DisclaimerRoute: DisclaimerRoute,
   GieldaRoute: GieldaRouteWithChildren,
+  LabRoute: LabRouteWithChildren,
   LikwidacjaRoute: LikwidacjaRoute,
   LoginRoute: LoginRoute,
   PolitykaPrywatnosciRoute: PolitykaPrywatnosciRoute,

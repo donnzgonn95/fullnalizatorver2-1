@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Bitcoin, LineChart, ArrowRight } from "lucide-react";
+import { Bitcoin, LineChart, FlaskConical, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const KEY = "app.preferred-mode";
-type Mode = "krypto" | "gielda";
+type Mode = "krypto" | "gielda" | "lab";
 
 export function ModeSwitcher() {
   const [pref, setPref] = useState<Mode | null>(null);
@@ -21,7 +21,7 @@ export function ModeSwitcher() {
   };
 
   return (
-    <section className="grid gap-3 md:grid-cols-2">
+    <section className="grid gap-3 md:grid-cols-3">
       <ModeCard
         active={pref === "krypto"}
         title="Analizator Krypto"
@@ -41,6 +41,16 @@ export function ModeSwitcher() {
         onClick={() => set("gielda")}
         href="/gielda"
         cta="Otwórz portal"
+      />
+      <ModeCard
+        active={pref === "lab"}
+        title="Agent Trading Lab"
+        desc="Backtest 3M, paper trading, risk engine, alerty Telegram, raporty. Bez realnej egzekucji."
+        icon={<FlaskConical className="h-5 w-5" />}
+        accent="warning"
+        onClick={() => set("lab")}
+        href="/lab"
+        cta="Wejdź w lab"
       />
     </section>
   );
