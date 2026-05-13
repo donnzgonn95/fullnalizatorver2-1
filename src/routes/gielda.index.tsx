@@ -140,7 +140,7 @@ function GieldaOverview() {
           </div>
         ) : (
           <p className="mt-3 text-sm text-muted-foreground">
-            {user ? "Kliknij „Pobierz werdykt", aby agent zinterpretował aktualne dane." : "Zaloguj się, aby skorzystać z agenta."}
+            {user ? "Kliknij „Pobierz werdykt”, aby agent zinterpretował aktualne dane." : "Zaloguj się, aby skorzystać z agenta."}
           </p>
         )}
       </section>
