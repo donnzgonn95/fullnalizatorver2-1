@@ -111,6 +111,7 @@ import { useAlertNotifications } from "@/lib/notifications";
 import { CommandPalette } from "@/components/CommandPalette";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ThemeProvider } from "@/lib/theme";
 
 function NotificationsBridge() {
   useAlertNotifications();
@@ -122,19 +123,21 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <div className="flex min-h-screen flex-col bg-background">
-          <Header />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-32 pt-32 md:pb-24 md:pt-24">
-            <Outlet />
-          </main>
-          <Footer />
-          <MobileBottomNav />
-          <CommandPalette />
-          <NotificationsBridge />
-          <Toaster position="top-right" richColors closeButton />
-        </div>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col bg-background">
+            <Header />
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-32 pt-32 md:pb-24 md:pt-24">
+              <Outlet />
+            </main>
+            <Footer />
+            <MobileBottomNav />
+            <CommandPalette />
+            <NotificationsBridge />
+            <Toaster position="top-right" richColors closeButton />
+          </div>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

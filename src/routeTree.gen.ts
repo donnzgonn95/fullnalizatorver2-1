@@ -25,6 +25,7 @@ import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
 import { Route as LabRouteImport } from './routes/lab'
 import { Route as GieldaRouteImport } from './routes/gielda'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LabIndexRouteImport } from './routes/lab.index'
@@ -59,6 +60,7 @@ import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
 import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/public/hooks/verify-setups'
 import { Route as ApiPublicHooksScanSetupsRouteImport } from './routes/api/public/hooks/scan-setups'
+import { Route as ApiPublicHooksNotifySetupsRouteImport } from './routes/api/public/hooks/notify-setups'
 import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
 
 const SqueezeRoute = SqueezeRouteImport.update({
@@ -139,6 +141,11 @@ const GieldaRoute = GieldaRouteImport.update({
 const DisclaimerRoute = DisclaimerRouteImport.update({
   id: '/disclaimer',
   path: '/disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -313,6 +320,12 @@ const ApiPublicHooksScanSetupsRoute =
     path: '/api/public/hooks/scan-setups',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksNotifySetupsRoute =
+  ApiPublicHooksNotifySetupsRouteImport.update({
+    id: '/api/public/hooks/notify-setups',
+    path: '/api/public/hooks/notify-setups',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksLabReportsRoute =
   ApiPublicHooksLabReportsRouteImport.update({
     id: '/api/public/hooks/lab-reports',
@@ -322,6 +335,7 @@ const ApiPublicHooksLabReportsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/disclaimer': typeof DisclaimerRoute
   '/gielda': typeof GieldaRouteWithChildren
   '/lab': typeof LabRouteWithChildren
@@ -369,11 +383,13 @@ export interface FileRoutesByFullPath {
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/disclaimer': typeof DisclaimerRoute
   '/likwidacja': typeof LikwidacjaRoute
   '/login': typeof LoginRoute
@@ -419,6 +435,7 @@ export interface FileRoutesByTo {
   '/gielda': typeof GieldaIndexRoute
   '/lab': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
@@ -426,6 +443,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/admin': typeof AdminRoute
   '/disclaimer': typeof DisclaimerRoute
   '/gielda': typeof GieldaRouteWithChildren
   '/lab': typeof LabRouteWithChildren
@@ -473,6 +491,7 @@ export interface FileRoutesById {
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
@@ -480,6 +499,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/disclaimer'
     | '/gielda'
     | '/lab'
@@ -527,11 +547,13 @@ export interface FileRouteTypes {
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/disclaimer'
     | '/likwidacja'
     | '/login'
@@ -577,12 +599,14 @@ export interface FileRouteTypes {
     | '/gielda'
     | '/lab'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/disclaimer'
     | '/gielda'
     | '/lab'
@@ -630,6 +654,7 @@ export interface FileRouteTypes {
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   fileRoutesById: FileRoutesById
@@ -637,6 +662,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AdminRoute: typeof AdminRoute
   DisclaimerRoute: typeof DisclaimerRoute
   GieldaRoute: typeof GieldaRouteWithChildren
   LabRoute: typeof LabRouteWithChildren
@@ -656,6 +682,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   CoinSymbolRoute: typeof CoinSymbolRoute
   ApiPublicHooksLabReportsRoute: typeof ApiPublicHooksLabReportsRoute
+  ApiPublicHooksNotifySetupsRoute: typeof ApiPublicHooksNotifySetupsRoute
   ApiPublicHooksScanSetupsRoute: typeof ApiPublicHooksScanSetupsRoute
   ApiPublicHooksVerifySetupsRoute: typeof ApiPublicHooksVerifySetupsRoute
 }
@@ -772,6 +799,13 @@ declare module '@tanstack/react-router' {
       path: '/disclaimer'
       fullPath: '/disclaimer'
       preLoaderRoute: typeof DisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1012,6 +1046,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksScanSetupsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/notify-setups': {
+      id: '/api/public/hooks/notify-setups'
+      path: '/api/public/hooks/notify-setups'
+      fullPath: '/api/public/hooks/notify-setups'
+      preLoaderRoute: typeof ApiPublicHooksNotifySetupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/lab-reports': {
       id: '/api/public/hooks/lab-reports'
       path: '/api/public/hooks/lab-reports'
@@ -1117,6 +1158,7 @@ const SetupyRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AdminRoute: AdminRoute,
   DisclaimerRoute: DisclaimerRoute,
   GieldaRoute: GieldaRouteWithChildren,
   LabRoute: LabRouteWithChildren,
@@ -1136,19 +1178,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   CoinSymbolRoute: CoinSymbolRoute,
   ApiPublicHooksLabReportsRoute: ApiPublicHooksLabReportsRoute,
+  ApiPublicHooksNotifySetupsRoute: ApiPublicHooksNotifySetupsRoute,
   ApiPublicHooksScanSetupsRoute: ApiPublicHooksScanSetupsRoute,
   ApiPublicHooksVerifySetupsRoute: ApiPublicHooksVerifySetupsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
