@@ -32,6 +32,7 @@ import { Route as GieldaIndexRouteImport } from './routes/gielda.index'
 import { Route as LabTelegramRouteImport } from './routes/lab.telegram'
 import { Route as LabScannerRouteImport } from './routes/lab.scanner'
 import { Route as LabRiskRouteImport } from './routes/lab.risk'
+import { Route as LabRaportyRouteImport } from './routes/lab.raporty'
 import { Route as LabPaperRouteImport } from './routes/lab.paper'
 import { Route as LabMorningRouteImport } from './routes/lab.morning'
 import { Route as LabLedgerRouteImport } from './routes/lab.ledger'
@@ -169,6 +170,11 @@ const LabScannerRoute = LabScannerRouteImport.update({
 const LabRiskRoute = LabRiskRouteImport.update({
   id: '/risk',
   path: '/risk',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabRaportyRoute = LabRaportyRouteImport.update({
+  id: '/raporty',
+  path: '/raporty',
   getParentRoute: () => LabRoute,
 } as any)
 const LabPaperRoute = LabPaperRouteImport.update({
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/lab/ledger': typeof LabLedgerRoute
   '/lab/morning': typeof LabMorningRoute
   '/lab/paper': typeof LabPaperRoute
+  '/lab/raporty': typeof LabRaportyRoute
   '/lab/risk': typeof LabRiskRoute
   '/lab/scanner': typeof LabScannerRoute
   '/lab/telegram': typeof LabTelegramRoute
@@ -381,6 +388,7 @@ export interface FileRoutesByTo {
   '/lab/ledger': typeof LabLedgerRoute
   '/lab/morning': typeof LabMorningRoute
   '/lab/paper': typeof LabPaperRoute
+  '/lab/raporty': typeof LabRaportyRoute
   '/lab/risk': typeof LabRiskRoute
   '/lab/scanner': typeof LabScannerRoute
   '/lab/telegram': typeof LabTelegramRoute
@@ -431,6 +439,7 @@ export interface FileRoutesById {
   '/lab/ledger': typeof LabLedgerRoute
   '/lab/morning': typeof LabMorningRoute
   '/lab/paper': typeof LabPaperRoute
+  '/lab/raporty': typeof LabRaportyRoute
   '/lab/risk': typeof LabRiskRoute
   '/lab/scanner': typeof LabScannerRoute
   '/lab/telegram': typeof LabTelegramRoute
@@ -481,6 +490,7 @@ export interface FileRouteTypes {
     | '/lab/ledger'
     | '/lab/morning'
     | '/lab/paper'
+    | '/lab/raporty'
     | '/lab/risk'
     | '/lab/scanner'
     | '/lab/telegram'
@@ -527,6 +537,7 @@ export interface FileRouteTypes {
     | '/lab/ledger'
     | '/lab/morning'
     | '/lab/paper'
+    | '/lab/raporty'
     | '/lab/risk'
     | '/lab/scanner'
     | '/lab/telegram'
@@ -576,6 +587,7 @@ export interface FileRouteTypes {
     | '/lab/ledger'
     | '/lab/morning'
     | '/lab/paper'
+    | '/lab/raporty'
     | '/lab/risk'
     | '/lab/scanner'
     | '/lab/telegram'
@@ -769,6 +781,13 @@ declare module '@tanstack/react-router' {
       path: '/risk'
       fullPath: '/lab/risk'
       preLoaderRoute: typeof LabRiskRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/raporty': {
+      id: '/lab/raporty'
+      path: '/raporty'
+      fullPath: '/lab/raporty'
+      preLoaderRoute: typeof LabRaportyRouteImport
       parentRoute: typeof LabRoute
     }
     '/lab/paper': {
@@ -1000,6 +1019,7 @@ interface LabRouteChildren {
   LabLedgerRoute: typeof LabLedgerRoute
   LabMorningRoute: typeof LabMorningRoute
   LabPaperRoute: typeof LabPaperRoute
+  LabRaportyRoute: typeof LabRaportyRoute
   LabRiskRoute: typeof LabRiskRoute
   LabScannerRoute: typeof LabScannerRoute
   LabTelegramRoute: typeof LabTelegramRoute
@@ -1013,6 +1033,7 @@ const LabRouteChildren: LabRouteChildren = {
   LabLedgerRoute: LabLedgerRoute,
   LabMorningRoute: LabMorningRoute,
   LabPaperRoute: LabPaperRoute,
+  LabRaportyRoute: LabRaportyRoute,
   LabRiskRoute: LabRiskRoute,
   LabScannerRoute: LabScannerRoute,
   LabTelegramRoute: LabTelegramRoute,
