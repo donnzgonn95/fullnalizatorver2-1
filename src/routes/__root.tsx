@@ -111,6 +111,7 @@ import { useAlertNotifications } from "@/lib/notifications";
 import { CommandPalette } from "@/components/CommandPalette";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ThemeProvider } from "@/lib/theme";
 
 function NotificationsBridge() {
   useAlertNotifications();
