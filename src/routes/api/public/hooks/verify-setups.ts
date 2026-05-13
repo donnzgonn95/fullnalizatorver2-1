@@ -44,17 +44,37 @@ export const Route = createFileRoute("/api/public/hooks/verify-setups")({
           return new Response(JSON.stringify({ error: error.message }), { status: 500 });
         }
         let updated = 0; let errors = 0;
+        const checks: Array<{
+          id: string; symbol: string; interval: string; setup_type: string; direction: string;
+          entry_price: number; stop_loss: number; take_profit: number;
+          range: { high: number; low: number } | null;
+          newStatus: "win" | "loss" | "still_active";
+          reason: string;
+        }> = [];
         for (const s of setups ?? []) {
           const range = await lastCandle(s.symbol, s.interval);
-          if (!range) continue;
-          let result: "win" | "loss" | null = null;
-          if (s.direction === "long") {
-            if (range.high >= Number(s.take_profit)) result = "win";
-            else if (range.low <= Number(s.stop_loss)) result = "loss";
-          } else {
-            if (range.low <= Number(s.take_profit)) result = "win";
-            else if (range.high >= Number(s.stop_loss)) result = "loss";
+          if (!range) {
+            checks.push({
+              id: s.id, symbol: s.symbol, interval: s.interval, setup_type: s.setup_type, direction: s.direction,
+              entry_price: Number(s.entry_price), stop_loss: Number(s.stop_loss), take_profit: Number(s.take_profit),
+              range: null, newStatus: "still_active", reason: "Brak danych z Binance",
+            });
+            continue;
           }
+          let result: "win" | "loss" | null = null;
+          let reason = "Cena w korytarzu SL/TP";
+          if (s.direction === "long") {
+            if (range.high >= Number(s.take_profit)) { result = "win"; reason = `high ${range.high} ≥ TP ${s.take_profit}`; }
+            else if (range.low <= Number(s.stop_loss)) { result = "loss"; reason = `low ${range.low} ≤ SL ${s.stop_loss}`; }
+          } else {
+            if (range.low <= Number(s.take_profit)) { result = "win"; reason = `low ${range.low} ≤ TP ${s.take_profit}`; }
+            else if (range.high >= Number(s.stop_loss)) { result = "loss"; reason = `high ${range.high} ≥ SL ${s.stop_loss}`; }
+          }
+          checks.push({
+            id: s.id, symbol: s.symbol, interval: s.interval, setup_type: s.setup_type, direction: s.direction,
+            entry_price: Number(s.entry_price), stop_loss: Number(s.stop_loss), take_profit: Number(s.take_profit),
+            range, newStatus: result ?? "still_active", reason,
+          });
           if (result) {
             const { error: uerr } = await supabaseAdmin.from("detected_setups").update({
               status: "completed", result, result_checked_at: new Date().toISOString(),
@@ -68,7 +88,13 @@ export const Route = createFileRoute("/api/public/hooks/verify-setups")({
           finished_at: finishedAt.toISOString(),
           duration_ms: finishedAt.getTime() - startedAt.getTime(),
           status: errors > 0 ? "partial" : "success",
-          details: { scanned: setups?.length ?? 0, updated, errors },
+          details: {
+            scanned: setups?.length ?? 0, updated, errors,
+            wins: checks.filter((c) => c.newStatus === "win").length,
+            losses: checks.filter((c) => c.newStatus === "loss").length,
+            stillActive: checks.filter((c) => c.newStatus === "still_active").length,
+            checks,
+          } as never,
         }).eq("id", logId);
 
         return new Response(JSON.stringify({ ok: true, scanned: setups?.length ?? 0, updated }), {
