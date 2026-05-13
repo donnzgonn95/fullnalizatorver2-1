@@ -80,9 +80,14 @@ function TelegramPage() {
           <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />
           Włączone (preview only)
         </label>
-        <button onClick={save} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-          <Save className="h-4 w-4" /> Zapisz
-        </button>
+        <div className="flex gap-2">
+          <button onClick={save} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <Save className="h-4 w-4" /> Zapisz
+          </button>
+          <button onClick={sendTest} disabled={!enabled || !token || !chatId} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-secondary disabled:opacity-50">
+            <Send className="h-4 w-4" /> Wyślij test
+          </button>
+        </div>
       </section>
 
       <section className="rounded-xl border border-border bg-card p-5">
