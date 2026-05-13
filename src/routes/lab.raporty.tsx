@@ -15,15 +15,24 @@ type LabReport = {
 
 type BacktestRun = {
   id: string;
+  strategy_name?: string | null;
   started_at: string;
   finished_at: string | null;
   summary: Record<string, unknown> | null;
+  params?: Record<string, unknown> | null;
 };
 
 type PaperTrade = {
+  id?: string;
+  instrument?: string;
+  side?: string;
+  entry_price?: number | null;
+  quantity?: number | null;
+  opened_at?: string | null;
   closed_at: string | null;
   result_pnl: number | null;
   status: string;
+  rationale?: string | null;
 };
 
 export const Route = createFileRoute("/lab/raporty")({
