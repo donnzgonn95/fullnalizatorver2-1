@@ -34,6 +34,15 @@ export interface MarketIndex {
   changeYtd: number;
 }
 
+export interface EtfScore {
+  momentum: number;   // 0-100 — siła trendu (1M/3M)
+  trend: number;      // 0-100 — pozycja względem MA
+  cost: number;       // 0-100 — niski koszt = wysoki score
+  liquidity: number;  // 0-100 — AUM, spread
+  risk: number;       // 0-100 — odwrotnie: wysokie ryzyko = niski
+  total: number;      // ważona suma
+}
+
 export interface Etf {
   symbol: string;
   name: string;
@@ -43,7 +52,25 @@ export interface Etf {
   aumBn: number;
   ytd: number;
   change1d: number;
+  change1m?: number;
+  change3m?: number;
   description: string;
+  category?: string;          // np. „Szeroki rynek USA", „Sektor: Technology"
+  sectorExposure?: string[];  // sektory dominujące
+  topHoldings?: string[];     // 3-5 największych pozycji
+  dividend?: number;          // % yield
+  rating?: "Buy" | "Hold" | "Reduce" | "Avoid";
+  score?: EtfScore;
+}
+
+export interface SectorScore {
+  momentum: number;        // 0-100
+  trendStrength: number;   // 0-100
+  breadth: number;         // 0-100 — % spółek nad MA50
+  valuation: number;       // 0-100 — niski P/E = wysoki
+  flows: number;           // 0-100 — napływy do sektora
+  risk: number;            // 0-100 — odwrotnie do zmienności
+  total: number;           // 0-100
 }
 
 export interface Sector {
@@ -54,11 +81,21 @@ export interface Sector {
   change1m: number;
   changeYtd: number;
   trend: "bull" | "bear" | "neutral";
+  description?: string;
+  topHoldings?: string[];
+  pe?: number;
+  breadth?: number;       // % spółek nad MA50
+  relativeStrength?: number; // vs S&P, -100..+100
+  score?: SectorScore;
+  rating?: "Overweight" | "Neutral" | "Underweight";
+  catalysts?: string[];
+  risks?: string[];
 }
 
 export interface MacroIndicator {
   id: string;
   name: string;
+  nameEn?: string;
   region: Region;
   value: number;
   unit: string;
@@ -66,6 +103,19 @@ export interface MacroIndicator {
   asOf: string; // ISO date
   interpretation: "positive" | "negative" | "neutral";
   note?: string;
+  category?: "Inflacja" | "Stopy" | "Rynek pracy" | "Aktywność" | "Sentyment" | "Waluty" | "Surowce" | "Obligacje";
+  description?: string;        // co to jest
+  whyItMatters?: string;       // dlaczego to ważne dla rynku
+  impact?: string;             // wpływ na akcje/obligacje
+  trend?: "rising" | "falling" | "stable";
+  target?: number;             // cel (np. 2% dla CPI)
+  source?: string;
+}
+
+export interface TacticParameter {
+  name: string;
+  value: string;
+  description?: string;
 }
 
 export interface Tactic {
@@ -80,6 +130,18 @@ export interface Tactic {
   backtest: { winRate: number; avgRR: number; trades: number };
   observations: string[];
   horizon: Horizon;
+  longDescription?: string;
+  instruments?: string[];            // np. SPY, QQQ
+  parameters?: TacticParameter[];
+  dependencies?: string[];           // od czego zależy skuteczność
+  examples?: { date: string; setup: string; outcome: string }[];
+  marketRegime?: string[];           // np. „bull-low-vol", „risk-on"
+  capitalRequirement?: string;
+  timeCommitment?: string;
+  pros?: string[];
+  cons?: string[];
+  related?: string[];                // ID powiązanych taktyk
+  source?: string;
 }
 
 export interface DecisionContext {

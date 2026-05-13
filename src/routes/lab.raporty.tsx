@@ -15,15 +15,24 @@ type LabReport = {
 
 type BacktestRun = {
   id: string;
+  strategy_name?: string | null;
   started_at: string;
   finished_at: string | null;
   summary: Record<string, unknown> | null;
+  params?: Record<string, unknown> | null;
 };
 
 type PaperTrade = {
+  id?: string;
+  instrument?: string;
+  side?: string;
+  entry_price?: number | null;
+  quantity?: number | null;
+  opened_at?: string | null;
   closed_at: string | null;
   result_pnl: number | null;
   status: string;
+  rationale?: string | null;
 };
 
 export const Route = createFileRoute("/lab/raporty")({
@@ -46,6 +55,8 @@ function RaportyPage() {
   const [filter, setFilter] = useState<"all" | "morning" | "evening">("all");
   const [openId, setOpenId] = useState<string | null>(null);
 
+  const [search, setSearch] = useState("");
+
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -60,13 +71,12 @@ function RaportyPage() {
           .limit(200),
         supabase
           .from("lab_backtest_runs")
-          .select("id, started_at, finished_at, summary")
+          .select("id, strategy_name, started_at, finished_at, summary, params")
           .order("started_at", { ascending: false })
           .limit(500),
         supabase
           .from("lab_paper_trades")
-          .select("closed_at, result_pnl, status")
-          .eq("status", "closed"),
+          .select("id, instrument, side, entry_price, quantity, opened_at, closed_at, result_pnl, status, rationale"),
       ]);
       if (cancelled) return;
       setReports((r.data ?? []) as LabReport[]);
@@ -95,7 +105,51 @@ function RaportyPage() {
     return m;
   }, [trades, runs]);
 
-  const filtered = filter === "all" ? reports : reports.filter((r) => r.report_type === filter);
+  // Lookup poprzedniego raportu tego samego typu (do porównania)
+  const prevByReportId = useMemo(() => {
+    const map = new Map<string, LabReport | null>();
+    const sortedAsc = [...reports].sort((a, b) => a.report_date.localeCompare(b.report_date));
+    const lastByType = new Map<string, LabReport>();
+    for (const r of sortedAsc) {
+      map.set(r.id, lastByType.get(r.report_type) ?? null);
+      lastByType.set(r.report_type, r);
+    }
+    return map;
+  }, [reports]);
+
+  // Backtesty i trade'y dla danego dnia (do rozwijanych szczegółów)
+  const runsByDate = useMemo(() => {
+    const m = new Map<string, BacktestRun[]>();
+    for (const r of runs) {
+      const d = (r.finished_at ?? r.started_at).slice(0, 10);
+      if (!m.has(d)) m.set(d, []);
+      m.get(d)!.push(r);
+    }
+    return m;
+  }, [runs]);
+
+  const tradesByDate = useMemo(() => {
+    const m = new Map<string, PaperTrade[]>();
+    for (const t of trades) {
+      const d = (t.closed_at ?? t.opened_at)?.slice(0, 10);
+      if (!d) continue;
+      if (!m.has(d)) m.set(d, []);
+      m.get(d)!.push(t);
+    }
+    return m;
+  }, [trades]);
+
+  const filtered = useMemo(() => {
+    let arr = filter === "all" ? reports : reports.filter((r) => r.report_type === filter);
+    const q = search.trim().toLowerCase();
+    if (q) {
+      arr = arr.filter((r) => {
+        const blob = JSON.stringify(r.content ?? {}).toLowerCase();
+        return blob.includes(q) || r.report_date.includes(q);
+      });
+    }
+    return arr;
+  }, [reports, filter, search]);
 
   if (authLoading || loading) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Ładowanie…</div>;
@@ -110,30 +164,38 @@ function RaportyPage() {
           <h1 className="mt-1 text-2xl font-bold">Historia raportów</h1>
           <p className="mt-1 text-sm text-muted-foreground">Archiwum porannych i wieczornych raportów z Twojej bazy.</p>
         </div>
-        <div className="flex gap-1 rounded-md border border-border bg-card p-1 text-xs">
-          {(["all", "morning", "evening"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`rounded px-2 py-1 ${filter === f ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              {f === "all" ? "Wszystkie" : f === "morning" ? "Poranne" : "Wieczorne"}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Szukaj: ryzyka, watchlista, notatki…"
+            className="rounded-md border border-border bg-card px-3 py-1.5 text-xs"
+          />
+          <div className="flex gap-1 rounded-md border border-border bg-card p-1 text-xs">
+            {(["all", "morning", "evening"] as const).map((f) => (
+              <button key={f} onClick={() => setFilter(f)}
+                className={`rounded px-2 py-1 ${filter === f ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                {f === "all" ? "Wszystkie" : f === "morning" ? "Poranne" : "Wieczorne"}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
       {filtered.length === 0 ? (
         <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
-          Brak raportów w bazie. Pojawią się tu po zadziałaniu cronów porannego (5:10) i wieczornego (21:00).
+          {search ? "Brak raportów pasujących do zapytania." : "Brak raportów w bazie. Pojawią się tu po zadziałaniu cronów porannego (5:10) i wieczornego (21:00)."}
         </div>
       ) : (
         <ul className="space-y-2">
           {filtered.map((r) => {
             const stats = byDate.get(r.report_date) ?? { pnl: 0, backtests: 0 };
+            const prev = prevByReportId.get(r.id) ?? null;
+            const prevStats = prev ? (byDate.get(prev.report_date) ?? { pnl: 0, backtests: 0 }) : null;
             const isMorning = r.report_type === "morning";
             const Icon = isMorning ? Sunrise : Moon;
             const open = openId === r.id;
+            const dayRuns = runsByDate.get(r.report_date) ?? [];
+            const dayTrades = tradesByDate.get(r.report_date) ?? [];
             return (
               <li key={r.id} className="rounded-xl border border-border bg-card">
                 <button
@@ -158,8 +220,12 @@ function RaportyPage() {
                   </div>
                 </button>
                 {open && (
-                  <div className="border-t border-border px-4 py-3">
+                  <div className="space-y-3 border-t border-border px-4 py-3">
+                    {prev && prevStats && (
+                      <ComparisonStrip current={{ date: r.report_date, ...stats }} prev={{ date: prev.report_date, ...prevStats }} />
+                    )}
                     <ReportView content={r.content} type={isMorning ? "morning" : "evening"} stats={stats} />
+                    <DayDetails runs={dayRuns} trades={dayTrades} />
                   </div>
                 )}
               </li>
@@ -169,6 +235,84 @@ function RaportyPage() {
       )}
     </div>
   );
+}
+
+function ComparisonStrip({ current, prev }: { current: { date: string; pnl: number; backtests: number }; prev: { date: string; pnl: number; backtests: number } }) {
+  const dPnl = current.pnl - prev.pnl;
+  const dBt = current.backtests - prev.backtests;
+  return (
+    <div className="rounded-md border border-border bg-background/40 p-3 text-xs">
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Porównanie z poprzednim raportem ({prev.date})</div>
+      <div className="mt-1 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div>
+          <div className="text-muted-foreground">PnL</div>
+          <div className="num font-bold">{prev.pnl.toFixed(2)} → {current.pnl.toFixed(2)}</div>
+          <div className={dPnl >= 0 ? "text-bull" : "text-bear"}>Δ {dPnl >= 0 ? "+" : ""}{dPnl.toFixed(2)}</div>
+        </div>
+        <div>
+          <div className="text-muted-foreground">Backtesty</div>
+          <div className="num font-bold">{prev.backtests} → {current.backtests}</div>
+          <div className={dBt >= 0 ? "text-bull" : "text-bear"}>Δ {dBt >= 0 ? "+" : ""}{dBt}</div>
+        </div>
+        <div>
+          <div className="text-muted-foreground">Tempo</div>
+          <div className="font-bold">{dPnl > 0 && dBt >= 0 ? "↗ poprawa" : dPnl < 0 ? "↘ słabiej" : "≈ bez zmian"}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DayDetails({ runs, trades }: { runs: BacktestRun[]; trades: PaperTrade[] }) {
+  if (runs.length === 0 && trades.length === 0) return null;
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {runs.length > 0 && (
+        <details className="rounded-md border border-border bg-background/40 p-2">
+          <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">Backtesty ({runs.length})</summary>
+          <ul className="mt-2 space-y-1.5 text-xs">
+            {runs.map((r) => (
+              <li key={r.id} className="rounded bg-background/60 p-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold">{r.strategy_name ?? "—"}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">{new Date(r.started_at).toLocaleString("pl-PL")}</span>
+                </div>
+                {r.summary && (
+                  <pre className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap break-words text-[10px] text-muted-foreground">
+{JSON.stringify(r.summary, null, 2)}
+                  </pre>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+      {trades.length > 0 && (
+        <details className="rounded-md border border-border bg-background/40 p-2">
+          <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">Pozycje paper ({trades.length})</summary>
+          <ul className="mt-2 space-y-1.5 text-xs">
+            {trades.map((t) => (
+              <li key={t.id} className="rounded bg-background/60 p-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold">{t.instrument} <span className="text-[10px] uppercase text-muted-foreground">{t.side}</span></span>
+                  <span className={cnTone(t.result_pnl)}>{t.result_pnl != null ? `${t.result_pnl >= 0 ? "+" : ""}${Number(t.result_pnl).toFixed(2)}` : t.status}</span>
+                </div>
+                <div className="text-[10px] text-muted-foreground">
+                  {t.quantity ?? 0} szt @ {t.entry_price ?? 0}
+                </div>
+                {t.rationale && <div className="mt-1 text-[10px] text-muted-foreground/90">{t.rationale}</div>}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function cnTone(v: number | null | undefined) {
+  if (v == null) return "text-muted-foreground";
+  return v >= 0 ? "text-bull" : "text-bear";
 }
 
 // ---- Słowniczek pojęć (EN → PL + krótki opis) ----
