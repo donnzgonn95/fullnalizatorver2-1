@@ -1,8 +1,4 @@
-import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { listTopSetups } from "@/lib/setups.functions";
-import { startScanner } from "@/lib/feed/scanner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
@@ -20,28 +16,22 @@ function fmtTime(iso: string) {
 }
 
 export function TopSetupsWidget() {
-  const fetchTop = useServerFn(listTopSetups);
-  const [authed, setAuthed] = useState(false);
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setAuthed(!!data.user));
-  }, []);
-
-  useEffect(() => { if (authed) startScanner(); }, [authed]);
-
   const { data, isLoading } = useQuery({
-    queryKey: ["top-setups"],
-    queryFn: () => fetchTop(),
+    queryKey: ["top-setups-global"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("detected_setups")
+        .select("*")
+        .is("user_id", null)
+        .in("status", ["pending", "active"])
+        .order("signal_strength", { ascending: false })
+        .order("detected_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data ?? [];
+    },
     refetchInterval: 30_000,
-    enabled: authed,
   });
-
-  if (!authed) {
-    return (
-      <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
-        Zaloguj się, aby uruchomić skaner setupów. <Link to="/login" className="text-primary hover:underline">Zaloguj się</Link>
-      </div>
-    );
-  }
 
   return (
     <section className="rounded-xl border border-border bg-card p-5">
