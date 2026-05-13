@@ -12,6 +12,14 @@ const STATIC_PATHS = [
   "/ulubione",
   "/asystent",
   "/slownik",
+  "/gielda",
+  "/gielda/usa",
+  "/gielda/europa",
+  "/gielda/etf",
+  "/gielda/sektory",
+  "/gielda/makro",
+  "/gielda/watchlista",
+  "/gielda/taktyki",
 ];
 
 const POPULAR_COINS = [

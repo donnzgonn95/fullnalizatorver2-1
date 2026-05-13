@@ -14,6 +14,7 @@ import { ArrowRight, Radio, RotateCcw, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { seoHead } from "@/lib/seo";
+import { ModeSwitcher } from "@/components/gielda/ModeSwitcher";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -196,6 +197,7 @@ function Index() {
 
   return (
     <div className="space-y-6">
+      <ModeSwitcher />
       <div className="flex items-center justify-end">
         <button
           type="button"

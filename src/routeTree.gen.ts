@@ -22,9 +22,21 @@ import { Route as PrzeplywRouteImport } from './routes/przeplyw'
 import { Route as PolitykaPrywatnosciRouteImport } from './routes/polityka-prywatnosci'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
+import { Route as GieldaRouteImport } from './routes/gielda'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GieldaIndexRouteImport } from './routes/gielda.index'
+import { Route as GieldaWatchlistaRouteImport } from './routes/gielda.watchlista'
+import { Route as GieldaUsaRouteImport } from './routes/gielda.usa'
+import { Route as GieldaTaktykiRouteImport } from './routes/gielda.taktyki'
+import { Route as GieldaSektoryRouteImport } from './routes/gielda.sektory'
+import { Route as GieldaMakroRouteImport } from './routes/gielda.makro'
+import { Route as GieldaEuropaRouteImport } from './routes/gielda.europa'
+import { Route as GieldaEtfRouteImport } from './routes/gielda.etf'
+import { Route as GieldaDziennikRouteImport } from './routes/gielda.dziennik'
+import { Route as GieldaBajtlikRouteImport } from './routes/gielda.bajtlik'
+import { Route as GieldaAgentRouteImport } from './routes/gielda.agent'
 import { Route as CoinSymbolRouteImport } from './routes/coin.$symbol'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedUstawieniaRouteImport } from './routes/_authenticated/ustawienia'
@@ -98,6 +110,11 @@ const LikwidacjaRoute = LikwidacjaRouteImport.update({
   path: '/likwidacja',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GieldaRoute = GieldaRouteImport.update({
+  id: '/gielda',
+  path: '/gielda',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DisclaimerRoute = DisclaimerRouteImport.update({
   id: '/disclaimer',
   path: '/disclaimer',
@@ -111,6 +128,61 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const GieldaIndexRoute = GieldaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaWatchlistaRoute = GieldaWatchlistaRouteImport.update({
+  id: '/watchlista',
+  path: '/watchlista',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaUsaRoute = GieldaUsaRouteImport.update({
+  id: '/usa',
+  path: '/usa',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaTaktykiRoute = GieldaTaktykiRouteImport.update({
+  id: '/taktyki',
+  path: '/taktyki',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaSektoryRoute = GieldaSektoryRouteImport.update({
+  id: '/sektory',
+  path: '/sektory',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaMakroRoute = GieldaMakroRouteImport.update({
+  id: '/makro',
+  path: '/makro',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaEuropaRoute = GieldaEuropaRouteImport.update({
+  id: '/europa',
+  path: '/europa',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaEtfRoute = GieldaEtfRouteImport.update({
+  id: '/etf',
+  path: '/etf',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaDziennikRoute = GieldaDziennikRouteImport.update({
+  id: '/dziennik',
+  path: '/dziennik',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaBajtlikRoute = GieldaBajtlikRouteImport.update({
+  id: '/bajtlik',
+  path: '/bajtlik',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaAgentRoute = GieldaAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => GieldaRoute,
 } as any)
 const CoinSymbolRoute = CoinSymbolRouteImport.update({
   id: '/coin/$symbol',
@@ -152,6 +224,7 @@ const AuthenticatedAlertyRoute = AuthenticatedAlertyRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/gielda': typeof GieldaRouteWithChildren
   '/likwidacja': typeof LikwidacjaRoute
   '/login': typeof LoginRoute
   '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
@@ -172,6 +245,17 @@ export interface FileRoutesByFullPath {
   '/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
+  '/gielda/agent': typeof GieldaAgentRoute
+  '/gielda/bajtlik': typeof GieldaBajtlikRoute
+  '/gielda/dziennik': typeof GieldaDziennikRoute
+  '/gielda/etf': typeof GieldaEtfRoute
+  '/gielda/europa': typeof GieldaEuropaRoute
+  '/gielda/makro': typeof GieldaMakroRoute
+  '/gielda/sektory': typeof GieldaSektoryRoute
+  '/gielda/taktyki': typeof GieldaTaktykiRoute
+  '/gielda/usa': typeof GieldaUsaRoute
+  '/gielda/watchlista': typeof GieldaWatchlistaRoute
+  '/gielda/': typeof GieldaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,12 +280,24 @@ export interface FileRoutesByTo {
   '/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
+  '/gielda/agent': typeof GieldaAgentRoute
+  '/gielda/bajtlik': typeof GieldaBajtlikRoute
+  '/gielda/dziennik': typeof GieldaDziennikRoute
+  '/gielda/etf': typeof GieldaEtfRoute
+  '/gielda/europa': typeof GieldaEuropaRoute
+  '/gielda/makro': typeof GieldaMakroRoute
+  '/gielda/sektory': typeof GieldaSektoryRoute
+  '/gielda/taktyki': typeof GieldaTaktykiRoute
+  '/gielda/usa': typeof GieldaUsaRoute
+  '/gielda/watchlista': typeof GieldaWatchlistaRoute
+  '/gielda': typeof GieldaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/disclaimer': typeof DisclaimerRoute
+  '/gielda': typeof GieldaRouteWithChildren
   '/likwidacja': typeof LikwidacjaRoute
   '/login': typeof LoginRoute
   '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
@@ -222,12 +318,24 @@ export interface FileRoutesById {
   '/_authenticated/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/coin/$symbol': typeof CoinSymbolRoute
+  '/gielda/agent': typeof GieldaAgentRoute
+  '/gielda/bajtlik': typeof GieldaBajtlikRoute
+  '/gielda/dziennik': typeof GieldaDziennikRoute
+  '/gielda/etf': typeof GieldaEtfRoute
+  '/gielda/europa': typeof GieldaEuropaRoute
+  '/gielda/makro': typeof GieldaMakroRoute
+  '/gielda/sektory': typeof GieldaSektoryRoute
+  '/gielda/taktyki': typeof GieldaTaktykiRoute
+  '/gielda/usa': typeof GieldaUsaRoute
+  '/gielda/watchlista': typeof GieldaWatchlistaRoute
+  '/gielda/': typeof GieldaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/disclaimer'
+    | '/gielda'
     | '/likwidacja'
     | '/login'
     | '/polityka-prywatnosci'
@@ -248,6 +356,17 @@ export interface FileRouteTypes {
     | '/ustawienia'
     | '/auth/callback'
     | '/coin/$symbol'
+    | '/gielda/agent'
+    | '/gielda/bajtlik'
+    | '/gielda/dziennik'
+    | '/gielda/etf'
+    | '/gielda/europa'
+    | '/gielda/makro'
+    | '/gielda/sektory'
+    | '/gielda/taktyki'
+    | '/gielda/usa'
+    | '/gielda/watchlista'
+    | '/gielda/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -272,11 +391,23 @@ export interface FileRouteTypes {
     | '/ustawienia'
     | '/auth/callback'
     | '/coin/$symbol'
+    | '/gielda/agent'
+    | '/gielda/bajtlik'
+    | '/gielda/dziennik'
+    | '/gielda/etf'
+    | '/gielda/europa'
+    | '/gielda/makro'
+    | '/gielda/sektory'
+    | '/gielda/taktyki'
+    | '/gielda/usa'
+    | '/gielda/watchlista'
+    | '/gielda'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/disclaimer'
+    | '/gielda'
     | '/likwidacja'
     | '/login'
     | '/polityka-prywatnosci'
@@ -297,12 +428,24 @@ export interface FileRouteTypes {
     | '/_authenticated/ustawienia'
     | '/auth/callback'
     | '/coin/$symbol'
+    | '/gielda/agent'
+    | '/gielda/bajtlik'
+    | '/gielda/dziennik'
+    | '/gielda/etf'
+    | '/gielda/europa'
+    | '/gielda/makro'
+    | '/gielda/sektory'
+    | '/gielda/taktyki'
+    | '/gielda/usa'
+    | '/gielda/watchlista'
+    | '/gielda/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   DisclaimerRoute: typeof DisclaimerRoute
+  GieldaRoute: typeof GieldaRouteWithChildren
   LikwidacjaRoute: typeof LikwidacjaRoute
   LoginRoute: typeof LoginRoute
   PolitykaPrywatnosciRoute: typeof PolitykaPrywatnosciRoute
@@ -413,6 +556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LikwidacjaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gielda': {
+      id: '/gielda'
+      path: '/gielda'
+      fullPath: '/gielda'
+      preLoaderRoute: typeof GieldaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/disclaimer': {
       id: '/disclaimer'
       path: '/disclaimer'
@@ -433,6 +583,83 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/gielda/': {
+      id: '/gielda/'
+      path: '/'
+      fullPath: '/gielda/'
+      preLoaderRoute: typeof GieldaIndexRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/watchlista': {
+      id: '/gielda/watchlista'
+      path: '/watchlista'
+      fullPath: '/gielda/watchlista'
+      preLoaderRoute: typeof GieldaWatchlistaRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/usa': {
+      id: '/gielda/usa'
+      path: '/usa'
+      fullPath: '/gielda/usa'
+      preLoaderRoute: typeof GieldaUsaRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/taktyki': {
+      id: '/gielda/taktyki'
+      path: '/taktyki'
+      fullPath: '/gielda/taktyki'
+      preLoaderRoute: typeof GieldaTaktykiRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/sektory': {
+      id: '/gielda/sektory'
+      path: '/sektory'
+      fullPath: '/gielda/sektory'
+      preLoaderRoute: typeof GieldaSektoryRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/makro': {
+      id: '/gielda/makro'
+      path: '/makro'
+      fullPath: '/gielda/makro'
+      preLoaderRoute: typeof GieldaMakroRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/europa': {
+      id: '/gielda/europa'
+      path: '/europa'
+      fullPath: '/gielda/europa'
+      preLoaderRoute: typeof GieldaEuropaRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/etf': {
+      id: '/gielda/etf'
+      path: '/etf'
+      fullPath: '/gielda/etf'
+      preLoaderRoute: typeof GieldaEtfRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/dziennik': {
+      id: '/gielda/dziennik'
+      path: '/dziennik'
+      fullPath: '/gielda/dziennik'
+      preLoaderRoute: typeof GieldaDziennikRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/bajtlik': {
+      id: '/gielda/bajtlik'
+      path: '/bajtlik'
+      fullPath: '/gielda/bajtlik'
+      preLoaderRoute: typeof GieldaBajtlikRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/agent': {
+      id: '/gielda/agent'
+      path: '/agent'
+      fullPath: '/gielda/agent'
+      preLoaderRoute: typeof GieldaAgentRouteImport
+      parentRoute: typeof GieldaRoute
     }
     '/coin/$symbol': {
       id: '/coin/$symbol'
@@ -506,10 +733,42 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface GieldaRouteChildren {
+  GieldaAgentRoute: typeof GieldaAgentRoute
+  GieldaBajtlikRoute: typeof GieldaBajtlikRoute
+  GieldaDziennikRoute: typeof GieldaDziennikRoute
+  GieldaEtfRoute: typeof GieldaEtfRoute
+  GieldaEuropaRoute: typeof GieldaEuropaRoute
+  GieldaMakroRoute: typeof GieldaMakroRoute
+  GieldaSektoryRoute: typeof GieldaSektoryRoute
+  GieldaTaktykiRoute: typeof GieldaTaktykiRoute
+  GieldaUsaRoute: typeof GieldaUsaRoute
+  GieldaWatchlistaRoute: typeof GieldaWatchlistaRoute
+  GieldaIndexRoute: typeof GieldaIndexRoute
+}
+
+const GieldaRouteChildren: GieldaRouteChildren = {
+  GieldaAgentRoute: GieldaAgentRoute,
+  GieldaBajtlikRoute: GieldaBajtlikRoute,
+  GieldaDziennikRoute: GieldaDziennikRoute,
+  GieldaEtfRoute: GieldaEtfRoute,
+  GieldaEuropaRoute: GieldaEuropaRoute,
+  GieldaMakroRoute: GieldaMakroRoute,
+  GieldaSektoryRoute: GieldaSektoryRoute,
+  GieldaTaktykiRoute: GieldaTaktykiRoute,
+  GieldaUsaRoute: GieldaUsaRoute,
+  GieldaWatchlistaRoute: GieldaWatchlistaRoute,
+  GieldaIndexRoute: GieldaIndexRoute,
+}
+
+const GieldaRouteWithChildren =
+  GieldaRoute._addFileChildren(GieldaRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   DisclaimerRoute: DisclaimerRoute,
+  GieldaRoute: GieldaRouteWithChildren,
   LikwidacjaRoute: LikwidacjaRoute,
   LoginRoute: LoginRoute,
   PolitykaPrywatnosciRoute: PolitykaPrywatnosciRoute,
