@@ -74,7 +74,7 @@ export const tactics: Tactic[] = [
     pros: ["Wysoki win rate", "Krótkie trzymanie pozycji"],
     cons: ["RR < 2", "Bardzo bolesne porażki w bear markecie"],
     related: ["trend-following"],
-    source: "Connors – „Short Term Trading Strategies That Work"",
+    source: "Connors — Short Term Trading Strategies That Work",
   },
   {
     id: "sector-rotation",
