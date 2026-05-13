@@ -78,6 +78,9 @@ function Index() {
         <FeedStatusBadge />
       </div>
 
+      {/* 4 kolorowe ramki — quick pulse */}
+      <QuickFrames sentiment={sentiment} />
+
       {/* 1. TRYB RYNKU */}
       <FeatureCard
         variant={activeRegime.tone === "bull" ? "mint" : activeRegime.tone === "bear" ? "bear" : "warning"}
