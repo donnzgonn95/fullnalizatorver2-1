@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 
 import { seoHead } from "@/lib/seo";
 import { ModeSwitcher } from "@/components/gielda/ModeSwitcher";
+import { TopSetupsWidget } from "@/components/feed/TopSetupsWidget";
+import { FeedStatusBadge } from "@/components/feed/FeedStatusBadge";
 
 export const Route = createFileRoute("/")({
   head: () => ({
