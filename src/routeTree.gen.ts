@@ -59,6 +59,7 @@ import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
 import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/public/hooks/verify-setups'
 import { Route as ApiPublicHooksScanSetupsRouteImport } from './routes/api/public/hooks/scan-setups'
+import { Route as ApiPublicHooksNotifySetupsRouteImport } from './routes/api/public/hooks/notify-setups'
 import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
 
 const SqueezeRoute = SqueezeRouteImport.update({
@@ -313,6 +314,12 @@ const ApiPublicHooksScanSetupsRoute =
     path: '/api/public/hooks/scan-setups',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksNotifySetupsRoute =
+  ApiPublicHooksNotifySetupsRouteImport.update({
+    id: '/api/public/hooks/notify-setups',
+    path: '/api/public/hooks/notify-setups',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksLabReportsRoute =
   ApiPublicHooksLabReportsRouteImport.update({
     id: '/api/public/hooks/lab-reports',
@@ -369,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
@@ -419,6 +427,7 @@ export interface FileRoutesByTo {
   '/gielda': typeof GieldaIndexRoute
   '/lab': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
@@ -473,6 +482,7 @@ export interface FileRoutesById {
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
@@ -527,6 +537,7 @@ export interface FileRouteTypes {
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   fileRoutesByTo: FileRoutesByTo
@@ -577,6 +588,7 @@ export interface FileRouteTypes {
     | '/gielda'
     | '/lab'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   id:
@@ -630,6 +642,7 @@ export interface FileRouteTypes {
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
     | '/api/public/hooks/verify-setups'
   fileRoutesById: FileRoutesById
@@ -656,6 +669,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   CoinSymbolRoute: typeof CoinSymbolRoute
   ApiPublicHooksLabReportsRoute: typeof ApiPublicHooksLabReportsRoute
+  ApiPublicHooksNotifySetupsRoute: typeof ApiPublicHooksNotifySetupsRoute
   ApiPublicHooksScanSetupsRoute: typeof ApiPublicHooksScanSetupsRoute
   ApiPublicHooksVerifySetupsRoute: typeof ApiPublicHooksVerifySetupsRoute
 }
@@ -1012,6 +1026,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksScanSetupsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/notify-setups': {
+      id: '/api/public/hooks/notify-setups'
+      path: '/api/public/hooks/notify-setups'
+      fullPath: '/api/public/hooks/notify-setups'
+      preLoaderRoute: typeof ApiPublicHooksNotifySetupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/lab-reports': {
       id: '/api/public/hooks/lab-reports'
       path: '/api/public/hooks/lab-reports'
@@ -1136,6 +1157,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   CoinSymbolRoute: CoinSymbolRoute,
   ApiPublicHooksLabReportsRoute: ApiPublicHooksLabReportsRoute,
+  ApiPublicHooksNotifySetupsRoute: ApiPublicHooksNotifySetupsRoute,
   ApiPublicHooksScanSetupsRoute: ApiPublicHooksScanSetupsRoute,
   ApiPublicHooksVerifySetupsRoute: ApiPublicHooksVerifySetupsRoute,
 }
