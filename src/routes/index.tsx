@@ -80,7 +80,7 @@ function Index() {
 
       {/* 1. TRYB RYNKU */}
       <FeatureCard
-        variant={activeRegime.id === "risk_on" ? "mint" : activeRegime.id === "risk_off" ? "bear" : "warning"}
+        variant={activeRegime.tone === "bull" ? "mint" : activeRegime.tone === "bear" ? "bear" : "warning"}
         icon={Compass}
         title="Tryb rynku"
         badge={activeRegime.label}
