@@ -80,6 +80,11 @@ function LoginPage() {
           <Link to="/reset-password" className="hover:text-foreground">Nie pamiętam hasła</Link>
           <Link to="/signup" className="hover:text-foreground">Załóż konto</Link>
         </div>
+        <div className="relative my-2 text-center text-[11px] uppercase tracking-widest text-muted-foreground">
+          <span className="bg-card px-2">lub</span>
+          <div className="absolute inset-x-0 top-1/2 -z-10 h-px bg-border" />
+        </div>
+        <GoogleButton />
       </form>
     </div>
   );
