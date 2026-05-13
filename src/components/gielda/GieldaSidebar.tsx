@@ -29,7 +29,8 @@ export function GieldaSidebar() {
         </div>
         <ul className="space-y-0.5">
           {items.map((it) => {
-            const active = it.exact ? path === it.to : path === it.to || path.startsWith(it.to + "/");
+            const exact = "exact" in it ? it.exact : false;
+            const active = exact ? path === it.to : path === it.to || path.startsWith(it.to + "/");
             const Icon = it.icon;
             return (
               <li key={it.to}>
