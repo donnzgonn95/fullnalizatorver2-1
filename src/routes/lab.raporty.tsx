@@ -159,9 +159,7 @@ function RaportyPage() {
                 </button>
                 {open && (
                   <div className="border-t border-border px-4 py-3">
-                    <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-md bg-background p-3 text-xs text-muted-foreground">
-{JSON.stringify(r.content, null, 2)}
-                    </pre>
+                    <ReportView content={r.content} type={isMorning ? "morning" : "evening"} stats={stats} />
                   </div>
                 )}
               </li>
