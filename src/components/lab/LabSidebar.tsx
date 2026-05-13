@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, FlaskConical, FileBarChart, ScanSearch, ShieldAlert,
-  Notebook, Send, Sunrise, Moon, Wallet,
+  Notebook, Send, Sunrise, Moon, Wallet, Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,7 @@ const items = [
   { to: "/lab/telegram", label: "Telegram Alerts", icon: Send },
   { to: "/lab/morning", label: "Morning Report", icon: Sunrise },
   { to: "/lab/evening", label: "Evening Report", icon: Moon },
+  { to: "/lab/raporty", label: "Historia raportów", icon: Archive },
   { to: "/lab/ledger", label: "Bajtlik Ledger", icon: Wallet },
 ] as const;
 
