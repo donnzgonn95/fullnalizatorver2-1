@@ -1,8 +1,4 @@
-import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { listTopSetups } from "@/lib/setups.functions";
-import { startScanner } from "@/lib/feed/scanner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
