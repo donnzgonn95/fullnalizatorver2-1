@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Activity,
   ArrowLeftRight,
