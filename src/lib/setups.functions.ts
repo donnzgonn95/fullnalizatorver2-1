@@ -46,7 +46,7 @@ export const ingestSetup = createServerFn({ method: "POST" })
       signal_strength: data.signal_strength,
       entry_time: data.entry_time,
       status: "active",
-      details: data.details,
+      details: data.details as never,
     });
     if (error) throw new Error(error.message);
     return { ok: true };

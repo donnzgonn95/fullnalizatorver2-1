@@ -18,6 +18,6 @@ export function useLiveCandles(symbol: ScanSymbol | null, interval: Interval) {
 
 export function useFeedSnapshot() {
   const [snap, setSnap] = useState<FeedSnapshot>({ provider: "binance", status: "offline" });
-  useEffect(() => getFeedManager().onSnapshot(setSnap), []);
+  useEffect(() => { const off = getFeedManager().onSnapshot(setSnap); return () => { off(); }; }, []);
   return snap;
 }
