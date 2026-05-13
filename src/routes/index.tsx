@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 
 import { seoHead } from "@/lib/seo";
 import { ModeSwitcher } from "@/components/gielda/ModeSwitcher";
+import { TopSetupsWidget } from "@/components/feed/TopSetupsWidget";
+import { FeedStatusBadge } from "@/components/feed/FeedStatusBadge";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -198,7 +200,8 @@ function Index() {
   return (
     <div className="space-y-6">
       <ModeSwitcher />
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-between gap-2">
+        <FeedStatusBadge />
         <button
           type="button"
           onClick={reset}
@@ -209,6 +212,7 @@ function Index() {
           <RotateCcw className="h-3 w-3" /> Domyślny układ
         </button>
       </div>
+      <TopSetupsWidget />
       {layout.order.map((id) => (
         <div key={id} data-section={id}>
           {sections[id]}

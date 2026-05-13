@@ -29,6 +29,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LabIndexRouteImport } from './routes/lab.index'
 import { Route as GieldaIndexRouteImport } from './routes/gielda.index'
+import { Route as SetupyHistoriaRouteImport } from './routes/setupy.historia'
 import { Route as LabTelegramRouteImport } from './routes/lab.telegram'
 import { Route as LabScannerRouteImport } from './routes/lab.scanner'
 import { Route as LabRiskRouteImport } from './routes/lab.risk'
@@ -56,6 +57,7 @@ import { Route as AuthenticatedUlubioneRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_authenticated/historia-alertow'
 import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
+import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/public/hooks/verify-setups'
 import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
 
 const SqueezeRoute = SqueezeRouteImport.update({
@@ -156,6 +158,11 @@ const GieldaIndexRoute = GieldaIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => GieldaRoute,
+} as any)
+const SetupyHistoriaRoute = SetupyHistoriaRouteImport.update({
+  id: '/historia',
+  path: '/historia',
+  getParentRoute: () => SetupyRoute,
 } as any)
 const LabTelegramRoute = LabTelegramRouteImport.update({
   id: '/telegram',
@@ -293,6 +300,12 @@ const AuthenticatedAlertyRoute = AuthenticatedAlertyRouteImport.update({
   path: '/alerty',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicHooksVerifySetupsRoute =
+  ApiPublicHooksVerifySetupsRouteImport.update({
+    id: '/api/public/hooks/verify-setups',
+    path: '/api/public/hooks/verify-setups',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksLabReportsRoute =
   ApiPublicHooksLabReportsRouteImport.update({
     id: '/api/public/hooks/lab-reports',
@@ -312,7 +325,7 @@ export interface FileRoutesByFullPath {
   '/regulamin': typeof RegulaminRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sentyment': typeof SentymentRoute
-  '/setupy': typeof SetupyRoute
+  '/setupy': typeof SetupyRouteWithChildren
   '/signup': typeof SignupRoute
   '/sila': typeof SilaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -345,9 +358,11 @@ export interface FileRoutesByFullPath {
   '/lab/risk': typeof LabRiskRoute
   '/lab/scanner': typeof LabScannerRoute
   '/lab/telegram': typeof LabTelegramRoute
+  '/setupy/historia': typeof SetupyHistoriaRoute
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -359,7 +374,7 @@ export interface FileRoutesByTo {
   '/regulamin': typeof RegulaminRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sentyment': typeof SentymentRoute
-  '/setupy': typeof SetupyRoute
+  '/setupy': typeof SetupyRouteWithChildren
   '/signup': typeof SignupRoute
   '/sila': typeof SilaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -392,9 +407,11 @@ export interface FileRoutesByTo {
   '/lab/risk': typeof LabRiskRoute
   '/lab/scanner': typeof LabScannerRoute
   '/lab/telegram': typeof LabTelegramRoute
+  '/setupy/historia': typeof SetupyHistoriaRoute
   '/gielda': typeof GieldaIndexRoute
   '/lab': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -410,7 +427,7 @@ export interface FileRoutesById {
   '/regulamin': typeof RegulaminRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sentyment': typeof SentymentRoute
-  '/setupy': typeof SetupyRoute
+  '/setupy': typeof SetupyRouteWithChildren
   '/signup': typeof SignupRoute
   '/sila': typeof SilaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -443,9 +460,11 @@ export interface FileRoutesById {
   '/lab/risk': typeof LabRiskRoute
   '/lab/scanner': typeof LabScannerRoute
   '/lab/telegram': typeof LabTelegramRoute
+  '/setupy/historia': typeof SetupyHistoriaRoute
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
+  '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -494,9 +513,11 @@ export interface FileRouteTypes {
     | '/lab/risk'
     | '/lab/scanner'
     | '/lab/telegram'
+    | '/setupy/historia'
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/verify-setups'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -541,9 +562,11 @@ export interface FileRouteTypes {
     | '/lab/risk'
     | '/lab/scanner'
     | '/lab/telegram'
+    | '/setupy/historia'
     | '/gielda'
     | '/lab'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/verify-setups'
   id:
     | '__root__'
     | '/'
@@ -591,9 +614,11 @@ export interface FileRouteTypes {
     | '/lab/risk'
     | '/lab/scanner'
     | '/lab/telegram'
+    | '/setupy/historia'
     | '/gielda/'
     | '/lab/'
     | '/api/public/hooks/lab-reports'
+    | '/api/public/hooks/verify-setups'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -609,7 +634,7 @@ export interface RootRouteChildren {
   RegulaminRoute: typeof RegulaminRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SentymentRoute: typeof SentymentRoute
-  SetupyRoute: typeof SetupyRoute
+  SetupyRoute: typeof SetupyRouteWithChildren
   SignupRoute: typeof SignupRoute
   SilaRoute: typeof SilaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -618,6 +643,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   CoinSymbolRoute: typeof CoinSymbolRoute
   ApiPublicHooksLabReportsRoute: typeof ApiPublicHooksLabReportsRoute
+  ApiPublicHooksVerifySetupsRoute: typeof ApiPublicHooksVerifySetupsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -761,6 +787,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/gielda/'
       preLoaderRoute: typeof GieldaIndexRouteImport
       parentRoute: typeof GieldaRoute
+    }
+    '/setupy/historia': {
+      id: '/setupy/historia'
+      path: '/historia'
+      fullPath: '/setupy/historia'
+      preLoaderRoute: typeof SetupyHistoriaRouteImport
+      parentRoute: typeof SetupyRoute
     }
     '/lab/telegram': {
       id: '/lab/telegram'
@@ -951,6 +984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlertyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/hooks/verify-setups': {
+      id: '/api/public/hooks/verify-setups'
+      path: '/api/public/hooks/verify-setups'
+      fullPath: '/api/public/hooks/verify-setups'
+      preLoaderRoute: typeof ApiPublicHooksVerifySetupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/lab-reports': {
       id: '/api/public/hooks/lab-reports'
       path: '/api/public/hooks/lab-reports'
@@ -1042,6 +1082,17 @@ const LabRouteChildren: LabRouteChildren = {
 
 const LabRouteWithChildren = LabRoute._addFileChildren(LabRouteChildren)
 
+interface SetupyRouteChildren {
+  SetupyHistoriaRoute: typeof SetupyHistoriaRoute
+}
+
+const SetupyRouteChildren: SetupyRouteChildren = {
+  SetupyHistoriaRoute: SetupyHistoriaRoute,
+}
+
+const SetupyRouteWithChildren =
+  SetupyRoute._addFileChildren(SetupyRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1055,7 +1106,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegulaminRoute: RegulaminRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SentymentRoute: SentymentRoute,
-  SetupyRoute: SetupyRoute,
+  SetupyRoute: SetupyRouteWithChildren,
   SignupRoute: SignupRoute,
   SilaRoute: SilaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -1064,17 +1115,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   CoinSymbolRoute: CoinSymbolRoute,
   ApiPublicHooksLabReportsRoute: ApiPublicHooksLabReportsRoute,
+  ApiPublicHooksVerifySetupsRoute: ApiPublicHooksVerifySetupsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
