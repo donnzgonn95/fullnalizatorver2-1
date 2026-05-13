@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { listSetupHistory } from "@/lib/setups.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { seoHead } from "@/lib/seo";
@@ -14,14 +13,21 @@ export const Route = createFileRoute("/setupy/historia")({
 function HistoryPage() {
   const [result, setResult] = useState<"win" | "loss" | "neutral" | "all">("all");
   const [type, setType] = useState<"elliott_wave" | "bb_bounce" | "all">("all");
-  const fetchHistory = useServerFn(listSetupHistory);
   const { data, isLoading } = useQuery({
-    queryKey: ["setup-history", result, type],
-    queryFn: () => fetchHistory({ data: {
-      result: result === "all" ? null : result,
-      setup_type: type === "all" ? null : type,
-      limit: 100,
-    } }),
+    queryKey: ["setup-history-global", result, type],
+    queryFn: async () => {
+      let q = supabase
+        .from("detected_setups")
+        .select("*")
+        .is("user_id", null)
+        .order("detected_at", { ascending: false })
+        .limit(100);
+      if (result !== "all") q = q.eq("result", result);
+      if (type !== "all") q = q.eq("setup_type", type);
+      const { data, error } = await q;
+      if (error) throw error;
+      return data ?? [];
+    },
     refetchInterval: 60_000,
   });
 
