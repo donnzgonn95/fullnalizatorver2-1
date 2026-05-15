@@ -336,7 +336,7 @@ function OutcomeChip({ outcome }: { outcome: string }) {
 }
 
 function LogDetailTabs({ details }: { details: any }) {
-  const [tab, setTab] = useState<"summary" | "runs" | "diff" | "raw">("summary");
+  const [tab, setTab] = useState<"summary" | "runs" | "checks" | "diff" | "raw">("summary");
   const [openRun, setOpenRun] = useState<string | null>(null);
   const runs: any[] = details?.runs ?? [];
   const checks: any[] = details?.checks ?? [];
@@ -355,7 +355,7 @@ function LogDetailTabs({ details }: { details: any }) {
       <div className="flex flex-wrap gap-1">
         <TabBtn id="summary" label="Podsumowanie" />
         {runs.length > 0 && <TabBtn id="runs" label="Runs" count={runs.length} />}
-        {checks.length > 0 && <TabBtn id="runs" label="Setupy" count={checks.length} />}
+        {checks.length > 0 && <TabBtn id="checks" label="Setupy" count={checks.length} />}
         {diff.length > 0 && <TabBtn id="diff" label="Diff" count={diff.length} />}
         <TabBtn id="raw" label="JSON" />
       </div>
@@ -422,15 +422,39 @@ function LogDetailTabs({ details }: { details: any }) {
                     </span>
                   </button>
                   {isOpen && (
-                    <div className="space-y-1.5 bg-background/40 px-3 py-2 text-[10px]">
+                    <div className="space-y-2 bg-background/40 px-3 py-2 text-[10px]">
                       <div className="text-muted-foreground">
                         Świece: {r.candles?.firstOpenTime?.slice(0, 16)?.replace("T", " ")} → {r.candles?.lastCloseTime?.slice(0, 16)?.replace("T", " ")}
                         {" · "}vol {r.candles?.lastVolume?.toFixed?.(2) ?? "—"}
                       </div>
+                      {Array.isArray(r.candles?.tail) && r.candles.tail.length > 0 && (
+                        <div className="overflow-x-auto rounded border border-border bg-background/60">
+                          <div className="grid grid-cols-6 gap-2 border-b border-border/60 px-2 py-1 text-[9px] uppercase tracking-widest text-muted-foreground">
+                            <span>time</span><span className="text-right">open</span><span className="text-right">high</span><span className="text-right">low</span><span className="text-right">close</span><span className="text-right">vol</span>
+                          </div>
+                          {r.candles.tail.map((c: any, i: number) => (
+                            <div key={i} className="grid grid-cols-6 gap-2 px-2 py-0.5 font-mono text-[10px] odd:bg-background/30">
+                              <span className="text-muted-foreground">{c.openTime?.slice(5, 16)?.replace("T", " ")}</span>
+                              <span className="num text-right">{Number(c.open).toFixed(2)}</span>
+                              <span className="num text-right">{Number(c.high).toFixed(2)}</span>
+                              <span className="num text-right">{Number(c.low).toFixed(2)}</span>
+                              <span className="num text-right">{Number(c.close).toFixed(2)}</span>
+                              <span className="num text-right text-muted-foreground">{Number(c.volume).toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       {r.detectors?.map((d: any, i: number) => (
                         <div key={i} className="rounded border border-border bg-background/60 p-2">
                           <div className="mb-1 flex items-center gap-2"><span className="font-bold">{d.name}</span><OutcomeChip outcome={d.outcome} /><span className="text-muted-foreground">· {d.durationMs} ms</span></div>
                           {d.reason && <div className="text-muted-foreground">{d.reason}</div>}
+                          {d.params && (
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {Object.entries(d.params).map(([k, v]) => (
+                                <Mini key={k} label={k} v={String(v)} />
+                              ))}
+                            </div>
+                          )}
                           {d.setup && (
                             <div className="mt-1 grid grid-cols-2 gap-1 md:grid-cols-4">
                               <Mini label="dir" v={d.setup.direction} />
@@ -443,6 +467,10 @@ function LogDetailTabs({ details }: { details: any }) {
                           )}
                         </div>
                       ))}
+                      <details className="rounded border border-border/60 bg-background/40 p-1">
+                        <summary className="cursor-pointer px-1 text-[9px] uppercase tracking-widest text-muted-foreground">Surowy JSON</summary>
+                        <pre className="mt-1 max-h-60 overflow-auto p-2 text-[10px]">{JSON.stringify(r, null, 2)}</pre>
+                      </details>
                     </div>
                   )}
                 </div>
@@ -452,7 +480,7 @@ function LogDetailTabs({ details }: { details: any }) {
         </div>
       )}
 
-      {tab === "runs" && checks.length > 0 && (
+      {tab === "checks" && checks.length > 0 && (
         <div className="overflow-hidden rounded-md border border-border">
           <div className="grid grid-cols-12 gap-2 bg-background/60 px-2 py-1 text-[9px] uppercase tracking-widest text-muted-foreground">
             <span className="col-span-3">Symbol/Itv</span>

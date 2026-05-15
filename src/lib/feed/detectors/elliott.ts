@@ -1,6 +1,16 @@
 import type { Candle } from "../types";
 import type { DetectedSetup } from "./bb-bounce";
 
+export const ELLIOTT_PARAMS = {
+  zigzagThresholdPct: 1.5,
+  tailPivots: 5,
+  minCandles: 60,
+  tpFib: 0.618,
+  slBufferPct: 0.3,
+  w3MinRatio: 0.8,
+  baseStrength: 60,
+} as const;
+
 interface Pivot { i: number; price: number; type: "H" | "L"; time: number }
 
 function zigzag(candles: Candle[], threshold = 0.015): Pivot[] {

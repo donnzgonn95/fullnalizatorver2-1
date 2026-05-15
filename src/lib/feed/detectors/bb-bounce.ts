@@ -13,6 +13,17 @@ export interface DetectedSetup {
   details: Record<string, unknown>;
 }
 
+export const BB_PARAMS = {
+  bbPeriod: 20,
+  bbStdDev: 2,
+  rsiPeriod: 14,
+  rsiOversold: 40,
+  rsiOverbought: 60,
+  minStrength: 20,
+  slBufferPct: 0.2,
+  minCandles: 25,
+} as const;
+
 export function detectBBBounce(candles: Candle[]): DetectedSetup | null {
   if (candles.length < 25) return null;
   const closes = candles.map((c) => c.close);

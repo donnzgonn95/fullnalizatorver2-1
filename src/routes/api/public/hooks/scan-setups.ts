@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { detectBBBounce, type DetectedSetup } from "@/lib/feed/detectors/bb-bounce";
-import { detectElliott } from "@/lib/feed/detectors/elliott";
+import { detectBBBounce, BB_PARAMS, type DetectedSetup } from "@/lib/feed/detectors/bb-bounce";
+import { detectElliott, ELLIOTT_PARAMS } from "@/lib/feed/detectors/elliott";
 import { aggregateM45 } from "@/lib/feed/m45";
 import { bollinger, rsi } from "@/lib/feed/indicators";
 import {
@@ -29,7 +29,17 @@ interface DetectorReport {
     wave_label?: string | null;
     setup_type: string;
   };
+  params?: Record<string, unknown>;
   durationMs: number;
+}
+
+interface CandleTailItem {
+  openTime: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
 }
 
 interface RunReport {
@@ -41,9 +51,18 @@ interface RunReport {
     lastCloseTime: string | null;
     lastClose: number | null;
     lastVolume: number | null;
+    tail?: CandleTailItem[];
   };
   detectors: DetectorReport[];
 }
+
+const TAIL_SIZE = 20;
+
+const DETECTOR_PARAMS: Record<DetectorReport["name"], Record<string, unknown>> = {
+  bb_bounce: BB_PARAMS as unknown as Record<string, unknown>,
+  elliott_wave: ELLIOTT_PARAMS as unknown as Record<string, unknown>,
+};
+
 
 async function fetchKlines(pair: string, binItv: string, limit = 200): Promise<Candle[]> {
   const url = `https://api.binance.com/api/v3/klines?symbol=${pair}&interval=${binItv}&limit=${limit}`;
@@ -183,10 +202,14 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
                   candleMeta.lastCloseTime = new Date(last.openTime).toISOString();
                   candleMeta.lastClose = last.close;
                   candleMeta.lastVolume = last.volume;
+                  candleMeta.tail = candles.slice(-TAIL_SIZE).map((c) => ({
+                    openTime: new Date(c.openTime).toISOString(),
+                    open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume,
+                  }));
                 }
                 if (candles.length < 35) {
-                  detectorReports.push({ name: "bb_bounce", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, durationMs: 0 });
-                  detectorReports.push({ name: "elliott_wave", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, durationMs: 0 });
+                  detectorReports.push({ name: "bb_bounce", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.bb_bounce, durationMs: 0 });
+                  detectorReports.push({ name: "elliott_wave", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.elliott_wave, durationMs: 0 });
                   runs.push({ symbol, interval, candles: candleMeta, detectors: detectorReports });
                   continue;
                 }
@@ -198,11 +221,12 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
 
                 for (const d of detectors) {
                   const t0 = Date.now();
+                  const params = DETECTOR_PARAMS[d.name];
                   try {
                     const setup = d.fn(candles);
                     const dur = Date.now() - t0;
                     if (!setup) {
-                      detectorReports.push({ name: d.name, outcome: "no-signal", reason: d.explain(candles), durationMs: dur });
+                      detectorReports.push({ name: d.name, outcome: "no-signal", reason: d.explain(candles), params, durationMs: dur });
                       continue;
                     }
                     detected += 1;
@@ -217,7 +241,7 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
                       wave_label: setup.wave_label ?? null,
                     };
                     if (await alreadyExists(symbol, interval, setup.setup_type, entryISO)) {
-                      detectorReports.push({ name: d.name, outcome: "duplicate", reason: "Identyczny setup w ostatnich 30 min", setup: setupSummary, durationMs: dur });
+                      detectorReports.push({ name: d.name, outcome: "duplicate", reason: "Identyczny setup w ostatnich 30 min", setup: setupSummary, params, durationMs: dur });
                       continue;
                     }
                     const { error } = await supabaseAdmin.from("detected_setups").insert({
@@ -231,24 +255,24 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
                     if (error) {
                       errors += 1;
                       errorMessages.push(`${symbol}/${interval}/${d.name}: ${error.message}`);
-                      detectorReports.push({ name: d.name, outcome: "error", reason: error.message, setup: setupSummary, durationMs: dur });
+                      detectorReports.push({ name: d.name, outcome: "error", reason: error.message, setup: setupSummary, params, durationMs: dur });
                     } else {
                       inserted += 1;
-                      detectorReports.push({ name: d.name, outcome: "setup", setup: setupSummary, durationMs: dur });
+                      detectorReports.push({ name: d.name, outcome: "setup", setup: setupSummary, params, durationMs: dur });
                     }
                   } catch (e) {
                     const dur = Date.now() - t0;
                     errors += 1;
                     const msg = (e as Error).message ?? "unknown";
                     errorMessages.push(`${symbol}/${interval}/${d.name}: ${msg}`);
-                    detectorReports.push({ name: d.name, outcome: "error", reason: msg, durationMs: dur });
+                    detectorReports.push({ name: d.name, outcome: "error", reason: msg, params, durationMs: dur });
                   }
                 }
               } catch (e) {
                 errors += 1;
                 const msg = (e as Error).message ?? "unknown";
                 errorMessages.push(`${symbol}/${interval}: ${msg}`);
-                detectorReports.push({ name: "bb_bounce", outcome: "error", reason: msg, durationMs: 0 });
+                detectorReports.push({ name: "bb_bounce", outcome: "error", reason: msg, params: DETECTOR_PARAMS.bb_bounce, durationMs: 0 });
               }
               runs.push({ symbol, interval, candles: candleMeta, detectors: detectorReports });
             }
