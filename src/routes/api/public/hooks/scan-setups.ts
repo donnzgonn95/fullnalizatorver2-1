@@ -29,8 +29,39 @@ interface DetectorReport {
     wave_label?: string | null;
     setup_type: string;
   };
+  params?: Record<string, unknown>;
   durationMs: number;
 }
+
+interface CandleTailItem {
+  openTime: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+interface RunReport {
+  symbol: string;
+  interval: string;
+  candles: {
+    count: number;
+    firstOpenTime: string | null;
+    lastCloseTime: string | null;
+    lastClose: number | null;
+    lastVolume: number | null;
+    tail?: CandleTailItem[];
+  };
+  detectors: DetectorReport[];
+}
+
+const TAIL_SIZE = 20;
+
+const DETECTOR_PARAMS: Record<DetectorReport["name"], Record<string, unknown>> = {
+  bb_bounce: BB_PARAMS as unknown as Record<string, unknown>,
+  elliott_wave: ELLIOTT_PARAMS as unknown as Record<string, unknown>,
+};
 
 interface RunReport {
   symbol: string;
