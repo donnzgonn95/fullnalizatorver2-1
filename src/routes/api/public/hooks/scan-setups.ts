@@ -63,18 +63,6 @@ const DETECTOR_PARAMS: Record<DetectorReport["name"], Record<string, unknown>> =
   elliott_wave: ELLIOTT_PARAMS as unknown as Record<string, unknown>,
 };
 
-interface RunReport {
-  symbol: string;
-  interval: string;
-  candles: {
-    count: number;
-    firstOpenTime: string | null;
-    lastCloseTime: string | null;
-    lastClose: number | null;
-    lastVolume: number | null;
-  };
-  detectors: DetectorReport[];
-}
 
 async function fetchKlines(pair: string, binItv: string, limit = 200): Promise<Candle[]> {
   const url = `https://api.binance.com/api/v3/klines?symbol=${pair}&interval=${binItv}&limit=${limit}`;
