@@ -355,7 +355,7 @@ function LogDetailTabs({ details }: { details: any }) {
       <div className="flex flex-wrap gap-1">
         <TabBtn id="summary" label="Podsumowanie" />
         {runs.length > 0 && <TabBtn id="runs" label="Runs" count={runs.length} />}
-        {checks.length > 0 && <TabBtn id="runs" label="Setupy" count={checks.length} />}
+        {checks.length > 0 && <TabBtn id="checks" label="Setupy" count={checks.length} />}
         {diff.length > 0 && <TabBtn id="diff" label="Diff" count={diff.length} />}
         <TabBtn id="raw" label="JSON" />
       </div>
