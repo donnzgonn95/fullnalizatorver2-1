@@ -202,10 +202,14 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
                   candleMeta.lastCloseTime = new Date(last.openTime).toISOString();
                   candleMeta.lastClose = last.close;
                   candleMeta.lastVolume = last.volume;
+                  candleMeta.tail = candles.slice(-TAIL_SIZE).map((c) => ({
+                    openTime: new Date(c.openTime).toISOString(),
+                    open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume,
+                  }));
                 }
                 if (candles.length < 35) {
-                  detectorReports.push({ name: "bb_bounce", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, durationMs: 0 });
-                  detectorReports.push({ name: "elliott_wave", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, durationMs: 0 });
+                  detectorReports.push({ name: "bb_bounce", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.bb_bounce, durationMs: 0 });
+                  detectorReports.push({ name: "elliott_wave", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.elliott_wave, durationMs: 0 });
                   runs.push({ symbol, interval, candles: candleMeta, detectors: detectorReports });
                   continue;
                 }
