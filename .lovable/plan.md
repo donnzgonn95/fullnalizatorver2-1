@@ -1,93 +1,94 @@
 ## Cel
 
-Dziś `cron_run_logs.details` zawiera tylko liczniki (`detected`, `inserted`, `errors`, lista `errorMessages`). Po kliknięciu wpisu w `/admin` widać tylko surowy JSON z agregatami — nie wiadomo **co** detektor dostał na wejściu i **dlaczego** wypluł (lub nie wypluł) setup.
+Po kliknięciu wiersza w zakładce **Runs** (panel `/admin`) chcesz zobaczyć obok wyniku detektora także:
 
-Rozbudowa ma dać pełną „ścieżkę audytu" dla każdego ręcznego (i automatycznego) skanu:
-- ile świec wczytano, z jakiego zakresu czasowego, ostatni close
-- co każdy detektor zwrócił (setup albo powód odrzucenia)
-- czy setup był nowy, czy duplikat (deduplikacja po 30 min)
-- diff względem poprzedniego runu tej samej pary symbol/interwał
+- **payload wejściowy świec** (ostatnie OHLCV użyte do decyzji),
+- **parametry detektora** (BB period/std, progi RSI, lookback Elliotta itd.).
 
-Bez zmian w logice detektorów ani w cronach automatycznych — tylko więcej telemetrii + nowy widok w `/admin`.
+Przy okazji dwa szybkie fixy błędów runtime, które już są w preview.
 
 ---
 
-## Zakres
+## Bug fixy (po drodze)
 
-### 1. Backend — bogatszy payload w `cron_run_logs.details`
+### A. Hydration mismatch w `AiThinkingCard` (`src/routes/index.tsx` ~304–310)
 
-**Plik:** `src/routes/api/public/hooks/scan-setups.ts`
+`new Date()` jest wołane w trakcie renderu — SSR generuje czas serwera (np. `02:21`), klient po hydratacji wstawia czas lokalny (`00:21`) → React #418. Naprawiam: `useState<Date | null>(null)` + `useEffect(() => setNow(new Date()), [])`, do pierwszego renderu placeholder `--:--`. Logika i wygląd bez zmian.
 
-Dorzucam wewnątrz pętli `for symbol → for interval` zbieranie obiektu:
+### B. Duplikat `id="runs"` w zakładkach `CronLogsCard` (`src/routes/admin.tsx` 357–358)
 
-```text
-runs: [
-  {
-    symbol, interval,
-    candles: { count, firstOpenTime, lastCloseTime, lastClose, lastVolume },
-    detectors: [
-      {
-        name: "bb-bounce" | "elliott",
-        outcome: "setup" | "no-signal" | "duplicate" | "error",
-        reason?: string,           // np. "RSI 62 > próg 30", "brak fali 5"
-        setup?: { direction, entry_price, stop_loss, take_profit, signal_strength, wave_label },
-        durationMs: number,
-      }
-    ],
-  }
-]
-```
-
-Detektory (`detectBBBounce`, `detectElliott`) zwracają obecnie `DetectedSetup | null` — dodaję cienki wrapper w hooku, który łapie `null` i zapisuje `outcome: "no-signal"` z krótkim opisem powodu pobranym z ostatniej świecy (BB%, RSI, fale). To NIE wymaga zmian w samych detektorach.
-
-Limity rozmiaru: górny cap 200 wpisów `runs` w jednym logu (więcej i tak nie zmieści się sensownie w UI), świece nie są zapisywane (tylko meta), `errorMessages` zostaje.
-
-### 2. Backend — diff vs poprzedni run
-
-W tym samym hooku, **przed** insertem nowego loga, czytam ostatni `cron_run_logs` o `job_name='scan-setups'` i `status IN ('success','partial')`. Dla każdego klucza `symbol/interval` porównuję `lastClose` i listę wykrytych typów setupów. Wynik trafia do `details.diff`:
-
-```text
-diff: {
-  vsRunId: "...",
-  changed: [
-    { symbol, interval, lastCloseDelta: +0.42, newSetups: ["bb-bounce-long"], goneSetups: [] }
-  ]
-}
-```
-
-To samo dla `verify-setups` (diff: które setupy zmieniły status `active → win/loss/expired`).
-
-### 3. UI — rozbudowany `CronLogsCard`
-
-**Plik:** `src/routes/admin.tsx` (sekcja `CronLogsCard`)
-
-Po rozwinięciu wiersza, zamiast surowego `<pre>{JSON.stringify(details)}</pre>`, renderuję trzy zakładki (lokalny `useState`, bez Radix Tabs — proste przyciski):
-
-1. **Podsumowanie** — kafelki: detected, inserted, errors, czas trwania, użyta lista symboli/interwałów (z `cfg`).
-2. **Runs** — tabela: symbol · interwał · #świec · lastClose · wynik każdego detektora (kolorowy chip: zielony=setup, szary=no-signal, żółty=duplicate, czerwony=error). Klik wiersza → drawer z pełnym `setup` JSON i `reason`.
-3. **Diff** — lista zmian względem poprzedniego runu, z kolorowymi delta (↑/↓ ceny, „NOWY: bb-bounce-long").
-
-Na poziomie samej listy logów dorzucam mini-wskaźnik nad numerem `det:X ins:Y` (np. „+2 NEW" jeśli `diff.changed` zawiera nowe setupy) — od razu widać który skan coś znalazł.
-
-### 4. Bez zmian
-
-- Schemat tabeli `cron_run_logs` — `details jsonb` już to udźwignie.
-- Cron pg_cron i jego harmonogram.
-- Detektory, deduplikacja, RLS.
-- `verify-setups` i `notify-setups` dostają tylko bogatsze `details` w analogicznym stylu (per-setup `pnl_pct`, dlaczego status się zmienił).
+Dwa `<TabBtn id="runs" />` — jeden dla skanów, drugi dla setupów (verify) — powodują kolizję stanu. Zmieniam typ stanu na `"summary" | "runs" | "checks" | "diff" | "raw"`, drugi przycisk dostaje `id="checks"`, warunek `tab === "runs" && checks.length` → `tab === "checks"`.
 
 ---
+
+## Główna zmiana — bogatszy drawer w Runs
+
+### 1. Backend — `src/routes/api/public/hooks/scan-setups.ts`
+
+Rozszerzam `RunReport.candles` o `tail` (5 ostatnich OHLCV) i każdy `DetectorReport` o `params`:
+
+```text
+candles: { count, firstOpenTime, lastCloseTime, lastClose, lastVolume,
+           tail: [{ openTime, open, high, low, close, volume }, ...5] }
+detectors: [{
+  name, outcome, reason, setup, durationMs,
+  params: { ...statyczna konfiguracja detektora }
+}]
+```
+
+`params` biorę z nowych eksportów w detektorach (poniżej) — pojedyncze obiekty, bez zmiany logiki sygnałów.
+
+Limit `runs` 200 zostaje. Dodatkowy narzut: ~5 świec × ~80 B + ~150 B params ≈ 0.5 KB/run, mieści się spokojnie.
+
+### 2. Detektory — eksport stałych
+
+- `src/lib/feed/detectors/bb-bounce.ts`: dodaję `export const BB_PARAMS = { bbPeriod: 20, bbStdDev: 2, rsiPeriod: 14, rsiOversold: 40, rsiOverbought: 60 }` (wartości odczytane z aktualnych użyć `bollinger`/`rsi` — bez zmiany progów). Detektor dalej używa tych samych liczb, ale przez stałą.
+- `src/lib/feed/detectors/elliott.ts`: `export const ELLIOTT_PARAMS = { zigzagThresholdPct: 0.5, tailPivots: 5, tpFib: 0.618, slBufferPct: 0.3 }` (też zgodnie z aktualnym kodem).
+
+Brak zmian w logice — tylko wyciągnięcie magicznych liczb do stałej, którą można pokazać w UI i logach.
+
+### 3. UI — `src/routes/admin.tsx` drawer Runs (linie ~424–447)
+
+W rozwiniętym wierszu, pod nagłówkiem świec:
+
+**(a) Tail świec** — mini-tabela monospace:
+
+```
+time     open     high     low      close    volume
+13:30    67120.5  67230.0  67050.1  67200.3  412.20
+13:45    ...
+```
+
+**(b) W boxie każdego detektora** dodaję pasek `params` (komponent `Mini` używany już dla `setup`):
+
+```
+params: bbPeriod=20 · bbStdDev=2 · rsi=14 · oversold=40 · overbought=60
+```
+
+**(c)** Toggle `<details>Pokaż surowy JSON</details>` na końcu drawer'a — szybki podgląd całości bez wchodzenia w zakładkę Raw.
+
+Stare logi (bez `tail`/`params`) renderują się normalnie — pola opcjonalne.
+
+---
+
+## Bez zmian
+
+- Schemat bazy, RLS, crony.
+- Logika detektorów / ingestu / dedup.
+- `verify-setups`, `notify-setups`.
 
 ## Pliki do edycji
 
-- `src/routes/api/public/hooks/scan-setups.ts` — bogatszy `details`, diff, wrapper na detektory.
-- `src/routes/api/public/hooks/verify-setups.ts` — bogatszy `details` per setup + diff statusów.
-- `src/routes/admin.tsx` — `CronLogsCard` z 3 zakładkami, kolorowe chipy outcome'ów, drawer JSON.
+- `src/routes/index.tsx` — fix hydration `AiThinkingCard`.
+- `src/routes/admin.tsx` — fix duplicate tab id + rozbudowany drawer Runs.
+- `src/routes/api/public/hooks/scan-setups.ts` — `candles.tail` + `detectors[].params`.
+- `src/lib/feed/detectors/bb-bounce.ts` — eksport `BB_PARAMS`.
+- `src/lib/feed/detectors/elliott.ts` — eksport `ELLIOTT_PARAMS`.
 
-Brak migracji bazy. Brak nowych zależności.
+Brak migracji, brak nowych zależności.
 
----
+## Pytanie
 
-## Pytanie pomocnicze
-
-Czy chcesz też zapisywać **snapshot ostatnich N świec (np. ostatnie 5 OHLCV)** na detektor — żeby móc po fakcie ręcznie odtworzyć decyzję? To zwiększy wagę logów (~3–5 KB/run zamiast ~500 B), ale daje pełną reprodukcję bez ponownego strzału w Binance. Domyślnie **NIE robię** tego — tylko meta świec.
+Domyślnie tail = **5 świec**. OK, czy wolisz 10/20? Większa liczba = lepsza reprodukcja decyzji, ale rosną logi.  
+  
+20
