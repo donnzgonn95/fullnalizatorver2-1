@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { detectBBBounce, type DetectedSetup } from "@/lib/feed/detectors/bb-bounce";
-import { detectElliott } from "@/lib/feed/detectors/elliott";
+import { detectBBBounce, BB_PARAMS, type DetectedSetup } from "@/lib/feed/detectors/bb-bounce";
+import { detectElliott, ELLIOTT_PARAMS } from "@/lib/feed/detectors/elliott";
 import { aggregateM45 } from "@/lib/feed/m45";
 import { bollinger, rsi } from "@/lib/feed/indicators";
 import {
