@@ -452,7 +452,7 @@ function LogDetailTabs({ details }: { details: any }) {
         </div>
       )}
 
-      {tab === "runs" && checks.length > 0 && (
+      {tab === "checks" && checks.length > 0 && (
         <div className="overflow-hidden rounded-md border border-border">
           <div className="grid grid-cols-12 gap-2 bg-background/60 px-2 py-1 text-[9px] uppercase tracking-widest text-muted-foreground">
             <span className="col-span-3">Symbol/Itv</span>
