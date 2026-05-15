@@ -336,7 +336,7 @@ function OutcomeChip({ outcome }: { outcome: string }) {
 }
 
 function LogDetailTabs({ details }: { details: any }) {
-  const [tab, setTab] = useState<"summary" | "runs" | "diff" | "raw">("summary");
+  const [tab, setTab] = useState<"summary" | "runs" | "checks" | "diff" | "raw">("summary");
   const [openRun, setOpenRun] = useState<string | null>(null);
   const runs: any[] = details?.runs ?? [];
   const checks: any[] = details?.checks ?? [];
