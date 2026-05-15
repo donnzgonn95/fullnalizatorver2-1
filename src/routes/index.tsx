@@ -302,8 +302,10 @@ function RiskBar({ label, value, cap, pct, tone }: { label: string; value: strin
 }
 
 function AiThinkingCard({ regimeLabel }: { regimeLabel: string }) {
-  const now = new Date();
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => { setNow(new Date()); }, []);
   const t = (mins: number) => {
+    if (!now) return "--:--";
     const d = new Date(now.getTime() - mins * 60_000);
     return d.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
   };
