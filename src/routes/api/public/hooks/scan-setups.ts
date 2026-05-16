@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { appendLedger } from "@/lib/ledger/golden-ledger.server";
 import { detectBBBounce, BB_PARAMS, type DetectedSetup } from "@/lib/feed/detectors/bb-bounce";
 import { detectElliott, ELLIOTT_PARAMS } from "@/lib/feed/detectors/elliott";
 import { aggregateM45 } from "@/lib/feed/m45";
@@ -259,6 +260,16 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
                     } else {
                       inserted += 1;
                       detectorReports.push({ name: d.name, outcome: "setup", setup: setupSummary, params, durationMs: dur });
+                      // Zapis do Złotej Księgi + nagroda eljot za wykryty setup
+                      await appendLedger({
+                        category: "setup.detected",
+                        source: "setup-scanner-v1",
+                        agentSlug: "setup-scanner-v1",
+                        symbol,
+                        summary: `${setup.setup_type} ${setup.direction.toUpperCase()} ${symbol}/${interval} · siła ${setup.signal_strength}`,
+                        payload: { interval, ...setupSummary, params },
+                        reward: { amount: 1, reason: `setup ${setup.setup_type} ${symbol}/${interval}` },
+                      });
                     }
                   } catch (e) {
                     const dur = Date.now() - t0;
