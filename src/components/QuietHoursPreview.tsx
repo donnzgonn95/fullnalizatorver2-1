@@ -7,11 +7,17 @@ import { isInQuietHours, type QuietHours } from "@/lib/notifications";
  * with a marker for the current time.
  */
 export function QuietHoursPreview({ qh }: { qh: QuietHours }) {
-  const [now, setNow] = useState(() => new Date());
+  // Start as null to avoid SSR/client time mismatch (server is UTC, client is local).
+  const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
+    setNow(new Date());
     const t = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(t);
   }, []);
+  if (!now) {
+    // Stable placeholder for SSR: render structure without the time-dependent cursor/label.
+    return <div className="space-y-2 h-[72px]" data-testid="quiet-preview" aria-hidden="true" />;
+  }
 
   const slots = Array.from({ length: 48 }, (_, i) => {
     const d = new Date(now);
