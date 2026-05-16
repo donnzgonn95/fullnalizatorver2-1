@@ -55,6 +55,97 @@ export type Database = {
           },
         ]
       }
+      agent_reputation: {
+        Row: {
+          agent_id: string
+          events_count: number
+          hits: number
+          last_active_at: string | null
+          misses: number
+          score: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          events_count?: number
+          hits?: number
+          last_active_at?: string | null
+          misses?: number
+          score?: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          events_count?: number
+          hits?: number
+          last_active_at?: string | null
+          misses?: number
+          score?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_reputation_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents: {
+        Row: {
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          mentor_id: string | null
+          name: string
+          slug: string
+          status: string
+          updated_at: string
+          version: string
+          wallet_address: string | null
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind: string
+          mentor_id?: string | null
+          name: string
+          slug: string
+          status?: string
+          updated_at?: string
+          version?: string
+          wallet_address?: string | null
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          mentor_id?: string | null
+          name?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+          version?: string
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agents_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bajtlik_capital: {
         Row: {
           available_cash: number
@@ -246,6 +337,101 @@ export type Database = {
           wave_label?: string | null
         }
         Relationships: []
+      }
+      eljot_ledger: {
+        Row: {
+          agent_id: string | null
+          amount: number
+          created_at: string
+          id: string
+          ledger_entry_id: string | null
+          reason: string
+          wallet_address: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          ledger_entry_id?: string | null
+          reason: string
+          wallet_address?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          ledger_entry_id?: string | null
+          reason?: string
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eljot_ledger_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eljot_ledger_ledger_entry_id_fkey"
+            columns: ["ledger_entry_id"]
+            isOneToOne: false
+            referencedRelation: "golden_ledger"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      golden_ledger: {
+        Row: {
+          agent_id: string | null
+          category: string
+          created_at: string
+          entry_hash: string
+          id: string
+          payload: Json
+          prev_hash: string | null
+          seq: number
+          source: string
+          summary: string
+          symbol: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          category: string
+          created_at?: string
+          entry_hash: string
+          id?: string
+          payload?: Json
+          prev_hash?: string | null
+          seq?: number
+          source: string
+          summary: string
+          symbol?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          category?: string
+          created_at?: string
+          entry_hash?: string
+          id?: string
+          payload?: Json
+          prev_hash?: string | null
+          seq?: number
+          source?: string
+          summary?: string
+          symbol?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "golden_ledger_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       investment_tactics: {
         Row: {
