@@ -73,7 +73,7 @@ export async function appendLedger(w: LedgerWrite): Promise<{ id: string; hash: 
         agent_id: agentId,
         symbol: w.symbol ?? null,
         summary: w.summary,
-        payload: w.payload ?? {},
+        payload: (w.payload ?? {}) as never,
         prev_hash: prev,
         entry_hash: hash,
         created_at: createdAt,

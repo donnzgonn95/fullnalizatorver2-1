@@ -55,6 +55,7 @@ import { Route as CoinSymbolRouteImport } from './routes/coin.$symbol'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedUstawieniaRouteImport } from './routes/_authenticated/ustawienia'
 import { Route as AuthenticatedUlubioneRouteImport } from './routes/_authenticated/ulubione'
+import { Route as AuthenticatedKsiegaRouteImport } from './routes/_authenticated/ksiega'
 import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_authenticated/historia-alertow'
 import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
@@ -292,6 +293,11 @@ const AuthenticatedUlubioneRoute = AuthenticatedUlubioneRouteImport.update({
   path: '/ulubione',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedKsiegaRoute = AuthenticatedKsiegaRouteImport.update({
+  id: '/ksiega',
+  path: '/ksiega',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedHistoriaAlertowRoute =
   AuthenticatedHistoriaAlertowRouteImport.update({
     id: '/historia-alertow',
@@ -355,6 +361,7 @@ export interface FileRoutesByFullPath {
   '/alerty': typeof AuthenticatedAlertyRoute
   '/asystent': typeof AuthenticatedAsystentRoute
   '/historia-alertow': typeof AuthenticatedHistoriaAlertowRoute
+  '/ksiega': typeof AuthenticatedKsiegaRoute
   '/ulubione': typeof AuthenticatedUlubioneRoute
   '/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -407,6 +414,7 @@ export interface FileRoutesByTo {
   '/alerty': typeof AuthenticatedAlertyRoute
   '/asystent': typeof AuthenticatedAsystentRoute
   '/historia-alertow': typeof AuthenticatedHistoriaAlertowRoute
+  '/ksiega': typeof AuthenticatedKsiegaRoute
   '/ulubione': typeof AuthenticatedUlubioneRoute
   '/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -463,6 +471,7 @@ export interface FileRoutesById {
   '/_authenticated/alerty': typeof AuthenticatedAlertyRoute
   '/_authenticated/asystent': typeof AuthenticatedAsystentRoute
   '/_authenticated/historia-alertow': typeof AuthenticatedHistoriaAlertowRoute
+  '/_authenticated/ksiega': typeof AuthenticatedKsiegaRoute
   '/_authenticated/ulubione': typeof AuthenticatedUlubioneRoute
   '/_authenticated/ustawienia': typeof AuthenticatedUstawieniaRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -519,6 +528,7 @@ export interface FileRouteTypes {
     | '/alerty'
     | '/asystent'
     | '/historia-alertow'
+    | '/ksiega'
     | '/ulubione'
     | '/ustawienia'
     | '/auth/callback'
@@ -571,6 +581,7 @@ export interface FileRouteTypes {
     | '/alerty'
     | '/asystent'
     | '/historia-alertow'
+    | '/ksiega'
     | '/ulubione'
     | '/ustawienia'
     | '/auth/callback'
@@ -626,6 +637,7 @@ export interface FileRouteTypes {
     | '/_authenticated/alerty'
     | '/_authenticated/asystent'
     | '/_authenticated/historia-alertow'
+    | '/_authenticated/ksiega'
     | '/_authenticated/ulubione'
     | '/_authenticated/ustawienia'
     | '/auth/callback'
@@ -1011,6 +1023,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUlubioneRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/ksiega': {
+      id: '/_authenticated/ksiega'
+      path: '/ksiega'
+      fullPath: '/ksiega'
+      preLoaderRoute: typeof AuthenticatedKsiegaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/historia-alertow': {
       id: '/_authenticated/historia-alertow'
       path: '/historia-alertow'
@@ -1067,6 +1086,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAlertyRoute: typeof AuthenticatedAlertyRoute
   AuthenticatedAsystentRoute: typeof AuthenticatedAsystentRoute
   AuthenticatedHistoriaAlertowRoute: typeof AuthenticatedHistoriaAlertowRoute
+  AuthenticatedKsiegaRoute: typeof AuthenticatedKsiegaRoute
   AuthenticatedUlubioneRoute: typeof AuthenticatedUlubioneRoute
   AuthenticatedUstawieniaRoute: typeof AuthenticatedUstawieniaRoute
 }
@@ -1075,6 +1095,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAlertyRoute: AuthenticatedAlertyRoute,
   AuthenticatedAsystentRoute: AuthenticatedAsystentRoute,
   AuthenticatedHistoriaAlertowRoute: AuthenticatedHistoriaAlertowRoute,
+  AuthenticatedKsiegaRoute: AuthenticatedKsiegaRoute,
   AuthenticatedUlubioneRoute: AuthenticatedUlubioneRoute,
   AuthenticatedUstawieniaRoute: AuthenticatedUstawieniaRoute,
 }
