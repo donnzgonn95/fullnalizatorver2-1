@@ -123,14 +123,24 @@ export const Route = createFileRoute("/api/public/hooks/lab-reports")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const auth = await authorizeCronRequest(request);
+        if (!auth.ok) return unauthorizedResponse(auth.status);
         try {
           const url = new URL(request.url);
           const body = await request.json().catch(() => ({}));
           const type = (body.type ?? url.searchParams.get("type") ?? "morning") as ReportType;
           if (type !== "morning" && type !== "evening") {
-            return new Response(JSON.stringify({ error: "Invalid type" }), { status: 400 });
+            return new Response(JSON.stringify({ error: "Invalid type" }), {
+              status: 400, headers: { "Content-Type": "application/json" },
+            });
           }
-          const date = (body.date ?? new Date().toISOString().slice(0, 10)) as string;
+          const rawDate = (body.date ?? url.searchParams.get("date") ?? new Date().toISOString().slice(0, 10)) as string;
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+            return new Response(JSON.stringify({ error: "Invalid date (expected YYYY-MM-DD)" }), {
+              status: 400, headers: { "Content-Type": "application/json" },
+            });
+          }
+          const date = rawDate;
 
           // Active users = those with risk settings or telegram config
           const { data: users } = await supabaseAdmin
@@ -138,21 +148,28 @@ export const Route = createFileRoute("/api/public/hooks/lab-reports")({
             .select("user_id");
           const userIds = Array.from(new Set((users ?? []).map((u: any) => u.user_id)));
 
-          const results = [];
+          let processed = 0;
+          let sent = 0;
+          let failed = 0;
           for (const uid of userIds) {
             try {
-              results.push(await processUser(uid as string, type, date));
+              const r = await processUser(uid as string, type, date);
+              processed += 1;
+              if (r.sent) sent += 1;
             } catch (e) {
-              results.push({ userId: uid, error: String(e) });
+              failed += 1;
+              console.error(`lab-reports: user ${uid} failed`, e);
             }
           }
 
-          return new Response(JSON.stringify({ ok: true, type, date, processed: results.length, results }), {
+          return new Response(JSON.stringify({ ok: true, type, date, processed, sent, failed }), {
             status: 200, headers: { "Content-Type": "application/json" },
           });
         } catch (e) {
           console.error("lab-reports cron error", e);
-          return new Response(JSON.stringify({ error: String(e) }), { status: 500 });
+          return new Response(JSON.stringify({ error: "Internal server error" }), {
+            status: 500, headers: { "Content-Type": "application/json" },
+          });
         }
       },
     },
