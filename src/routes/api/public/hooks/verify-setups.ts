@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { authorizeCronRequest, unauthorizedResponse } from "@/lib/cron-auth.server";
 import { BINANCE_PAIR, type ScanSymbol } from "@/lib/feed/types";
 
 const BINANCE_INTERVAL_MAP: Record<string, string> = {
