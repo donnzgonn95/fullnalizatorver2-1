@@ -166,7 +166,9 @@ function buildDiff(prevRuns: RunReport[] | undefined, currRuns: RunReport[]): Di
 export const Route = createFileRoute("/api/public/hooks/scan-setups")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const auth = await authorizeCronRequest(request);
+        if (!auth.ok) return unauthorizedResponse(auth.status);
         const startedAt = new Date();
         const { data: logRow } = await supabaseAdmin.from("cron_run_logs").insert({
           job_name: "scan-setups", status: "running",
