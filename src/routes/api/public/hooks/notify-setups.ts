@@ -5,7 +5,9 @@ import { authorizeCronRequest, isSafeOutboundUrl, unauthorizedResponse } from "@
 export const Route = createFileRoute("/api/public/hooks/notify-setups")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const auth = await authorizeCronRequest(request);
+        if (!auth.ok) return unauthorizedResponse(auth.status);
         const startedAt = new Date();
         const { data: logRow } = await supabaseAdmin.from("cron_run_logs").insert({
           job_name: "notify-setups", status: "running",
