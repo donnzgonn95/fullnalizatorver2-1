@@ -3,6 +3,7 @@
 // enabled for the user) pushes the report via api.telegram.org with retry.
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { authorizeCronRequest, unauthorizedResponse } from "@/lib/cron-auth.server";
 
 type ReportType = "morning" | "evening";
 
