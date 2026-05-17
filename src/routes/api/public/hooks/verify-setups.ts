@@ -27,7 +27,9 @@ async function lastCandle(symbol: string, interval: string) {
 export const Route = createFileRoute("/api/public/hooks/verify-setups")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const auth = await authorizeCronRequest(request);
+        if (!auth.ok) return unauthorizedResponse(auth.status);
         const startedAt = new Date();
         const { data: logRow } = await supabaseAdmin.from("cron_run_logs").insert({
           job_name: "verify-setups", status: "running",
@@ -38,11 +40,14 @@ export const Route = createFileRoute("/api/public/hooks/verify-setups")({
           .from("detected_setups").select("*")
           .in("status", ["pending", "active"]).limit(500);
         if (error) {
+          console.error("verify-setups: load error", error);
           if (logId) await supabaseAdmin.from("cron_run_logs").update({
             finished_at: new Date().toISOString(), status: "error",
-            details: { error: error.message },
+            details: { error: "internal_error" },
           }).eq("id", logId);
-          return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+          return new Response(JSON.stringify({ error: "Internal server error" }), {
+            status: 500, headers: { "Content-Type": "application/json" },
+          });
         }
         let updated = 0; let errors = 0;
         const checks: Array<{
