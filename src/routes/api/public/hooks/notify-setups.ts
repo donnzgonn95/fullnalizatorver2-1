@@ -40,6 +40,16 @@ export const Route = createFileRoute("/api/public/hooks/notify-setups")({
 
             // Webhook
             if (sub.webhook_url) {
+              if (!isSafeOutboundUrl(sub.webhook_url)) {
+                await supabaseAdmin.from("notification_log").insert({
+                  setup_id: setup.id, user_id: sub.user_id, channel: "webhook",
+                  status: "failed", error: "Blocked: webhook URL must be https and public",
+                });
+                errors += 1;
+                errorMessages.push(`webhook[${errors}]: blocked unsafe url`);
+                console.warn(`notify-setups: blocked unsafe webhook url for user ${sub.user_id}`);
+                continue;
+              }
               const { data: existing } = await supabaseAdmin
                 .from("notification_log").select("id")
                 .eq("setup_id", setup.id).eq("user_id", sub.user_id).eq("channel", "webhook").maybeSingle();
@@ -62,7 +72,8 @@ export const Route = createFileRoute("/api/public/hooks/notify-setups")({
                     status: "failed", error: (e as Error).message,
                   });
                   errors += 1;
-                  errorMessages.push(`webhook ${sub.user_id}: ${(e as Error).message}`);
+                  console.error(`notify-setups: webhook failed for user ${sub.user_id}`, e);
+                  errorMessages.push(`webhook[${errors}]: ${(e as Error).message}`);
                 }
               }
             }
