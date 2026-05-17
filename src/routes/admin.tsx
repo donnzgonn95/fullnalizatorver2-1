@@ -109,7 +109,11 @@ function ManualTriggersCard({ canRun, onRan }: { canRun: boolean; onRan: () => v
   const run = async (path: string, label: string) => {
     setBusy(path);
     try {
-      const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" } });
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(path, { method: "POST", headers });
       const json = await res.json().catch(() => ({}));
       if (res.ok) toast.success(`${label}: OK`, { description: JSON.stringify(json).slice(0, 200) });
       else toast.error(`${label}: błąd ${res.status}`);
