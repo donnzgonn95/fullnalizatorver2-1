@@ -325,8 +325,8 @@ function WebhookTestCard() {
             </div>
             <div className="num text-sm">{result.status || "—"} {result.statusText}</div>
             <div className="mt-1 text-[10px] text-muted-foreground">Czas: {result.durationMs} ms</div>
-            {result.responseSnippet && (
-              <pre className="mt-2 max-h-40 overflow-auto rounded bg-background/60 p-2 text-[10px] text-muted-foreground">{result.responseSnippet}</pre>
+            {"responseSnippet" in result && (result as any).responseSnippet && (
+              <pre className="mt-2 max-h-40 overflow-auto rounded bg-background/60 p-2 text-[10px] text-muted-foreground">{(result as any).responseSnippet}</pre>
             )}
           </div>
           <div className="rounded-lg border border-border bg-background/40 p-3">
