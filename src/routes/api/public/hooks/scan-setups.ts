@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { appendLedger } from "@/lib/ledger/golden-ledger.server";
+import { authorizeCronRequest, unauthorizedResponse } from "@/lib/cron-auth.server";
 import { detectBBBounce, BB_PARAMS, type DetectedSetup } from "@/lib/feed/detectors/bb-bounce";
 import { detectElliott, ELLIOTT_PARAMS } from "@/lib/feed/detectors/elliott";
 import { aggregateM45 } from "@/lib/feed/m45";
@@ -165,7 +166,9 @@ function buildDiff(prevRuns: RunReport[] | undefined, currRuns: RunReport[]): Di
 export const Route = createFileRoute("/api/public/hooks/scan-setups")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const auth = await authorizeCronRequest(request);
+        if (!auth.ok) return unauthorizedResponse(auth.status);
         const startedAt = new Date();
         const { data: logRow } = await supabaseAdmin.from("cron_run_logs").insert({
           job_name: "scan-setups", status: "running",

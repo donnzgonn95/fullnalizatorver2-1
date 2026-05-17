@@ -56,17 +56,27 @@ function AdminPage() {
         <p className="mt-1 text-xs text-muted-foreground">Zarządzaj globalnym skanerem, podglądaj logi cronów, konfiguruj swoje powiadomienia.</p>
       </header>
 
-      {isAdmin === false && (
-        <div className="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
-          Nie masz roli <code>admin</code>. Edycja konfiguracji skanera i ręczne uruchamianie jest niedostępne.
+      {isAdmin === null && (
+        <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+          Weryfikuję uprawnienia…
         </div>
       )}
 
-      <ManualTriggersCard canRun={!!isAdmin} onRan={refreshLogs} />
-      <ScannerConfigCard cfg={cfg} canEdit={!!isAdmin} onSaved={() => qc.invalidateQueries({ queryKey: ["scanner_config"] })} />
-      <NotificationsCard />
-      <WebhookTestCard />
-      <CronLogsCard logs={logs ?? []} onRefresh={refreshLogs} />
+      {isAdmin === false && (
+        <div className="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
+          Nie masz roli <code>admin</code>. Panel jest niedostępny.
+        </div>
+      )}
+
+      {isAdmin === true && (
+        <>
+          <ManualTriggersCard canRun={true} onRan={refreshLogs} />
+          <ScannerConfigCard cfg={cfg} canEdit={true} onSaved={() => qc.invalidateQueries({ queryKey: ["scanner_config"] })} />
+          <NotificationsCard />
+          <WebhookTestCard />
+          <CronLogsCard logs={logs ?? []} onRefresh={refreshLogs} />
+        </>
+      )}
     </div>
   );
 }
@@ -99,7 +109,11 @@ function ManualTriggersCard({ canRun, onRan }: { canRun: boolean; onRan: () => v
   const run = async (path: string, label: string) => {
     setBusy(path);
     try {
-      const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" } });
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(path, { method: "POST", headers });
       const json = await res.json().catch(() => ({}));
       if (res.ok) toast.success(`${label}: OK`, { description: JSON.stringify(json).slice(0, 200) });
       else toast.error(`${label}: błąd ${res.status}`);
@@ -311,8 +325,8 @@ function WebhookTestCard() {
             </div>
             <div className="num text-sm">{result.status || "—"} {result.statusText}</div>
             <div className="mt-1 text-[10px] text-muted-foreground">Czas: {result.durationMs} ms</div>
-            {result.responseSnippet && (
-              <pre className="mt-2 max-h-40 overflow-auto rounded bg-background/60 p-2 text-[10px] text-muted-foreground">{result.responseSnippet}</pre>
+            {"responseSnippet" in result && (result as any).responseSnippet && (
+              <pre className="mt-2 max-h-40 overflow-auto rounded bg-background/60 p-2 text-[10px] text-muted-foreground">{(result as any).responseSnippet}</pre>
             )}
           </div>
           <div className="rounded-lg border border-border bg-background/40 p-3">
