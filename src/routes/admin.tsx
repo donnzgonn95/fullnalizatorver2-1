@@ -56,17 +56,27 @@ function AdminPage() {
         <p className="mt-1 text-xs text-muted-foreground">Zarządzaj globalnym skanerem, podglądaj logi cronów, konfiguruj swoje powiadomienia.</p>
       </header>
 
-      {isAdmin === false && (
-        <div className="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
-          Nie masz roli <code>admin</code>. Edycja konfiguracji skanera i ręczne uruchamianie jest niedostępne.
+      {isAdmin === null && (
+        <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+          Weryfikuję uprawnienia…
         </div>
       )}
 
-      <ManualTriggersCard canRun={!!isAdmin} onRan={refreshLogs} />
-      <ScannerConfigCard cfg={cfg} canEdit={!!isAdmin} onSaved={() => qc.invalidateQueries({ queryKey: ["scanner_config"] })} />
-      <NotificationsCard />
-      <WebhookTestCard />
-      <CronLogsCard logs={logs ?? []} onRefresh={refreshLogs} />
+      {isAdmin === false && (
+        <div className="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
+          Nie masz roli <code>admin</code>. Panel jest niedostępny.
+        </div>
+      )}
+
+      {isAdmin === true && (
+        <>
+          <ManualTriggersCard canRun={true} onRan={refreshLogs} />
+          <ScannerConfigCard cfg={cfg} canEdit={true} onSaved={() => qc.invalidateQueries({ queryKey: ["scanner_config"] })} />
+          <NotificationsCard />
+          <WebhookTestCard />
+          <CronLogsCard logs={logs ?? []} onRefresh={refreshLogs} />
+        </>
+      )}
     </div>
   );
 }
