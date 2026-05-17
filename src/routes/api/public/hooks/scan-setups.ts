@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { appendLedger } from "@/lib/ledger/golden-ledger.server";
+import { authorizeCronRequest, unauthorizedResponse } from "@/lib/cron-auth.server";
 import { detectBBBounce, BB_PARAMS, type DetectedSetup } from "@/lib/feed/detectors/bb-bounce";
 import { detectElliott, ELLIOTT_PARAMS } from "@/lib/feed/detectors/elliott";
 import { aggregateM45 } from "@/lib/feed/m45";
