@@ -1,94 +1,59 @@
-## Cel
+# Plan naprawy bezpieczeństwa (A + B + C)
 
-Po kliknięciu wiersza w zakładce **Runs** (panel `/admin`) chcesz zobaczyć obok wyniku detektora także:
+## A. P0 — Krytyczne
 
-- **payload wejściowy świec** (ostatnie OHLCV użyte do decyzji),
-- **parametry detektora** (BB period/std, progi RSI, lookback Elliotta itd.).
+**1. `src/integrations/supabase/auth-middleware.ts`** — zamień `supabase.auth.getClaims(token)` na `supabase.auth.getUser()`. To wymusza weryfikację podpisu JWT po stronie Supabase (zamiast lokalnego dekodowania bez podpisu). Z `data.user` zbuduj `userId = data.user.id` i `claims = data.user` (dla kompatybilności z istniejącymi handlerami).
 
-Przy okazji dwa szybkie fixy błędów runtime, które już są w preview.
+**2. `src/start.ts`** — dodaj import `attachSupabaseAuth` i zarejestruj go jako `functionMiddleware`:
+```ts
+import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
----
-
-## Bug fixy (po drodze)
-
-### A. Hydration mismatch w `AiThinkingCard` (`src/routes/index.tsx` ~304–310)
-
-`new Date()` jest wołane w trakcie renderu — SSR generuje czas serwera (np. `02:21`), klient po hydratacji wstawia czas lokalny (`00:21`) → React #418. Naprawiam: `useState<Date | null>(null)` + `useEffect(() => setNow(new Date()), [])`, do pierwszego renderu placeholder `--:--`. Logika i wygląd bez zmian.
-
-### B. Duplikat `id="runs"` w zakładkach `CronLogsCard` (`src/routes/admin.tsx` 357–358)
-
-Dwa `<TabBtn id="runs" />` — jeden dla skanów, drugi dla setupów (verify) — powodują kolizję stanu. Zmieniam typ stanu na `"summary" | "runs" | "checks" | "diff" | "raw"`, drugi przycisk dostaje `id="checks"`, warunek `tab === "runs" && checks.length` → `tab === "checks"`.
-
----
-
-## Główna zmiana — bogatszy drawer w Runs
-
-### 1. Backend — `src/routes/api/public/hooks/scan-setups.ts`
-
-Rozszerzam `RunReport.candles` o `tail` (5 ostatnich OHLCV) i każdy `DetectorReport` o `params`:
-
-```text
-candles: { count, firstOpenTime, lastCloseTime, lastClose, lastVolume,
-           tail: [{ openTime, open, high, low, close, volume }, ...5] }
-detectors: [{
-  name, outcome, reason, setup, durationMs,
-  params: { ...statyczna konfiguracja detektora }
-}]
+export const startInstance = createStart(() => ({
+  requestMiddleware: [errorMiddleware],
+  functionMiddleware: [attachSupabaseAuth],
+}));
 ```
 
-`params` biorę z nowych eksportów w detektorach (poniżej) — pojedyncze obiekty, bez zmiany logiki sygnałów.
+## B. P1 — Ważne
 
-Limit `runs` 200 zostaje. Dodatkowy narzut: ~5 świec × ~80 B + ~150 B params ≈ 0.5 KB/run, mieści się spokojnie.
-
-### 2. Detektory — eksport stałych
-
-- `src/lib/feed/detectors/bb-bounce.ts`: dodaję `export const BB_PARAMS = { bbPeriod: 20, bbStdDev: 2, rsiPeriod: 14, rsiOversold: 40, rsiOverbought: 60 }` (wartości odczytane z aktualnych użyć `bollinger`/`rsi` — bez zmiany progów). Detektor dalej używa tych samych liczb, ale przez stałą.
-- `src/lib/feed/detectors/elliott.ts`: `export const ELLIOTT_PARAMS = { zigzagThresholdPct: 0.5, tailPivots: 5, tpFib: 0.618, slBufferPct: 0.3 }` (też zgodnie z aktualnym kodem).
-
-Brak zmian w logice — tylko wyciągnięcie magicznych liczb do stałej, którą można pokazać w UI i logach.
-
-### 3. UI — `src/routes/admin.tsx` drawer Runs (linie ~424–447)
-
-W rozwiniętym wierszu, pod nagłówkiem świec:
-
-**(a) Tail świec** — mini-tabela monospace:
-
+**3. Migration — fix RLS `detected_setups` SELECT policy.** Aktualnie globalne setupy (`user_id IS NULL`) są czytelne dla anon. Zmień politykę na:
+```sql
+DROP POLICY IF EXISTS "<old-name>" ON public.detected_setups;
+CREATE POLICY "detected_setups_select_auth_only"
+ON public.detected_setups FOR SELECT
+TO authenticated
+USING (user_id IS NULL OR auth.uid() = user_id);
 ```
-time     open     high     low      close    volume
-13:30    67120.5  67230.0  67050.1  67200.3  412.20
-13:45    ...
+(Najpierw odczytam dokładną nazwę istniejącej polityki przez `supabase--read_query`.)
+
+**4. CORS allow-list dla edge functions `market-ai` i `telegram-send`.** Zamiast `Access-Control-Allow-Origin: *` — funkcja `pickOrigin(req)` zwracająca origin tylko dla allow-listy:
+- `https://*.lovable.app` (preview + published)
+- `http://localhost:*` (dev)
+- `https://kukomy.pl` jeśli istnieje custom domain (do potwierdzenia z użytkownikiem — póki co tylko lovable.app + localhost)
+
+Dodać `Vary: Origin` w odpowiedziach.
+
+## C. P2 — Konfiguracja / hardening
+
+**5. HIBP** — `supabase--configure_auth({ password_hibp_enabled: true, ...obecne wartości })`.
+
+**6. Migration — revoke EXECUTE z anon/authenticated** dla SECURITY DEFINER funkcji nie wywoływanych z klienta:
+```sql
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, app_role) FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.prevent_self_admin_role_change() FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.update_updated_at_column() FROM anon, authenticated;
 ```
+`has_role` nadal działa w wyrażeniach RLS (planner używa właściciela funkcji, nie wywołującego). `handle_new_user` i `prevent_self_admin_role_change` to triggery — `EXECUTE` przyznawany użytkownikom nie jest potrzebny.
 
-**(b) W boxie każdego detektora** dodaję pasek `params` (komponent `Mini` używany już dla `setup`):
+**Pominięte:** `SUPA_extension_in_public` — niskie ryzyko, ruszanie schematu rozszerzenia ryzykuje regresjami. Do osobnej iteracji.
 
-```
-params: bbPeriod=20 · bbStdDev=2 · rsi=14 · oversold=40 · overbought=60
-```
+## Po wdrożeniu
 
-**(c)** Toggle `<details>Pokaż surowy JSON</details>` na końcu drawer'a — szybki podgląd całości bez wchodzenia w zakładkę Raw.
+- `security--run_security_scan` ponownie.
+- Oznaczenie naprawionych findings przez `manage_security_finding`.
+- Update `mem://security-memory.md` o nowych regułach (JWT przez `getUser()`, CORS allow-list, brak `EXECUTE` na SECURITY DEFINER dla anon/authenticated).
 
-Stare logi (bez `tail`/`params`) renderują się normalnie — pola opcjonalne.
+## Pytanie do ciebie
 
----
-
-## Bez zmian
-
-- Schemat bazy, RLS, crony.
-- Logika detektorów / ingestu / dedup.
-- `verify-setups`, `notify-setups`.
-
-## Pliki do edycji
-
-- `src/routes/index.tsx` — fix hydration `AiThinkingCard`.
-- `src/routes/admin.tsx` — fix duplicate tab id + rozbudowany drawer Runs.
-- `src/routes/api/public/hooks/scan-setups.ts` — `candles.tail` + `detectors[].params`.
-- `src/lib/feed/detectors/bb-bounce.ts` — eksport `BB_PARAMS`.
-- `src/lib/feed/detectors/elliott.ts` — eksport `ELLIOTT_PARAMS`.
-
-Brak migracji, brak nowych zależności.
-
-## Pytanie
-
-Domyślnie tail = **5 świec**. OK, czy wolisz 10/20? Większa liczba = lepsza reprodukcja decyzji, ale rosną logi.  
-  
-20
+Czy masz **custom domain** (np. `kukomy.pl`), którą mam dopisać do CORS allow-listy w `market-ai` i `telegram-send`? Jeśli nie — zostawiam tylko `*.lovable.app` + `localhost`.
