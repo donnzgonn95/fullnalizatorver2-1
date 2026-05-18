@@ -31,10 +31,12 @@ export async function authorizeCronRequest(request: Request): Promise<{ ok: true
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
         if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) return { ok: false, status: 500 };
         const sb = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          global: { headers: { Authorization: `Bearer ${token}` } },
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
-        const { data, error } = await sb.auth.getClaims(token);
-        const userId = data?.claims?.sub;
+        // Verify JWT signature server-side via Supabase JWKS (not local decode).
+        const { data, error } = await sb.auth.getUser(token);
+        const userId = data?.user?.id;
         if (error || !userId) return { ok: false, status: 401 };
         const { data: roleRow } = await supabaseAdmin
           .from("user_roles")
