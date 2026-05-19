@@ -7,12 +7,18 @@ import { FeatureCard } from "@/components/FeatureCard";
 import { Settings, ListChecks, Bell, X, Plus, RefreshCw, Play, ShieldCheck, Send, Zap, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { testWebhook } from "@/lib/admin.functions";
+import { testWebhook, verifyAdminAccess } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/login" });
+    // Server-side admin role verification (defence-in-depth on top of RLS).
+    try {
+      await verifyAdminAccess();
+    } catch {
+      throw redirect({ to: "/" });
+    }
   },
   component: AdminPage,
 });

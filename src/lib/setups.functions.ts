@@ -48,7 +48,7 @@ export const ingestSetup = createServerFn({ method: "POST" })
       status: "active",
       details: data.details as never,
     });
-    if (error) throw new Error(error.message);
+    if (error) { console.error("[setups] DB error", error); throw new Response("Internal server error", { status: 500 }); }
     return { ok: true };
   });
 
@@ -63,7 +63,7 @@ export const listTopSetups = createServerFn({ method: "GET" })
       .order("signal_strength", { ascending: false })
       .order("detected_at", { ascending: false })
       .limit(10);
-    if (error) throw new Error(error.message);
+    if (error) { console.error("[setups] DB error", error); throw new Response("Internal server error", { status: 500 }); }
     return data ?? [];
   });
 
@@ -82,6 +82,6 @@ export const listSetupHistory = createServerFn({ method: "POST" })
     if (data.result) q = q.eq("result", data.result);
     if (data.setup_type) q = q.eq("setup_type", data.setup_type);
     const { data: rows, error } = await q;
-    if (error) throw new Error(error.message);
+    if (error) { console.error("[setups] DB error", error); throw new Response("Internal server error", { status: 500 }); }
     return rows ?? [];
   });
