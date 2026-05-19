@@ -1,0 +1,52 @@
+name: Security Regression
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Codzienny skan o 04:17 UTC
+    - cron: "17 4 * * *"
+
+jobs:
+  audit:
+    name: Dependency audit & security regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: npm audit (high+critical)
+        run: |
+          npm audit --omit=dev --audit-level=high || {
+            echo "::warning::npm audit found high/critical vulnerabilities"
+            exit 1
+          }
+
+      - name: Run security regression tests
+        run: bun run test -- --run security
+
+      - name: Static check — no getClaims in auth middleware
+        run: |
+          if grep -rn "getClaims" src/integrations/supabase/auth-middleware.ts src/lib/cron-auth.server.ts 2>/dev/null; then
+            echo "::error::Detected unsafe getClaims() usage — JWT must be verified via getUser()"
+            exit 1
+          fi
+
+      - name: Static check — no wildcard CORS on authenticated edge functions
+        run: |
+          if grep -rEn "Access-Control-Allow-Origin\"\s*:\s*\"\*\"" supabase/functions/ 2>/dev/null; then
+            echo "::error::Wildcard CORS detected on edge function — use allow-list"
+            exit 1
+          fi
+
+      - name: Static check — attachSupabaseAuth registered
+        run: |
+          if ! grep -q "attachSupabaseAuth" src/start.ts; then
+            echo "::error::attachSupabaseAuth not registered in src/start.ts"
+            exit 1
+          fi
