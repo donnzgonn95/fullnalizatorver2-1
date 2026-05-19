@@ -71,3 +71,19 @@ export const testWebhook = createServerFn({ method: "POST" })
       };
     }
   });
+
+// Server-side admin role check used by the /admin route's beforeLoad guard.
+export const verifyAdminAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: roleRow } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) {
+      throw new Response("Forbidden: admin role required", { status: 403 });
+    }
+    return { ok: true as const };
+  });
