@@ -14,6 +14,165 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_decisions: {
+        Row: {
+          agent_id: string
+          confidence: number
+          created_at: string
+          guideline_id: string | null
+          id: string
+          payload: Json
+          rationale: string
+          report_id: string | null
+          report_kind: string | null
+          symbol: string | null
+          verdict: string
+        }
+        Insert: {
+          agent_id: string
+          confidence?: number
+          created_at?: string
+          guideline_id?: string | null
+          id?: string
+          payload?: Json
+          rationale: string
+          report_id?: string | null
+          report_kind?: string | null
+          symbol?: string | null
+          verdict: string
+        }
+        Update: {
+          agent_id?: string
+          confidence?: number
+          created_at?: string
+          guideline_id?: string | null
+          id?: string
+          payload?: Json
+          rationale?: string
+          report_id?: string | null
+          report_kind?: string | null
+          symbol?: string | null
+          verdict?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_decisions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_decisions_guideline_id_fkey"
+            columns: ["guideline_id"]
+            isOneToOne: false
+            referencedRelation: "agent_guidelines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_guidelines: {
+        Row: {
+          agent_id: string | null
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          priority: number
+          rules: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          rules?: Json
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          rules?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_guidelines_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_journal: {
+        Row: {
+          agent_id: string
+          content: string
+          created_at: string
+          decision_id: string | null
+          id: string
+          tags: string[]
+          topic: string
+          trade_id: string | null
+        }
+        Insert: {
+          agent_id: string
+          content: string
+          created_at?: string
+          decision_id?: string | null
+          id?: string
+          tags?: string[]
+          topic: string
+          trade_id?: string | null
+        }
+        Update: {
+          agent_id?: string
+          content?: string
+          created_at?: string
+          decision_id?: string | null
+          id?: string
+          tags?: string[]
+          topic?: string
+          trade_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_journal_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_journal_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "agent_decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_journal_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "agent_paper_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_notes: {
         Row: {
           content: string
@@ -51,6 +210,110 @@ export type Database = {
             columns: ["linked_decision_id"]
             isOneToOne: false
             referencedRelation: "decision_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_paper_trades: {
+        Row: {
+          agent_id: string
+          closed_at: string | null
+          decision_id: string
+          entry_price: number
+          exit_price: number | null
+          id: string
+          opened_at: string
+          pnl: number | null
+          quantity: number
+          report_id: string
+          side: string
+          status: string
+          stop_loss: number | null
+          symbol: string
+          take_profit: number | null
+        }
+        Insert: {
+          agent_id: string
+          closed_at?: string | null
+          decision_id: string
+          entry_price: number
+          exit_price?: number | null
+          id?: string
+          opened_at?: string
+          pnl?: number | null
+          quantity: number
+          report_id: string
+          side: string
+          status?: string
+          stop_loss?: number | null
+          symbol: string
+          take_profit?: number | null
+        }
+        Update: {
+          agent_id?: string
+          closed_at?: string | null
+          decision_id?: string
+          entry_price?: number
+          exit_price?: number | null
+          id?: string
+          opened_at?: string
+          pnl?: number | null
+          quantity?: number
+          report_id?: string
+          side?: string
+          status?: string
+          stop_loss?: number | null
+          symbol?: string
+          take_profit?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_paper_trades_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_paper_trades_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "agent_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_report_reads: {
+        Row: {
+          agent_id: string
+          id: string
+          notes: string | null
+          read_at: string
+          report_id: string
+          report_kind: string
+        }
+        Insert: {
+          agent_id: string
+          id?: string
+          notes?: string | null
+          read_at?: string
+          report_id: string
+          report_kind: string
+        }
+        Update: {
+          agent_id?: string
+          id?: string
+          notes?: string | null
+          read_at?: string
+          report_id?: string
+          report_kind?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_report_reads_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
             referencedColumns: ["id"]
           },
         ]
@@ -846,6 +1109,36 @@ export type Database = {
         }
         Relationships: []
       }
+      private_reports: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          payload: Json
+          shared_with_agents: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          payload?: Json
+          shared_with_agents?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          shared_with_agents?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           accepted_terms_at: string | null
@@ -870,6 +1163,39 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          payload: Json
+          report_date: string
+          source: string
+          summary: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          payload?: Json
+          report_date?: string
+          source?: string
+          summary?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          report_date?: string
+          source?: string
+          summary?: string | null
+          title?: string
         }
         Relationships: []
       }
@@ -926,6 +1252,82 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      treasury_balance: {
+        Row: {
+          amount: number
+          currency: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          currency: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          currency?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      treasury_events: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          currency: string
+          decision_id: string | null
+          delta: number
+          eljot_entry_id: string | null
+          id: string
+          payload: Json
+          reason: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          currency?: string
+          decision_id?: string | null
+          delta: number
+          eljot_entry_id?: string | null
+          id?: string
+          payload?: Json
+          reason: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          currency?: string
+          decision_id?: string | null
+          delta?: number
+          eljot_entry_id?: string | null
+          id?: string
+          payload?: Json
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treasury_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_events_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "agent_decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_events_eljot_entry_id_fkey"
+            columns: ["eljot_entry_id"]
+            isOneToOne: false
+            referencedRelation: "eljot_ledger"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
