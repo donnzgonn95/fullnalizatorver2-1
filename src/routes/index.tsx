@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLiveCoins } from "@/lib/binance";
 import { generateSetups } from "@/lib/signals";
 import { useRegime } from "@/lib/regime-store";
-import { sentiment } from "@/lib/demo-data";
+import { sentiment, coins as demoCoins } from "@/lib/demo-data";
 import { supabase } from "@/integrations/supabase/client";
 import { ChangePill, formatMoney } from "@/components/StatPill";
 import { FeatureCard } from "@/components/FeatureCard";
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { data: liveCoins } = useLiveCoins();
-  const coinsForRegime = liveCoins && liveCoins.length ? liveCoins : [];
+  const coinsForRegime = liveCoins && liveCoins.length ? liveCoins : demoCoins;
   const { active: activeRegime } = useRegime(coinsForRegime);
 
   // Best setup — z globalnych detected_setups, fallback do demo

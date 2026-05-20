@@ -3,8 +3,9 @@ import { cn } from "@/lib/utils";
 import { AlertCircle, AlertTriangle, Info, Loader2, Radio } from "lucide-react";
 import { useState } from "react";
 import { useLiveCoins } from "@/lib/binance";
-import { generateAlerts } from "@/lib/signals";
-import { alerts as demoAlerts } from "@/lib/demo-data";
+import { generateAlerts, adjustAlertsForRegime } from "@/lib/signals";
+import { alerts as demoAlerts, coins as demoCoins } from "@/lib/demo-data";
+import { useRegime } from "@/lib/regime-store";
 
 import { seoHead } from "@/lib/seo";
 
@@ -26,7 +27,10 @@ function AlertyPage() {
   const [filter, setFilter] = useState<(typeof filters)[number]>("Wszystkie");
   const { data: coins, isLoading, isError, dataUpdatedAt } = useLiveCoins();
 
-  const alerts = coins && coins.length ? generateAlerts(coins) : demoAlerts;
+  const sourceCoins = coins && coins.length ? coins : demoCoins;
+  const { active: regime } = useRegime(sourceCoins);
+  const rawAlerts = coins && coins.length ? generateAlerts(coins) : demoAlerts;
+  const alerts = adjustAlertsForRegime(rawAlerts, regime.id);
   const list = alerts.filter((a) => filter === "Wszystkie" || a.level === filter);
   const updated = dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("pl-PL") : "";
 
