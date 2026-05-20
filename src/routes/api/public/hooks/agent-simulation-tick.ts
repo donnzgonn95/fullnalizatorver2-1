@@ -347,30 +347,8 @@ export const Route = createFileRoute("/api/public/hooks/agent-simulation-tick")(
             for (const report of candidates) {
               const preview = buildPreview(agent, top, report, cfg);
 
-              // a) odczyt raportu (idempotentny upsert)
-              const { data: readUpsert, error: readErr } = await supabaseAdmin
-                .from("agent_report_reads")
-                .upsert(
-                  {
-                    agent_id: agent.id,
-                    report_id: report.id,
-                    report_kind: "public",
-                    notes: `tick:${startedAt.toISOString()}`,
-                  },
-                  { onConflict: "agent_id,report_id,report_kind", ignoreDuplicates: true },
-                )
-                .select("id");
-              if (readErr) {
-                errorMessages.push(`read[${agent.slug}/${report.id}]: ${readErr.message}`);
-                continue;
-              }
-              if (!readUpsert || readUpsert.length === 0) {
-                // ktoś inny już oznaczył ten raport jako przeczytany — pomijamy.
-                skippedDuplicates += 1;
-                continue;
-              }
-
-              // b) decyzja (idempotentny upsert po agent_id+report_id)
+              // a) decyzja PIERWSZA (idempotentny upsert po agent_id+report_id) —
+              //    żeby nigdy nie zostawić "przeczytanego" raportu bez decyzji.
               const { data: decisionUpsert, error: decisionErr } = await supabaseAdmin
                 .from("agent_decisions")
                 .upsert(
@@ -397,11 +375,41 @@ export const Route = createFileRoute("/api/public/hooks/agent-simulation-tick")(
                 continue;
               }
               if (!decisionUpsert || decisionUpsert.length === 0) {
+                // decyzja już istnieje — traktujemy jako duplikat i oznaczamy read,
+                // żeby nie wracać do tego raportu w kolejnych tickach.
                 skippedDuplicates += 1;
+                await supabaseAdmin
+                  .from("agent_report_reads")
+                  .upsert(
+                    {
+                      agent_id: agent.id,
+                      report_id: report.id,
+                      report_kind: "public",
+                      notes: `tick:${startedAt.toISOString()}:dup`,
+                    },
+                    { onConflict: "agent_id,report_id,report_kind", ignoreDuplicates: true },
+                  );
                 continue;
               }
               decisionsCreated += 1;
               const decisionId = decisionUpsert[0].id as string;
+
+              // b) odczyt raportu PO udanej decyzji (idempotentny upsert).
+              const { error: readErr } = await supabaseAdmin
+                .from("agent_report_reads")
+                .upsert(
+                  {
+                    agent_id: agent.id,
+                    report_id: report.id,
+                    report_kind: "public",
+                    notes: `tick:${startedAt.toISOString()}`,
+                  },
+                  { onConflict: "agent_id,report_id,report_kind", ignoreDuplicates: true },
+                );
+              if (readErr) {
+                errorMessages.push(`read[${agent.slug}/${report.id}]: ${readErr.message}`);
+              }
+
 
               // c) paper trade (idempotentny upsert po decision_id)
               let tradeId: string | null = null;
