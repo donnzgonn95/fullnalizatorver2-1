@@ -63,6 +63,7 @@ import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksScanSetupsRouteImport } from './routes/api/public/hooks/scan-setups'
 import { Route as ApiPublicHooksNotifySetupsRouteImport } from './routes/api/public/hooks/notify-setups'
 import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
+import { Route as ApiPublicHooksAgentSimulationTickRouteImport } from './routes/api/public/hooks/agent-simulation-tick'
 
 const SqueezeRoute = SqueezeRouteImport.update({
   id: '/squeeze',
@@ -338,6 +339,12 @@ const ApiPublicHooksLabReportsRoute =
     path: '/api/public/hooks/lab-reports',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksAgentSimulationTickRoute =
+  ApiPublicHooksAgentSimulationTickRouteImport.update({
+    id: '/api/public/hooks/agent-simulation-tick',
+    path: '/api/public/hooks/agent-simulation-tick',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -389,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/setupy/historia': typeof SetupyHistoriaRoute
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
+  '/api/public/hooks/agent-simulation-tick': typeof ApiPublicHooksAgentSimulationTickRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
   '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
@@ -442,6 +450,7 @@ export interface FileRoutesByTo {
   '/setupy/historia': typeof SetupyHistoriaRoute
   '/gielda': typeof GieldaIndexRoute
   '/lab': typeof LabIndexRoute
+  '/api/public/hooks/agent-simulation-tick': typeof ApiPublicHooksAgentSimulationTickRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
   '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
@@ -499,6 +508,7 @@ export interface FileRoutesById {
   '/setupy/historia': typeof SetupyHistoriaRoute
   '/gielda/': typeof GieldaIndexRoute
   '/lab/': typeof LabIndexRoute
+  '/api/public/hooks/agent-simulation-tick': typeof ApiPublicHooksAgentSimulationTickRoute
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
   '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
@@ -556,6 +566,7 @@ export interface FileRouteTypes {
     | '/setupy/historia'
     | '/gielda/'
     | '/lab/'
+    | '/api/public/hooks/agent-simulation-tick'
     | '/api/public/hooks/lab-reports'
     | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
@@ -609,6 +620,7 @@ export interface FileRouteTypes {
     | '/setupy/historia'
     | '/gielda'
     | '/lab'
+    | '/api/public/hooks/agent-simulation-tick'
     | '/api/public/hooks/lab-reports'
     | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
@@ -665,6 +677,7 @@ export interface FileRouteTypes {
     | '/setupy/historia'
     | '/gielda/'
     | '/lab/'
+    | '/api/public/hooks/agent-simulation-tick'
     | '/api/public/hooks/lab-reports'
     | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
@@ -693,6 +706,7 @@ export interface RootRouteChildren {
   SqueezeRoute: typeof SqueezeRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   CoinSymbolRoute: typeof CoinSymbolRoute
+  ApiPublicHooksAgentSimulationTickRoute: typeof ApiPublicHooksAgentSimulationTickRoute
   ApiPublicHooksLabReportsRoute: typeof ApiPublicHooksLabReportsRoute
   ApiPublicHooksNotifySetupsRoute: typeof ApiPublicHooksNotifySetupsRoute
   ApiPublicHooksScanSetupsRoute: typeof ApiPublicHooksScanSetupsRoute
@@ -1079,6 +1093,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksLabReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/agent-simulation-tick': {
+      id: '/api/public/hooks/agent-simulation-tick'
+      path: '/api/public/hooks/agent-simulation-tick'
+      fullPath: '/api/public/hooks/agent-simulation-tick'
+      preLoaderRoute: typeof ApiPublicHooksAgentSimulationTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1198,6 +1219,8 @@ const rootRouteChildren: RootRouteChildren = {
   SqueezeRoute: SqueezeRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   CoinSymbolRoute: CoinSymbolRoute,
+  ApiPublicHooksAgentSimulationTickRoute:
+    ApiPublicHooksAgentSimulationTickRoute,
   ApiPublicHooksLabReportsRoute: ApiPublicHooksLabReportsRoute,
   ApiPublicHooksNotifySetupsRoute: ApiPublicHooksNotifySetupsRoute,
   ApiPublicHooksScanSetupsRoute: ApiPublicHooksScanSetupsRoute,
