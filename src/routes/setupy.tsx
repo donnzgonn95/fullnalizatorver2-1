@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useLiveCoins } from "@/lib/binance";
-import { generateSetups, type SetupTimeframe } from "@/lib/signals";
-import { setups as demoSetups } from "@/lib/demo-data";
+import { generateSetups, adjustSetupsForRegime, type SetupTimeframe } from "@/lib/signals";
+import { setups as demoSetups, coins as demoCoins } from "@/lib/demo-data";
+import { useRegime } from "@/lib/regime-store";
 import { Radio, Loader2, Clock } from "lucide-react";
 
 import { seoHead } from "@/lib/seo";
@@ -40,7 +41,10 @@ function SetupyPage() {
     if (typeof window !== "undefined") window.localStorage.setItem(TF_KEY, tf);
   }, [tf]);
 
-  const setups = coins && coins.length ? generateSetups(coins, tf) : demoSetups;
+  const sourceCoins = coins && coins.length ? coins : demoCoins;
+  const { active: regime } = useRegime(sourceCoins);
+  const rawSetups = coins && coins.length ? generateSetups(coins, tf) : demoSetups;
+  const { setups, note } = adjustSetupsForRegime(rawSetups, regime.id);
   const list = setups.filter((s) => filter === "Wszystkie" || s.type === filter);
   const updated = dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("pl-PL") : "";
 
@@ -105,6 +109,8 @@ function SetupyPage() {
           </div>
         </div>
       </header>
+
+      <div className="text-xs text-muted-foreground">Filtr reżimu rynku: {note.tag}</div>
 
       <section className="grid gap-4 md:grid-cols-2">
         {list.map((s) => {

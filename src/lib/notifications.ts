@@ -2,7 +2,8 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { useLiveCoins } from "./binance";
-import { generateAlerts } from "./signals";
+import { generateAlerts, adjustAlertsForRegime } from "./signals";
+import { detectRegime } from "./market-regime";
 import type { Alert } from "./demo-data";
 import { readTriggers, writeTriggers } from "./alert-triggers";
 
@@ -310,7 +311,8 @@ export function useAlertNotifications() {
     if (!settings.enabled && !settings.inAppToast) return;
     if (!coins || coins.length === 0) return;
 
-    const alerts = generateAlerts(coins);
+    const regime = detectRegime(coins);
+    const alerts = adjustAlertsForRegime(generateAlerts(coins), regime.id);
     const seen = loadSeen();
     const firstRun = !window.localStorage.getItem(SEEN_KEY);
 
