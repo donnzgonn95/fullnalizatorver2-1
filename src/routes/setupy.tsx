@@ -5,6 +5,7 @@ import { useLiveCoins } from "@/lib/binance";
 import { generateSetups, adjustSetupsForRegime, type SetupTimeframe } from "@/lib/signals";
 import { setups as demoSetups, coins as demoCoins } from "@/lib/demo-data";
 import { useRegime } from "@/lib/regime-store";
+import { getSetupContext } from "@/lib/setup-context";
 import { Radio, Loader2, Clock } from "lucide-react";
 
 import { seoHead } from "@/lib/seo";
