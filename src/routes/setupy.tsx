@@ -168,6 +168,68 @@ function SetupyPage() {
               </div>
 
               <p className="mt-4 border-t border-border pt-3 text-sm text-muted-foreground">{s.reason}</p>
+
+              {(() => {
+                const ctx = getSetupContext(s);
+                return (
+                  <div className="mt-3 space-y-2">
+                    <details className="rounded border border-border bg-background/40 p-2">
+                      <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">Parametry strategii</summary>
+                      <div className="mt-2 grid gap-1.5 text-xs">
+                        {ctx.parameters.map((p, i) => (
+                          <div key={i} className="flex items-baseline justify-between gap-2 border-b border-border/50 pb-1 last:border-0">
+                            <span className="font-semibold">{p.name}</span>
+                            <span className="num text-muted-foreground">{p.value}</span>
+                            {p.description && <span className="basis-full text-[10px] text-muted-foreground/80">{p.description}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+
+                    <details className="rounded border border-border bg-background/40 p-2">
+                      <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">Zależności</summary>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
+                        {ctx.dependencies.map((d, i) => <li key={i}>{d}</li>)}
+                      </ul>
+                    </details>
+
+                    <details className="rounded border border-border bg-background/40 p-2">
+                      <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">Przykłady historyczne</summary>
+                      <ul className="mt-2 space-y-1.5 text-xs">
+                        {ctx.examples.map((e, i) => (
+                          <li key={i} className="rounded bg-background/60 p-2">
+                            <div className="font-mono text-[10px] text-muted-foreground">{e.date}</div>
+                            <div className="text-foreground">{e.setup}</div>
+                            <div className="text-muted-foreground">→ {e.outcome}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+
+                    <details className="rounded border border-border bg-background/40 p-2">
+                      <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">Wymagania i kontekst</summary>
+                      <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                        <div><b className="text-foreground">Kapitał:</b> {ctx.requirements.capital}</div>
+                        <div><b className="text-foreground">Czas:</b> {ctx.requirements.time}</div>
+                        <div className="flex flex-wrap items-center gap-1">
+                          <b className="text-foreground">Reżim rynku:</b>
+                          {ctx.requirements.regime.map((m) => (
+                            <span key={m} className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">{m}</span>
+                          ))}
+                        </div>
+                        <div><b className="text-foreground">Źródło:</b> {ctx.requirements.source}</div>
+                      </div>
+                    </details>
+
+                    <details className="rounded border border-border bg-background/40 p-2">
+                      <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">Dziennik obserwacji</summary>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
+                        {ctx.observations.map((o, i) => <li key={i}>{o}</li>)}
+                      </ul>
+                    </details>
+                  </div>
+                );
+              })()}
             </article>
           );
         })}
