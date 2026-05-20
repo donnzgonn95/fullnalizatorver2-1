@@ -356,6 +356,48 @@ export type Database = {
           },
         ]
       }
+      agent_simulation_config: {
+        Row: {
+          agent_id: string
+          created_at: string
+          enabled: boolean
+          id: string
+          max_reports_per_tick: number
+          notes: string | null
+          penalty_amount: number
+          reward_amount: number
+          stop_loss_pct: number
+          take_profit_pct: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          max_reports_per_tick?: number
+          notes?: string | null
+          penalty_amount?: number
+          reward_amount?: number
+          stop_loss_pct?: number
+          take_profit_pct?: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          max_reports_per_tick?: number
+          notes?: string | null
+          penalty_amount?: number
+          reward_amount?: number
+          stop_loss_pct?: number
+          take_profit_pct?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agents: {
         Row: {
           config: Json
@@ -1383,6 +1425,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      release_sim_advisory_lock: { Args: { p_key: number }; Returns: boolean }
+      try_sim_advisory_lock: { Args: { p_key: number }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
