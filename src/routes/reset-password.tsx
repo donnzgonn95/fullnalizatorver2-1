@@ -85,7 +85,7 @@ function ResetPage() {
           {recoveryMode ? "Ustaw nowe hasło" : "Wyślij link"}
         </button>
         <p className="text-center text-xs text-muted-foreground">
-          <Link to="/login" className="underline hover:text-foreground">Powrót do logowania</Link>
+          <Link to="/login" search={{}} className="underline hover:text-foreground">Powrót do logowania</Link>
         </p>
       </form>
     </div>

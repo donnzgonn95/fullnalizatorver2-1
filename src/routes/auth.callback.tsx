@@ -25,7 +25,7 @@ function AuthCallback() {
         navigate({ to: "/" });
       } else {
         // Wait briefly for onAuthStateChange to populate, then go home regardless.
-        setTimeout(() => navigate({ to: "/login" }), 600);
+        setTimeout(() => navigate({ to: "/login", search: {} }), 600);
       }
     })();
     return () => { cancelled = true; };
