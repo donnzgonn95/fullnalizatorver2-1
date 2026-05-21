@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.invoke_cron_hook(text) FROM anon, authenticated, public;

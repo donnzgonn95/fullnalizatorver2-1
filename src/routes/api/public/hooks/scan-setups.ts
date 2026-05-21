@@ -297,13 +297,56 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
         const diff = buildDiff(prevRuns, cappedRuns);
 
         const finishedAt = new Date();
+        const durationMs = finishedAt.getTime() - startedAt.getTime();
+        const scannedCount = cappedRuns.length;
+        const candidatesCount = detected;
+        let duplicateCount = 0;
+        let noSignalCount = 0;
+        const blockReasons: Record<string, number> = {};
+        for (const r of cappedRuns) {
+          for (const d of r.detectors) {
+            if (d.outcome === "duplicate") duplicateCount += 1;
+            else if (d.outcome === "no-signal") noSignalCount += 1;
+            if (d.outcome !== "setup" && d.reason) {
+              blockReasons[d.reason] = (blockReasons[d.reason] ?? 0) + 1;
+            }
+          }
+        }
+        const blockedCount = duplicateCount + errors;
+
+        let runStatus: "success" | "partial" | "error" | "success_no_candidates";
+        let noCandidatesReason: string | null = null;
+        if (errors > 0) {
+          runStatus = inserted > 0 ? "partial" : "error";
+        } else if (inserted === 0) {
+          runStatus = "success_no_candidates";
+          if (!enabled) noCandidatesReason = "scanner_disabled";
+          else if (!symbols.length) noCandidatesReason = "no_symbols";
+          else if (scannedCount === 0) noCandidatesReason = "no_runs";
+          else if (cappedRuns.every((r) => r.candles.count === 0)) noCandidatesReason = "no_market_data";
+          else if (cappedRuns.every((r) => r.candles.count > 0 && r.candles.count < 35)) noCandidatesReason = "all_blocked_by_quality";
+          else if (candidatesCount === 0) noCandidatesReason = "all_below_confidence";
+          else if (candidatesCount > 0 && duplicateCount >= candidatesCount) noCandidatesReason = "all_duplicates";
+          else noCandidatesReason = "no_candidates";
+        } else {
+          runStatus = "success";
+        }
+
         if (logId) {
           await supabaseAdmin.from("cron_run_logs").update({
             finished_at: finishedAt.toISOString(),
-            duration_ms: finishedAt.getTime() - startedAt.getTime(),
-            status: errors > 0 ? (inserted > 0 ? "partial" : "error") : "success",
+            duration_ms: durationMs,
+            status: runStatus,
             details: {
               detected, inserted, errors, enabled, symbols, intervals,
+              scanned_count: scannedCount,
+              candidates_count: candidatesCount,
+              inserted_count: inserted,
+              blocked_count: blockedCount,
+              duplicate_count: duplicateCount,
+              no_signal_count: noSignalCount,
+              block_reasons: blockReasons,
+              no_candidates_reason: noCandidatesReason,
               errorMessages: errorMessages.slice(0, 20),
               runs: cappedRuns,
               diff: { vsRunId: prevLog?.id ?? null, changed: diff },
@@ -312,7 +355,19 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
         }
 
         return new Response(
-          JSON.stringify({ ok: true, detected, inserted, errors, enabled, runsCount: cappedRuns.length, diffCount: diff.length }),
+          JSON.stringify({
+            ok: errors === 0,
+            status: runStatus,
+            scanned_count: scannedCount,
+            candidates_count: candidatesCount,
+            inserted_count: inserted,
+            blocked_count: blockedCount,
+            duration_ms: durationMs,
+            no_candidates_reason: noCandidatesReason,
+            enabled,
+            errors,
+            diffCount: diff.length,
+          }),
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       },
