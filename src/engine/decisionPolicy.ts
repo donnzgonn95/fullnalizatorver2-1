@@ -25,8 +25,6 @@ import type {
   CapitalFlowDirection,
 } from "./contracts";
 
-const POLICY_VERSION = "decision-policy@1.1.0";
-
 const MAJOR_ASSETS: ReadonlySet<string> = new Set(["BTC", "ETH", "SOL"]);
 
 // Data-quality caps.
@@ -305,7 +303,7 @@ export function evaluateDecisionPolicy(
 
     let blocked = false;
     let blockReason: string | undefined;
-    let setupConfidence = globalConfidence;
+    const setupConfidence = globalConfidence;
 
     if (blockAllReason) {
       blocked = true;
@@ -398,12 +396,10 @@ export function evaluateDecisionPolicy(
     score: globalConfidence,
   });
 
-  // reasoning, rejectedGates, policyVersion are intentionally NOT part of
-  // DecisionPolicyOutput per v1.3-Final. They are accumulated internally and
-  // consumed by upstream orchestrator/MarketDecision (which owns policyVersion).
+  // reasoning and rejectedGates are intentionally NOT part of
+  // DecisionPolicyOutput per v1.3-Final.
   void reasoning;
   void rejectedGates;
-  void POLICY_VERSION;
 
   return {
     finalDecision,
@@ -411,4 +407,3 @@ export function evaluateDecisionPolicy(
     processedSetups,
   };
 }
-
