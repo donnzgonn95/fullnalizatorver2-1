@@ -12,7 +12,7 @@ import { testWebhook, verifyAdminAccess } from "@/lib/admin.functions";
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/login", search: {} });
+    if (!data.user) throw redirect({ to: "/login", search: { redirect: "/" } });
     // Server-side admin role verification (defence-in-depth on top of RLS).
     try {
       await verifyAdminAccess();

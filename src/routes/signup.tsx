@@ -101,7 +101,7 @@ function SignupPage() {
         </div>
         <GoogleButton label="Załóż konto przez Google" />
         <p className="text-center text-xs text-muted-foreground">
-          Masz już konto? <Link to="/login" search={{}} className="underline hover:text-foreground">Zaloguj się</Link>
+          Masz już konto? <Link to="/login" search={{ redirect: "/" }} className="underline hover:text-foreground">Zaloguj się</Link>
         </p>
       </form>
     </div>
