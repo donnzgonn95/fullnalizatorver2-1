@@ -164,17 +164,9 @@ export interface DecisionPolicyOutput {
     entryPrice?: number;
     stopLoss?: number;
     takeProfit?: number;
-    confidence: number;
     blocked: boolean;
     blockReason?: string;
   }>;
-  reasoning: ReasoningStep[];
-  rejectedGates: Array<{
-    gate: string;
-    severity: RejectedGateSeverity;
-    reason: string;
-  }>;
-  policyVersion: string;
 }
 
 export interface MarketDecision {
