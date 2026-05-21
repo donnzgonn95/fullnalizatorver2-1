@@ -60,6 +60,7 @@ import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_auth
 import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
 import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/public/hooks/verify-setups'
+import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
 import { Route as ApiPublicHooksScanSetupsRouteImport } from './routes/api/public/hooks/scan-setups'
 import { Route as ApiPublicHooksNotifySetupsRouteImport } from './routes/api/public/hooks/notify-setups'
 import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
@@ -321,6 +322,12 @@ const ApiPublicHooksVerifySetupsRoute =
     path: '/api/public/hooks/verify-setups',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSyncCronSecretRoute =
+  ApiPublicHooksSyncCronSecretRouteImport.update({
+    id: '/api/public/hooks/sync-cron-secret',
+    path: '/api/public/hooks/sync-cron-secret',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksScanSetupsRoute =
   ApiPublicHooksScanSetupsRouteImport.update({
     id: '/api/public/hooks/scan-setups',
@@ -400,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
   '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
+  '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRoutesByTo {
@@ -454,6 +462,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
   '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
+  '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRoutesById {
@@ -512,6 +521,7 @@ export interface FileRoutesById {
   '/api/public/hooks/lab-reports': typeof ApiPublicHooksLabReportsRoute
   '/api/public/hooks/notify-setups': typeof ApiPublicHooksNotifySetupsRoute
   '/api/public/hooks/scan-setups': typeof ApiPublicHooksScanSetupsRoute
+  '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/hooks/verify-setups': typeof ApiPublicHooksVerifySetupsRoute
 }
 export interface FileRouteTypes {
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/lab-reports'
     | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
+    | '/api/public/hooks/sync-cron-secret'
     | '/api/public/hooks/verify-setups'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -624,6 +635,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/lab-reports'
     | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
+    | '/api/public/hooks/sync-cron-secret'
     | '/api/public/hooks/verify-setups'
   id:
     | '__root__'
@@ -681,6 +693,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/lab-reports'
     | '/api/public/hooks/notify-setups'
     | '/api/public/hooks/scan-setups'
+    | '/api/public/hooks/sync-cron-secret'
     | '/api/public/hooks/verify-setups'
   fileRoutesById: FileRoutesById
 }
@@ -710,6 +723,7 @@ export interface RootRouteChildren {
   ApiPublicHooksLabReportsRoute: typeof ApiPublicHooksLabReportsRoute
   ApiPublicHooksNotifySetupsRoute: typeof ApiPublicHooksNotifySetupsRoute
   ApiPublicHooksScanSetupsRoute: typeof ApiPublicHooksScanSetupsRoute
+  ApiPublicHooksSyncCronSecretRoute: typeof ApiPublicHooksSyncCronSecretRoute
   ApiPublicHooksVerifySetupsRoute: typeof ApiPublicHooksVerifySetupsRoute
 }
 
@@ -1072,6 +1086,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksVerifySetupsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sync-cron-secret': {
+      id: '/api/public/hooks/sync-cron-secret'
+      path: '/api/public/hooks/sync-cron-secret'
+      fullPath: '/api/public/hooks/sync-cron-secret'
+      preLoaderRoute: typeof ApiPublicHooksSyncCronSecretRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/scan-setups': {
       id: '/api/public/hooks/scan-setups'
       path: '/api/public/hooks/scan-setups'
@@ -1224,8 +1245,19 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksLabReportsRoute: ApiPublicHooksLabReportsRoute,
   ApiPublicHooksNotifySetupsRoute: ApiPublicHooksNotifySetupsRoute,
   ApiPublicHooksScanSetupsRoute: ApiPublicHooksScanSetupsRoute,
+  ApiPublicHooksSyncCronSecretRoute: ApiPublicHooksSyncCronSecretRoute,
   ApiPublicHooksVerifySetupsRoute: ApiPublicHooksVerifySetupsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

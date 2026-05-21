@@ -1427,6 +1427,10 @@ export type Database = {
       }
       invoke_cron_hook: { Args: { hook_path: string }; Returns: number }
       release_sim_advisory_lock: { Args: { p_key: number }; Returns: boolean }
+      set_vault_secret: {
+        Args: { p_name: string; p_value: string }
+        Returns: string
+      }
       try_sim_advisory_lock: { Args: { p_key: number }; Returns: boolean }
     }
     Enums: {
