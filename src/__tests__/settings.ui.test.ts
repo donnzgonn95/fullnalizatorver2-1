@@ -1,5 +1,6 @@
 // UI/state tests for notification settings: dedup, muted history, export.
 // Run with: bun test
+import "./testDomShim";
 import { describe, it, expect, beforeEach } from "bun:test";
 
 // ---- Minimal browser shim (localStorage + Notification) ----
@@ -39,13 +40,17 @@ const downloads: { name: string; type: string; size: number }[] = [];
 };
 (globalThis as any).document = {
   createElement: () => {
-    const el: any = { click: () => {}, remove: () => {}, set href(_v: string) {}, set download(v: string) { if (downloads.length) downloads[downloads.length - 1].name = v; } };
+    const el: any = { styleSheet: { cssText: "" }, click: () => {}, remove: () => {}, appendChild: (_c: unknown) => {}, set href(_v: string) {}, set download(v: string) { if (downloads.length) downloads[downloads.length - 1].name = v; } };
     return el;
   },
+  head: { appendChild: (c: unknown) => c },
   body: { appendChild: () => {} },
+  getElementsByTagName: (tag: string) => tag === "head" ? [{ appendChild: (c: unknown) => c }] : [],
 };
 
 // Import AFTER shims so module-level reads see them.
+(globalThis as any).document.createTextNode = (text: string) => ({ textContent: text });
+
 const {
   alertKey,
   exportNotifHistory,

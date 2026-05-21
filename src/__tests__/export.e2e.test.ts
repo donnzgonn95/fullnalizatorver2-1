@@ -1,5 +1,6 @@
 // E2E test: full alert -> history -> export -> JSON file pipeline.
 // Run with: bun test
+import "./testDomShim";
 import { describe, it, expect, beforeEach } from "bun:test";
 
 class MemStorage {
@@ -42,14 +43,19 @@ let lastBlobPayload = "";
 (globalThis as any).document = {
   createElement: () => {
     const el: any = {
-      click: () => {}, remove: () => {},
+      styleSheet: { cssText: "" },
+      click: () => {}, remove: () => {}, appendChild: (_c: unknown) => {},
       set href(_v: string) {},
       set download(v: string) { if (downloads.length) downloads[downloads.length - 1].name = v; },
     };
     return el;
   },
+  head: { appendChild: (c: unknown) => c },
   body: { appendChild: () => {} },
+  getElementsByTagName: (tag: string) => tag === "head" ? [{ appendChild: (c: unknown) => c }] : [],
 };
+
+(globalThis as any).document.createTextNode = (text: string) => ({ textContent: text });
 
 const {
   fireNotification,

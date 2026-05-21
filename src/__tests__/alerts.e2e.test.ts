@@ -1,5 +1,6 @@
 // E2E-style tests for alert generation + notification pipeline.
 // Run with: bun test
+import "./testDomShim";
 import { describe, it, expect, beforeEach } from "bun:test";
 import { generateAlerts } from "../lib/signals";
 import type { Coin } from "../lib/demo-data";
