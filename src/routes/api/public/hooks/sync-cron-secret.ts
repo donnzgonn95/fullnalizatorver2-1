@@ -9,8 +9,11 @@ import { authorizeCronRequest, unauthorizedResponse } from "@/lib/cron-auth.serv
 export const Route = createFileRoute("/api/public/hooks/sync-cron-secret")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const auth = await authorizeCronRequest(request);
+        if (!auth.ok) return unauthorizedResponse(auth.status);
         const secret = process.env.CRON_SECRET;
+
         if (!secret) {
           return new Response(
             JSON.stringify({ ok: false, error: "CRON_SECRET env missing on server" }),
