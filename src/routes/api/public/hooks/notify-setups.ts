@@ -72,7 +72,6 @@ export const Route = createFileRoute("/api/public/hooks/notify-setups")({
                   });
                   if (ok2xx) sent += 1; else errors += 1;
                 } catch (e) {
-
                   await supabaseAdmin.from("notification_log").insert({
                     setup_id: setup.id, user_id: sub.user_id, channel: "webhook",
                     status: "failed", error: (e as Error).message,
@@ -80,7 +79,10 @@ export const Route = createFileRoute("/api/public/hooks/notify-setups")({
                   errors += 1;
                   console.error(`notify-setups: webhook failed for user ${sub.user_id}`, e);
                   errorMessages.push(`webhook[${errors}]: ${(e as Error).message}`);
+                } finally {
+                  clearTimeout(timer);
                 }
+
               }
             }
           }
