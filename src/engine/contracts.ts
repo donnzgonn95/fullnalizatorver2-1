@@ -138,17 +138,36 @@ export interface ExecutionMetrics {
 // ---------------------------------------------------------------------------
 
 export interface DecisionPolicyInput {
-  snapshot: MarketSnapshot;
-  symbol: string;
-  horizon: "short" | "mid" | "long";
-  capital: number;
-  riskBudget: number;
-  context?: Record<string, unknown>;
+  snapshotId: string;
+  dataQuality: DataQuality;
+  regime: { id: MarketRegimeId; confidence: number };
+  capitalFlow?: { dominantDirection: CapitalFlowDirection; momentumScore: number };
+  rankings: { strongest: string[]; weakest: string[] };
+  rawSetups: Array<{
+    symbol: string;
+    type: "LONG" | "SHORT" | "WATCH";
+    strategyName: string;
+    entryPrice?: number;
+    stopLoss?: number;
+    takeProfit?: number;
+  }>;
+  accumulatedReasoning: ReasoningStep[];
 }
 
 export interface DecisionPolicyOutput {
-  decision: MarketDecisionType;
-  confidence: number;
+  finalDecision: MarketDecisionType;
+  globalConfidence: number;
+  processedSetups: Array<{
+    symbol: string;
+    type: "LONG" | "SHORT" | "WATCH";
+    strategyName: string;
+    entryPrice?: number;
+    stopLoss?: number;
+    takeProfit?: number;
+    confidence: number;
+    blocked: boolean;
+    blockReason?: string;
+  }>;
   reasoning: ReasoningStep[];
   rejectedGates: Array<{
     gate: string;
