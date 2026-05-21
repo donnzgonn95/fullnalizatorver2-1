@@ -54,19 +54,25 @@ export const Route = createFileRoute("/api/public/hooks/notify-setups")({
                 .from("notification_log").select("id")
                 .eq("setup_id", setup.id).eq("user_id", sub.user_id).eq("channel", "webhook").maybeSingle();
               if (!existing) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 8_000);
                 try {
                   const res = await fetch(sub.webhook_url, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ event: "new_setup", setup }),
+                    redirect: "manual",
+                    signal: controller.signal,
                   });
+                  const ok2xx = res.status >= 200 && res.status < 300;
                   await supabaseAdmin.from("notification_log").insert({
                     setup_id: setup.id, user_id: sub.user_id, channel: "webhook",
-                    status: res.ok ? "sent" : "failed",
-                    error: res.ok ? null : `HTTP ${res.status}`,
+                    status: ok2xx ? "sent" : "failed",
+                    error: ok2xx ? null : `HTTP ${res.status}`,
                   });
-                  if (res.ok) sent += 1; else errors += 1;
+                  if (ok2xx) sent += 1; else errors += 1;
                 } catch (e) {
+
                   await supabaseAdmin.from("notification_log").insert({
                     setup_id: setup.id, user_id: sub.user_id, channel: "webhook",
                     status: "failed", error: (e as Error).message,
