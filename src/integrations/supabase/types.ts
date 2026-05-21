@@ -1425,6 +1425,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      invoke_cron_hook: { Args: { hook_path: string }; Returns: number }
       release_sim_advisory_lock: { Args: { p_key: number }; Returns: boolean }
       try_sim_advisory_lock: { Args: { p_key: number }; Returns: boolean }
     }
