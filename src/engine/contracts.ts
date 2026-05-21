@@ -26,14 +26,7 @@ export type MarketRegimeId =
 
 export type CapitalFlowDirection = "inflow" | "outflow" | "neutral" | "unknown";
 
-export type MarketDecisionType =
-  | "enter"
-  | "exit"
-  | "hold"
-  | "reduce"
-  | "hedge"
-  | "wait"
-  | "abstain";
+export type MarketDecisionType = "LONG" | "SHORT" | "WATCH" | "WAIT";
 
 export type AgentDecisionStatus =
   | "approved"
