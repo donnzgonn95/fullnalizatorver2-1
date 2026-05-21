@@ -15,10 +15,13 @@ export const Route = createFileRoute("/api/public/hooks/sync-cron-secret")({
             { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
-        const { data, error } = await supabaseAdmin.rpc("set_vault_secret", {
-          p_name: "CRON_SECRET",
-          p_value: secret,
-        });
+        const { data, error } = await (supabaseAdmin.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+          "set_vault_secret",
+          { p_name: "CRON_SECRET", p_value: secret },
+        );
         if (error) {
           return new Response(
             JSON.stringify({ ok: false, error: error.message }),
