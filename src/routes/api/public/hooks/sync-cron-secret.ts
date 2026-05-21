@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { authorizeCronRequest, unauthorizedResponse } from "@/lib/cron-auth.server";
+
 
 // One-shot, idempotent endpoint: syncs CRON_SECRET from runtime env into Supabase Vault
 // so that public.invoke_cron_hook() can read it during pg_cron jobs.
