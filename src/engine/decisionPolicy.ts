@@ -1,13 +1,16 @@
 /**
- * DecisionPolicyEngine — Phase 4
+ * DecisionPolicyEngine — Phase 3.1 Contract-Aligned
  *
  * Pure, deterministic decision policy.
  * No I/O, no fetch, no Supabase, no React, no localStorage,
  * no external libraries, no console.* calls, no side effects.
  *
- * Maps the engine contracts (src/engine/contracts.ts) onto the
- * Phase-4 policy rules. Confidence caps are always applied via
- * Math.min(base, cap) — caps never raise confidence.
+ * Reads ONLY input fields defined in DecisionPolicyInput
+ * (no input.snapshot, no input.context).
+ * MissingFields are read EXCLUSIVELY from
+ * input.accumulatedReasoning[].evidence.missingFields.
+ *
+ * finalDecision is always one of: "LONG" | "SHORT" | "WATCH" | "WAIT".
  */
 
 import type {
@@ -19,13 +22,14 @@ import type {
   DataQuality,
   MarketRegimeId,
   MissingField,
+  CapitalFlowDirection,
 } from "./contracts";
 
-const POLICY_VERSION = "decision-policy@1.0.0";
+const POLICY_VERSION = "decision-policy@1.1.0";
 
 const MAJOR_ASSETS: ReadonlySet<string> = new Set(["BTC", "ETH", "SOL"]);
 
-// Data-quality caps (max ceiling for global confidence).
+// Data-quality caps.
 const CAP_ESTIMATED = 20;
 const CAP_PROXY = 55;
 const CAP_DEMO = 70;
@@ -74,12 +78,10 @@ function capForMode(mode: DataMode): number {
 
 function isPanicRegime(
   regime: MarketRegimeId,
-  capitalFlow: DecisionPolicyInput["snapshot"]["capitalFlow"],
+  flow: CapitalFlowDirection | undefined,
 ): boolean {
-  // No explicit "panic" id in contracts — treat extreme outflow + high vol
-  // or bear-trend + outflow as panic.
   return (
-    capitalFlow === "outflow" &&
+    flow === "outflow" &&
     (regime === "high-volatility" || regime === "bear-trend")
   );
 }
@@ -92,49 +94,27 @@ function isAltcoin(symbol: string): boolean {
   return !MAJOR_ASSETS.has(symbol.toUpperCase());
 }
 
-function extractAccumulatedReasoning(
-  ctx: Record<string, unknown> | undefined,
-): ReadonlyArray<Record<string, unknown>> {
-  if (!ctx) return [];
-  const raw = ctx["accumulatedReasoning"];
-  if (!Array.isArray(raw)) return [];
-  return raw.filter(
-    (item): item is Record<string, unknown> =>
-      typeof item === "object" && item !== null,
-  );
-}
-
-function hasRegimeFailure(
-  accumulated: ReadonlyArray<Record<string, unknown>>,
-): boolean {
-  for (const step of accumulated) {
-    if (step["module"] === "regime" && step["status"] === "failed") {
+function hasRegimeFailure(reasoning: ReadonlyArray<ReasoningStep>): boolean {
+  for (const step of reasoning) {
+    const evidence = step.evidence;
+    if (
+      evidence &&
+      typeof evidence === "object" &&
+      (evidence as Record<string, unknown>)["status"] === "failed" &&
+      step.module === "regime-detector"
+    ) {
       return true;
     }
   }
   return false;
 }
 
-function collectMissingFieldsForSymbol(
-  symbol: string,
-  snapshot: DecisionPolicyInput["snapshot"],
-  accumulated: ReadonlyArray<Record<string, unknown>>,
+function collectMissingFieldsFromReasoning(
+  reasoning: ReadonlyArray<ReasoningStep>,
 ): MissingField[] {
   const out: MissingField[] = [];
-  const target = symbol.toUpperCase();
-
-  for (const mf of snapshot.missingFields) {
-    if (
-      mf.scope === "asset" &&
-      typeof mf.symbol === "string" &&
-      mf.symbol.toUpperCase() === target
-    ) {
-      out.push(mf);
-    }
-  }
-
-  for (const step of accumulated) {
-    const evidence = step["evidence"];
+  for (const step of reasoning) {
+    const evidence = step.evidence;
     if (!evidence || typeof evidence !== "object") continue;
     const list = (evidence as Record<string, unknown>)["missingFields"];
     if (!Array.isArray(list)) continue;
@@ -142,66 +122,38 @@ function collectMissingFieldsForSymbol(
       if (!entry || typeof entry !== "object") continue;
       const candidate = entry as Partial<MissingField>;
       if (
-        candidate.scope === "asset" &&
-        typeof candidate.symbol === "string" &&
-        candidate.symbol.toUpperCase() === target &&
+        (candidate.scope === "asset" || candidate.scope === "market") &&
         typeof candidate.field === "string" &&
         (candidate.severity === "critical" ||
           candidate.severity === "warning" ||
           candidate.severity === "info")
       ) {
         out.push({
-          scope: "asset",
-          symbol: candidate.symbol,
+          scope: candidate.scope,
+          symbol:
+            typeof candidate.symbol === "string" ? candidate.symbol : undefined,
           field: candidate.field,
           severity: candidate.severity,
+          source: typeof candidate.source === "string" ? candidate.source : undefined,
         });
       }
     }
   }
-
   return out;
 }
 
-function baseConfidenceFromSnapshot(
-  input: DecisionPolicyInput,
-): number {
-  const coin = input.snapshot.coins.find(
-    (c) => c.symbol.toUpperCase() === input.symbol.toUpperCase(),
+function blockingForSymbol(
+  missing: ReadonlyArray<MissingField>,
+  symbol: string,
+): MissingField[] {
+  const target = symbol.toUpperCase();
+  return missing.filter(
+    (m) =>
+      m.scope === "asset" &&
+      typeof m.symbol === "string" &&
+      m.symbol.toUpperCase() === target &&
+      (m.severity === "critical" || m.severity === "warning"),
   );
-  // Deterministic, bounded heuristic in [0..100].
-  let score = 50;
-  if (coin) {
-    if (typeof coin.change24h === "number") {
-      score += Math.max(-20, Math.min(20, coin.change24h));
-    }
-    if (typeof coin.rsi === "number") {
-      const dist = Math.abs(50 - coin.rsi);
-      score += Math.max(-15, Math.min(15, (50 - dist) / 2));
-    }
-    if (coin.trend === "up") score += 5;
-    else if (coin.trend === "down") score -= 5;
-  }
-  if (typeof input.snapshot.breadth === "number") {
-    score += Math.max(-10, Math.min(10, (input.snapshot.breadth - 50) / 5));
-  }
-  return Math.max(0, Math.min(100, Math.round(score)));
-}
-
-function intendedDirection(
-  input: DecisionPolicyInput,
-): "LONG" | "SHORT" | "FLAT" {
-  const coin = input.snapshot.coins.find(
-    (c) => c.symbol.toUpperCase() === input.symbol.toUpperCase(),
-  );
-  if (!coin) return "FLAT";
-  if (coin.trend === "up") return "LONG";
-  if (coin.trend === "down") return "SHORT";
-  if (typeof coin.change24h === "number") {
-    if (coin.change24h > 1) return "LONG";
-    if (coin.change24h < -1) return "SHORT";
-  }
-  return "FLAT";
 }
 
 // ---------------------------------------------------------------------------
@@ -218,43 +170,41 @@ export function evaluateDecisionPolicy(
     reason: string;
   }> = [];
 
-  const direction = intendedDirection(input);
-  const accumulated = extractAccumulatedReasoning(input.context);
-  let confidence = baseConfidenceFromSnapshot(input);
-  let decision: MarketDecisionType =
-    direction === "LONG"
-      ? "enter"
-      : direction === "SHORT"
-        ? "hedge"
-        : "hold";
-  let forceWait = false;
-  let executionAllowed = true;
+  // Baseline global confidence — deterministic, bounded.
+  let globalConfidence = Math.max(
+    0,
+    Math.min(100, Math.round(input.regime.confidence)),
+  );
 
   reasoning.push({
     step: reasoning.length + 1,
     module: "decision-policy",
     label: "baseline",
-    detail: `direction=${direction} baseConfidence=${confidence}`,
+    detail: `regime=${input.regime.id} regimeConfidence=${globalConfidence}`,
     pass: true,
-    score: confidence,
+    score: globalConfidence,
   });
 
   // ---- Gate 1: Data quality ----
-  const mode = mapQualityToMode(input.snapshot.quality);
+  const mode = mapQualityToMode(input.dataQuality);
   const dataCap = capForMode(mode);
-  const beforeData = confidence;
-  confidence = Math.min(confidence, dataCap);
+  const beforeData = globalConfidence;
+  globalConfidence = Math.min(globalConfidence, dataCap);
+
+  let forceWait = false;
+  let restrictToWatchOrWait = false;
+  let blockAllReason: string | null = null;
 
   if (mode === "ESTIMATED") {
     forceWait = true;
-    executionAllowed = false;
+    blockAllReason = "BLOCKED_BY_DATA_QUALITY";
     rejectedGates.push({
       gate: "data-quality",
       severity: "critical",
       reason: "BLOCKED_BY_DATA_QUALITY",
     });
   } else if (mode === "PROXY" || mode === "DEMO") {
-    executionAllowed = false;
+    restrictToWatchOrWait = true;
     rejectedGates.push({
       gate: "data-quality",
       severity: "warning",
@@ -266,19 +216,21 @@ export function evaluateDecisionPolicy(
     step: reasoning.length + 1,
     module: "decision-policy",
     label: "data-quality-gate",
-    detail: `mode=${mode} cap=${dataCap} before=${beforeData} after=${confidence}`,
+    detail: `mode=${mode} cap=${dataCap} before=${beforeData} after=${globalConfidence}`,
     pass: mode !== "ESTIMATED",
-    score: confidence,
+    score: globalConfidence,
   });
 
   // ---- Gate 2: Regime ----
-  const regime = input.snapshot.regime;
-  const flow = input.snapshot.capitalFlow;
+  const regime = input.regime.id;
+  const flow = input.capitalFlow?.dominantDirection;
+  let blockLong = false;
+  let blockShort = false;
+  let blockAltLong = false;
 
-  if (hasRegimeFailure(accumulated)) {
+  if (hasRegimeFailure(input.accumulatedReasoning)) {
     forceWait = true;
-    executionAllowed = false;
-    confidence = Math.min(confidence, CAP_REGIME_FAILURE);
+    globalConfidence = Math.min(globalConfidence, CAP_REGIME_FAILURE);
     rejectedGates.push({
       gate: "regime",
       severity: "critical",
@@ -290,134 +242,167 @@ export function evaluateDecisionPolicy(
       label: "regime-failure",
       detail: `cap=${CAP_REGIME_FAILURE}`,
       pass: false,
-      score: confidence,
+      score: globalConfidence,
     });
   } else if (isPanicRegime(regime, flow)) {
     forceWait = true;
-    executionAllowed = false;
-    confidence = Math.min(confidence, CAP_PANIC);
-    if (direction === "LONG") {
-      rejectedGates.push({
-        gate: "regime",
-        severity: "critical",
-        reason: "REGIME_PANIC_LONG_LOCK",
-      });
-    } else if (direction === "SHORT") {
-      rejectedGates.push({
-        gate: "regime",
-        severity: "critical",
-        reason: "REGIME_PANIC_SHORT_LOCK",
-      });
-    } else {
-      rejectedGates.push({
-        gate: "regime",
-        severity: "warning",
-        reason: "REGIME_PANIC",
-      });
-    }
+    blockLong = true;
+    blockShort = true;
+    globalConfidence = Math.min(globalConfidence, CAP_PANIC);
+    rejectedGates.push({
+      gate: "regime",
+      severity: "critical",
+      reason: "REGIME_PANIC_LOCK",
+    });
     reasoning.push({
       step: reasoning.length + 1,
       module: "regime-detector",
       label: "panic",
       detail: `cap=${CAP_PANIC} regime=${regime} flow=${flow}`,
       pass: false,
-      score: confidence,
+      score: globalConfidence,
     });
   } else if (isRiskOffRegime(regime)) {
-    executionAllowed = false;
-    confidence = Math.min(confidence, CAP_RISK_OFF);
-    if (direction === "LONG" && isAltcoin(input.symbol)) {
-      rejectedGates.push({
-        gate: "regime",
-        severity: "warning",
-        reason: "RISK_OFF_ALT_LONG_LOCK",
-      });
-    }
+    restrictToWatchOrWait = true;
+    blockAltLong = true;
+    globalConfidence = Math.min(globalConfidence, CAP_RISK_OFF);
+    rejectedGates.push({
+      gate: "regime",
+      severity: "warning",
+      reason: "RISK_OFF_RESTRICTION",
+    });
     reasoning.push({
       step: reasoning.length + 1,
       module: "regime-detector",
       label: "risk-off",
       detail: `cap=${CAP_RISK_OFF} regime=${regime}`,
       pass: false,
-      score: confidence,
+      score: globalConfidence,
     });
   } else {
     reasoning.push({
       step: reasoning.length + 1,
       module: "regime-detector",
       label: "regime-ok",
-      detail: `regime=${regime} flow=${flow}`,
+      detail: `regime=${regime} flow=${flow ?? "n/a"}`,
       pass: true,
-      score: confidence,
+      score: globalConfidence,
     });
   }
 
-  // ---- Gate 3: Missing fields for this asset ----
-  const missing = collectMissingFieldsForSymbol(
-    input.symbol,
-    input.snapshot,
-    accumulated,
-  );
-  const blockingMissing = missing.filter(
-    (m) => m.severity === "critical" || m.severity === "warning",
+  // ---- Gate 3: Missing fields (from accumulatedReasoning only) ----
+  const allMissing = collectMissingFieldsFromReasoning(
+    input.accumulatedReasoning,
   );
 
-  if (blockingMissing.length > 0) {
-    forceWait = true;
-    executionAllowed = false;
-    rejectedGates.push({
-      gate: "data-completeness",
-      severity:
-        blockingMissing.some((m) => m.severity === "critical")
-          ? "critical"
-          : "warning",
-      reason: "MISSING_DATA_FIELDS",
-    });
-    reasoning.push({
-      step: reasoning.length + 1,
-      module: "data-ingest",
-      label: "missing-fields",
-      detail: `symbol=${input.symbol} count=${blockingMissing.length}`,
-      pass: false,
-      evidence: { missingFields: blockingMissing },
-    });
-  }
+  // ---- Per-setup processing ----
+  const processedSetups: DecisionPolicyOutput["processedSetups"] = [];
+  let bestActionable: { type: "LONG" | "SHORT" | "WATCH"; confidence: number } | null = null;
 
-  // ---- Gate 4: Confidence threshold ----
-  const hasActiveDirection = direction === "LONG" || direction === "SHORT";
+  for (const setup of input.rawSetups) {
+    const symbolUpper = setup.symbol.toUpperCase();
+    const setupBlocking = blockingForSymbol(allMissing, setup.symbol);
 
-  if (forceWait || !hasActiveDirection || confidence < MIN_CONFIDENCE_TO_ACT) {
-    decision = "wait";
-    if (!forceWait && confidence < MIN_CONFIDENCE_TO_ACT) {
+    let blocked = false;
+    let blockReason: string | undefined;
+    let setupConfidence = globalConfidence;
+
+    if (blockAllReason) {
+      blocked = true;
+      blockReason = blockAllReason;
+    } else if (setupBlocking.length > 0) {
+      blocked = true;
+      blockReason = "MISSING_DATA_FIELDS";
+      const sev: RejectedGateSeverity = setupBlocking.some(
+        (m) => m.severity === "critical",
+      )
+        ? "critical"
+        : "warning";
       rejectedGates.push({
-        gate: "confidence-threshold",
-        severity: "info",
-        reason: `CONFIDENCE_BELOW_${MIN_CONFIDENCE_TO_ACT}`,
+        gate: "data-completeness",
+        severity: sev,
+        reason: `MISSING_DATA_FIELDS:${symbolUpper}`,
       });
+      reasoning.push({
+        step: reasoning.length + 1,
+        module: "data-ingest",
+        label: "missing-fields",
+        detail: `symbol=${symbolUpper} count=${setupBlocking.length}`,
+        pass: false,
+        evidence: { missingFields: setupBlocking },
+      });
+    } else if (setup.type === "LONG" && blockLong) {
+      blocked = true;
+      blockReason = "REGIME_PANIC_LONG_LOCK";
+    } else if (setup.type === "SHORT" && blockShort) {
+      blocked = true;
+      blockReason = "REGIME_PANIC_SHORT_LOCK";
+    } else if (setup.type === "LONG" && blockAltLong && isAltcoin(setup.symbol)) {
+      blocked = true;
+      blockReason = "RISK_OFF_ALT_LONG_LOCK";
     }
-  } else if (!executionAllowed) {
-    decision = "hold"; // maps to WATCH in MarketDecisionType
-    rejectedGates.push({
-      gate: "execution-allowed",
-      severity: "warning",
-      reason: "EXECUTION_DISABLED_BY_MODE_OR_REGIME",
+
+    processedSetups.push({
+      symbol: setup.symbol,
+      type: setup.type,
+      strategyName: setup.strategyName,
+      entryPrice: setup.entryPrice,
+      stopLoss: setup.stopLoss,
+      takeProfit: setup.takeProfit,
+      confidence: setupConfidence,
+      blocked,
+      blockReason,
     });
+
+    if (!blocked) {
+      if (!bestActionable || setupConfidence > bestActionable.confidence) {
+        bestActionable = { type: setup.type, confidence: setupConfidence };
+      }
+    }
+  }
+
+  // ---- Gate 4: Final decision selection ----
+  let finalDecision: MarketDecisionType;
+
+  if (forceWait) {
+    finalDecision = "WAIT";
+  } else if (!bestActionable) {
+    finalDecision = "WAIT";
+    rejectedGates.push({
+      gate: "actionable-setups",
+      severity: "info",
+      reason: "NO_ACTIONABLE_SETUPS",
+    });
+  } else if (globalConfidence < MIN_CONFIDENCE_TO_ACT) {
+    finalDecision = "WAIT";
+    rejectedGates.push({
+      gate: "confidence-threshold",
+      severity: "info",
+      reason: `CONFIDENCE_BELOW_${MIN_CONFIDENCE_TO_ACT}`,
+    });
+  } else if (restrictToWatchOrWait) {
+    finalDecision = "WATCH";
+  } else if (bestActionable.type === "WATCH") {
+    finalDecision = "WATCH";
+  } else if (bestActionable.type === "LONG") {
+    finalDecision = "LONG";
   } else {
-    decision = direction === "LONG" ? "enter" : "hedge";
+    finalDecision = "SHORT";
   }
 
   reasoning.push({
     step: reasoning.length + 1,
     module: "decision-policy",
     label: "final",
-    detail: `decision=${decision} confidence=${confidence}`,
-    pass: decision !== "wait",
-    score: confidence,
+    detail: `finalDecision=${finalDecision} globalConfidence=${globalConfidence}`,
+    pass: finalDecision !== "WAIT",
+    score: globalConfidence,
   });
 
   return {
-    decision,
-    confidence,
+    finalDecision,
+    globalConfidence,
+    processedSetups,
     reasoning,
     rejectedGates,
     policyVersion: POLICY_VERSION,
