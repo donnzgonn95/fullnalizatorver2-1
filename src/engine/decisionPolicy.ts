@@ -349,7 +349,6 @@ export function evaluateDecisionPolicy(
       entryPrice: setup.entryPrice,
       stopLoss: setup.stopLoss,
       takeProfit: setup.takeProfit,
-      confidence: setupConfidence,
       blocked,
       blockReason,
     });
@@ -399,12 +398,17 @@ export function evaluateDecisionPolicy(
     score: globalConfidence,
   });
 
+  // reasoning, rejectedGates, policyVersion are intentionally NOT part of
+  // DecisionPolicyOutput per v1.3-Final. They are accumulated internally and
+  // consumed by upstream orchestrator/MarketDecision (which owns policyVersion).
+  void reasoning;
+  void rejectedGates;
+  void POLICY_VERSION;
+
   return {
     finalDecision,
     globalConfidence,
     processedSetups,
-    reasoning,
-    rejectedGates,
-    policyVersion: POLICY_VERSION,
   };
 }
+
