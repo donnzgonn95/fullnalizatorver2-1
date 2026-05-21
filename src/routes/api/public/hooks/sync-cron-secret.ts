@@ -34,7 +34,7 @@ export const Route = createFileRoute("/api/public/hooks/sync-cron-secret")({
           );
         }
         return new Response(
-          JSON.stringify({ ok: true, action: data, secret_length: secret.length }),
+          JSON.stringify({ ok: true, action: data }),
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       },
