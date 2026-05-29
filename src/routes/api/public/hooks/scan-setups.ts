@@ -174,203 +174,232 @@ export const Route = createFileRoute("/api/public/hooks/scan-setups")({
           job_name: "scan-setups", status: "running",
         }).select("id").single();
         const logId = logRow?.id as string | undefined;
+        let terminalWritten = false;
 
-        // Read live config
-        const { data: cfg } = await supabaseAdmin.from("scanner_config")
-          .select("symbols,intervals,enabled").order("updated_at", { ascending: false }).limit(1).single();
-        const symbols = (cfg?.symbols as string[] | null)?.length ? cfg!.symbols as string[] : [...SCAN_SYMBOLS];
-        const intervals = (cfg?.intervals as string[] | null)?.length ? cfg!.intervals as string[] : [...INTERVALS];
-        const enabled = cfg?.enabled !== false;
-
-        // Poprzedni udany run — do diff
-        const { data: prevLog } = await supabaseAdmin.from("cron_run_logs")
-          .select("id,details").eq("job_name", "scan-setups").in("status", ["success", "partial"])
-          .order("started_at", { ascending: false }).limit(1).maybeSingle();
-        const prevRuns = (prevLog?.details as { runs?: RunReport[] } | null)?.runs;
-
-        const runs: RunReport[] = [];
-        let detected = 0, inserted = 0, errors = 0;
-        const errorMessages: string[] = [];
-
-        if (enabled) {
-          for (const symbol of symbols) {
-            for (const interval of intervals as Interval[]) {
-              const detectorReports: DetectorReport[] = [];
-              const candleMeta: RunReport["candles"] = { count: 0, firstOpenTime: null, lastCloseTime: null, lastClose: null, lastVolume: null };
-              try {
-                const candles = await loadCandles(symbol, interval);
-                if (candles.length) {
-                  const last = candles[candles.length - 1];
-                  candleMeta.count = candles.length;
-                  candleMeta.firstOpenTime = new Date(candles[0].openTime).toISOString();
-                  candleMeta.lastCloseTime = new Date(last.openTime).toISOString();
-                  candleMeta.lastClose = last.close;
-                  candleMeta.lastVolume = last.volume;
-                  candleMeta.tail = candles.slice(-TAIL_SIZE).map((c) => ({
-                    openTime: new Date(c.openTime).toISOString(),
-                    open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume,
-                  }));
-                }
-                if (candles.length < 35) {
-                  detectorReports.push({ name: "bb_bounce", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.bb_bounce, durationMs: 0 });
-                  detectorReports.push({ name: "elliott_wave", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.elliott_wave, durationMs: 0 });
-                  runs.push({ symbol, interval, candles: candleMeta, detectors: detectorReports });
-                  continue;
-                }
-
-                const detectors: Array<{ name: DetectorReport["name"]; fn: (c: Candle[]) => DetectedSetup | null; explain: (c: Candle[]) => string }> = [
-                  { name: "bb_bounce", fn: detectBBBounce, explain: explainBBNoSignal },
-                  { name: "elliott_wave", fn: detectElliott, explain: explainElliottNoSignal },
-                ];
-
-                for (const d of detectors) {
-                  const t0 = Date.now();
-                  const params = DETECTOR_PARAMS[d.name];
-                  try {
-                    const setup = d.fn(candles);
-                    const dur = Date.now() - t0;
-                    if (!setup) {
-                      detectorReports.push({ name: d.name, outcome: "no-signal", reason: d.explain(candles), params, durationMs: dur });
-                      continue;
-                    }
-                    detected += 1;
-                    const entryISO = new Date(setup.entry_time).toISOString();
-                    const setupSummary = {
-                      setup_type: setup.setup_type,
-                      direction: setup.direction,
-                      entry_price: setup.entry_price,
-                      stop_loss: setup.stop_loss,
-                      take_profit: setup.take_profit,
-                      signal_strength: setup.signal_strength,
-                      wave_label: setup.wave_label ?? null,
-                    };
-                    if (await alreadyExists(symbol, interval, setup.setup_type, entryISO)) {
-                      detectorReports.push({ name: d.name, outcome: "duplicate", reason: "Identyczny setup w ostatnich 30 min", setup: setupSummary, params, durationMs: dur });
-                      continue;
-                    }
-                    const { error } = await supabaseAdmin.from("detected_setups").insert({
-                      user_id: null, symbol, interval,
-                      setup_type: setup.setup_type, wave_label: setup.wave_label ?? null,
-                      direction: setup.direction, entry_price: setup.entry_price,
-                      stop_loss: setup.stop_loss, take_profit: setup.take_profit,
-                      signal_strength: setup.signal_strength, entry_time: entryISO,
-                      status: "active", details: setup.details as never,
-                    });
-                    if (error) {
-                      errors += 1;
-                      errorMessages.push(`${symbol}/${interval}/${d.name}: ${error.message}`);
-                      detectorReports.push({ name: d.name, outcome: "error", reason: error.message, setup: setupSummary, params, durationMs: dur });
-                    } else {
-                      inserted += 1;
-                      detectorReports.push({ name: d.name, outcome: "setup", setup: setupSummary, params, durationMs: dur });
-                      // Zapis do Złotej Księgi + nagroda eljot za wykryty setup
-                      await appendLedger({
-                        category: "setup.detected",
-                        source: "setup-scanner-v1",
-                        agentSlug: "setup-scanner-v1",
-                        symbol,
-                        summary: `${setup.setup_type} ${setup.direction.toUpperCase()} ${symbol}/${interval} · siła ${setup.signal_strength}`,
-                        payload: { interval, ...setupSummary, params },
-                        reward: { amount: 1, reason: `setup ${setup.setup_type} ${symbol}/${interval}` },
-                      });
-                    }
-                  } catch (e) {
-                    const dur = Date.now() - t0;
-                    errors += 1;
-                    const msg = (e as Error).message ?? "unknown";
-                    errorMessages.push(`${symbol}/${interval}/${d.name}: ${msg}`);
-                    detectorReports.push({ name: d.name, outcome: "error", reason: msg, params, durationMs: dur });
-                  }
-                }
-              } catch (e) {
-                errors += 1;
-                const msg = (e as Error).message ?? "unknown";
-                errorMessages.push(`${symbol}/${interval}: ${msg}`);
-                detectorReports.push({ name: "bb_bounce", outcome: "error", reason: msg, params: DETECTOR_PARAMS.bb_bounce, durationMs: 0 });
-              }
-              runs.push({ symbol, interval, candles: candleMeta, detectors: detectorReports });
-            }
-          }
-        }
-
-        const cappedRuns = runs.slice(0, 200);
-        const diff = buildDiff(prevRuns, cappedRuns);
-
-        const finishedAt = new Date();
-        const durationMs = finishedAt.getTime() - startedAt.getTime();
-        const scannedCount = cappedRuns.length;
-        const candidatesCount = detected;
-        let duplicateCount = 0;
-        let noSignalCount = 0;
-        const blockReasons: Record<string, number> = {};
-        for (const r of cappedRuns) {
-          for (const d of r.detectors) {
-            if (d.outcome === "duplicate") duplicateCount += 1;
-            else if (d.outcome === "no-signal") noSignalCount += 1;
-            if (d.outcome !== "setup" && d.reason) {
-              blockReasons[d.reason] = (blockReasons[d.reason] ?? 0) + 1;
-            }
-          }
-        }
-        const blockedCount = duplicateCount + errors;
-
-        let runStatus: "success" | "partial" | "error" | "success_no_candidates";
-        let noCandidatesReason: string | null = null;
-        if (errors > 0) {
-          runStatus = inserted > 0 ? "partial" : "error";
-        } else if (inserted === 0) {
-          runStatus = "success_no_candidates";
-          if (!enabled) noCandidatesReason = "scanner_disabled";
-          else if (!symbols.length) noCandidatesReason = "no_symbols";
-          else if (scannedCount === 0) noCandidatesReason = "no_runs";
-          else if (cappedRuns.every((r) => r.candles.count === 0)) noCandidatesReason = "no_market_data";
-          else if (cappedRuns.every((r) => r.candles.count > 0 && r.candles.count < 35)) noCandidatesReason = "all_blocked_by_quality";
-          else if (candidatesCount === 0) noCandidatesReason = "all_below_confidence";
-          else if (candidatesCount > 0 && duplicateCount >= candidatesCount) noCandidatesReason = "all_duplicates";
-          else noCandidatesReason = "no_candidates";
-        } else {
-          runStatus = "success";
-        }
-
-        if (logId) {
+        const writeTerminal = async (
+          status: "success" | "partial" | "error" | "success_no_candidates",
+          details: Record<string, unknown>,
+          errorMessage: string | null,
+          durationMs: number,
+        ) => {
+          if (!logId || terminalWritten) return;
+          terminalWritten = true;
           await supabaseAdmin.from("cron_run_logs").update({
-            finished_at: finishedAt.toISOString(),
+            finished_at: new Date().toISOString(),
             duration_ms: durationMs,
-            status: runStatus,
-            details: {
-              detected, inserted, errors, enabled, symbols, intervals,
-              scanned_count: scannedCount,
-              candidates_count: candidatesCount,
-              inserted_count: inserted,
-              blocked_count: blockedCount,
-              duplicate_count: duplicateCount,
-              no_signal_count: noSignalCount,
-              block_reasons: blockReasons,
-              no_candidates_reason: noCandidatesReason,
-              errorMessages: errorMessages.slice(0, 20),
-              runs: cappedRuns,
-              diff: { vsRunId: prevLog?.id ?? null, changed: diff },
-            } as never,
+            status,
+            error_message: errorMessage,
+            details: details as never,
           }).eq("id", logId);
-        }
+        };
 
-        return new Response(
-          JSON.stringify({
-            ok: errors === 0,
-            status: runStatus,
+        try {
+          // Read live config
+          const { data: cfg } = await supabaseAdmin.from("scanner_config")
+            .select("symbols,intervals,enabled").order("updated_at", { ascending: false }).limit(1).single();
+          const symbols = (cfg?.symbols as string[] | null)?.length ? cfg!.symbols as string[] : [...SCAN_SYMBOLS];
+          const intervals = (cfg?.intervals as string[] | null)?.length ? cfg!.intervals as string[] : [...INTERVALS];
+          const enabled = cfg?.enabled !== false;
+
+          // Poprzedni udany run — do diff
+          const { data: prevLog } = await supabaseAdmin.from("cron_run_logs")
+            .select("id,details").eq("job_name", "scan-setups").in("status", ["success", "partial"])
+            .order("started_at", { ascending: false }).limit(1).maybeSingle();
+          const prevRuns = (prevLog?.details as { runs?: RunReport[] } | null)?.runs;
+
+          const runs: RunReport[] = [];
+          let detected = 0, inserted = 0, errors = 0;
+          const errorMessages: string[] = [];
+
+          if (enabled) {
+            for (const symbol of symbols) {
+              for (const interval of intervals as Interval[]) {
+                const detectorReports: DetectorReport[] = [];
+                const candleMeta: RunReport["candles"] = { count: 0, firstOpenTime: null, lastCloseTime: null, lastClose: null, lastVolume: null };
+                try {
+                  const candles = await loadCandles(symbol, interval);
+                  if (candles.length) {
+                    const last = candles[candles.length - 1];
+                    candleMeta.count = candles.length;
+                    candleMeta.firstOpenTime = new Date(candles[0].openTime).toISOString();
+                    candleMeta.lastCloseTime = new Date(last.openTime).toISOString();
+                    candleMeta.lastClose = last.close;
+                    candleMeta.lastVolume = last.volume;
+                    candleMeta.tail = candles.slice(-TAIL_SIZE).map((c) => ({
+                      openTime: new Date(c.openTime).toISOString(),
+                      open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume,
+                    }));
+                  }
+                  if (candles.length < 35) {
+                    detectorReports.push({ name: "bb_bounce", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.bb_bounce, durationMs: 0 });
+                    detectorReports.push({ name: "elliott_wave", outcome: "no-signal", reason: `Tylko ${candles.length} świec (min 35)`, params: DETECTOR_PARAMS.elliott_wave, durationMs: 0 });
+                    runs.push({ symbol, interval, candles: candleMeta, detectors: detectorReports });
+                    continue;
+                  }
+
+                  const detectors: Array<{ name: DetectorReport["name"]; fn: (c: Candle[]) => DetectedSetup | null; explain: (c: Candle[]) => string }> = [
+                    { name: "bb_bounce", fn: detectBBBounce, explain: explainBBNoSignal },
+                    { name: "elliott_wave", fn: detectElliott, explain: explainElliottNoSignal },
+                  ];
+
+                  for (const d of detectors) {
+                    const t0 = Date.now();
+                    const params = DETECTOR_PARAMS[d.name];
+                    try {
+                      const setup = d.fn(candles);
+                      const dur = Date.now() - t0;
+                      if (!setup) {
+                        detectorReports.push({ name: d.name, outcome: "no-signal", reason: d.explain(candles), params, durationMs: dur });
+                        continue;
+                      }
+                      detected += 1;
+                      const entryISO = new Date(setup.entry_time).toISOString();
+                      const setupSummary = {
+                        setup_type: setup.setup_type,
+                        direction: setup.direction,
+                        entry_price: setup.entry_price,
+                        stop_loss: setup.stop_loss,
+                        take_profit: setup.take_profit,
+                        signal_strength: setup.signal_strength,
+                        wave_label: setup.wave_label ?? null,
+                      };
+                      if (await alreadyExists(symbol, interval, setup.setup_type, entryISO)) {
+                        detectorReports.push({ name: d.name, outcome: "duplicate", reason: "Identyczny setup w ostatnich 30 min", setup: setupSummary, params, durationMs: dur });
+                        continue;
+                      }
+                      const { error } = await supabaseAdmin.from("detected_setups").insert({
+                        user_id: null, symbol, interval,
+                        setup_type: setup.setup_type, wave_label: setup.wave_label ?? null,
+                        direction: setup.direction, entry_price: setup.entry_price,
+                        stop_loss: setup.stop_loss, take_profit: setup.take_profit,
+                        signal_strength: setup.signal_strength, entry_time: entryISO,
+                        status: "active", details: setup.details as never,
+                      });
+                      if (error) {
+                        errors += 1;
+                        errorMessages.push(`${symbol}/${interval}/${d.name}: ${error.message}`);
+                        detectorReports.push({ name: d.name, outcome: "error", reason: error.message, setup: setupSummary, params, durationMs: dur });
+                      } else {
+                        inserted += 1;
+                        detectorReports.push({ name: d.name, outcome: "setup", setup: setupSummary, params, durationMs: dur });
+                        // Zapis do Złotej Księgi + nagroda eljot za wykryty setup
+                        await appendLedger({
+                          category: "setup.detected",
+                          source: "setup-scanner-v1",
+                          agentSlug: "setup-scanner-v1",
+                          symbol,
+                          summary: `${setup.setup_type} ${setup.direction.toUpperCase()} ${symbol}/${interval} · siła ${setup.signal_strength}`,
+                          payload: { interval, ...setupSummary, params },
+                          reward: { amount: 1, reason: `setup ${setup.setup_type} ${symbol}/${interval}` },
+                        });
+                      }
+                    } catch (e) {
+                      const dur = Date.now() - t0;
+                      errors += 1;
+                      const msg = (e as Error).message ?? "unknown";
+                      errorMessages.push(`${symbol}/${interval}/${d.name}: ${msg}`);
+                      detectorReports.push({ name: d.name, outcome: "error", reason: msg, params, durationMs: dur });
+                    }
+                  }
+                } catch (e) {
+                  errors += 1;
+                  const msg = (e as Error).message ?? "unknown";
+                  errorMessages.push(`${symbol}/${interval}: ${msg}`);
+                  detectorReports.push({ name: "bb_bounce", outcome: "error", reason: msg, params: DETECTOR_PARAMS.bb_bounce, durationMs: 0 });
+                }
+                runs.push({ symbol, interval, candles: candleMeta, detectors: detectorReports });
+              }
+            }
+          }
+
+          const cappedRuns = runs.slice(0, 200);
+          const diff = buildDiff(prevRuns, cappedRuns);
+
+          const finishedAt = new Date();
+          const durationMs = finishedAt.getTime() - startedAt.getTime();
+          const scannedCount = cappedRuns.length;
+          const candidatesCount = detected;
+          let duplicateCount = 0;
+          let noSignalCount = 0;
+          const blockReasons: Record<string, number> = {};
+          for (const r of cappedRuns) {
+            for (const d of r.detectors) {
+              if (d.outcome === "duplicate") duplicateCount += 1;
+              else if (d.outcome === "no-signal") noSignalCount += 1;
+              if (d.outcome !== "setup" && d.reason) {
+                blockReasons[d.reason] = (blockReasons[d.reason] ?? 0) + 1;
+              }
+            }
+          }
+          const blockedCount = duplicateCount + errors;
+
+          let runStatus: "success" | "partial" | "error" | "success_no_candidates";
+          let noCandidatesReason: string | null = null;
+          if (errors > 0) {
+            runStatus = inserted > 0 ? "partial" : "error";
+          } else if (inserted === 0) {
+            runStatus = "success_no_candidates";
+            if (!enabled) noCandidatesReason = "scanner_disabled";
+            else if (!symbols.length) noCandidatesReason = "no_symbols";
+            else if (scannedCount === 0) noCandidatesReason = "no_runs";
+            else if (cappedRuns.every((r) => r.candles.count === 0)) noCandidatesReason = "no_market_data";
+            else if (cappedRuns.every((r) => r.candles.count > 0 && r.candles.count < 35)) noCandidatesReason = "all_blocked_by_quality";
+            else if (candidatesCount === 0) noCandidatesReason = "all_below_confidence";
+            else if (candidatesCount > 0 && duplicateCount >= candidatesCount) noCandidatesReason = "all_duplicates";
+            else noCandidatesReason = "no_candidates";
+          } else {
+            runStatus = "success";
+          }
+
+          await writeTerminal(runStatus, {
+            detected, inserted, errors, enabled, symbols, intervals,
             scanned_count: scannedCount,
             candidates_count: candidatesCount,
             inserted_count: inserted,
             blocked_count: blockedCount,
-            duration_ms: durationMs,
+            duplicate_count: duplicateCount,
+            no_signal_count: noSignalCount,
+            block_reasons: blockReasons,
             no_candidates_reason: noCandidatesReason,
-            enabled,
-            errors,
-            diffCount: diff.length,
-          }),
-          { status: 200, headers: { "Content-Type": "application/json" } },
-        );
+            errorMessages: errorMessages.slice(0, 20),
+            runs: cappedRuns,
+            diff: { vsRunId: prevLog?.id ?? null, changed: diff },
+          }, errors > 0 ? (errorMessages[0] ?? `errors=${errors}`) : null, durationMs);
+
+          return new Response(
+            JSON.stringify({
+              ok: errors === 0,
+              status: runStatus,
+              scanned_count: scannedCount,
+              candidates_count: candidatesCount,
+              inserted_count: inserted,
+              blocked_count: blockedCount,
+              duration_ms: durationMs,
+              no_candidates_reason: noCandidatesReason,
+              enabled,
+              errors,
+              diffCount: diff.length,
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          );
+        } catch (e) {
+          const msg = (e as Error)?.message ?? "unknown_fatal_error";
+          console.error("scan-setups: fatal", e);
+          const durationMs = Date.now() - startedAt.getTime();
+          await writeTerminal("error", { fatal: msg }, msg, durationMs);
+          return new Response(JSON.stringify({ ok: false, status: "error", error: msg }), {
+            status: 500, headers: { "Content-Type": "application/json" },
+          });
+        } finally {
+          // Safety net: if no terminal status was written above, mark as error
+          // so the row can never remain stuck in 'running'.
+          if (logId && !terminalWritten) {
+            const durationMs = Date.now() - startedAt.getTime();
+            await writeTerminal("error", { fatal: "handler_exited_without_terminal_status" }, "handler_exited_without_terminal_status", durationMs);
+          }
+        }
       },
+
     },
   },
 });
