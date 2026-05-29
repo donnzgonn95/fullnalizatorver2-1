@@ -521,6 +521,7 @@ export type Database = {
         Row: {
           details: Json
           duration_ms: number | null
+          error_message: string | null
           finished_at: string | null
           id: string
           job_name: string
@@ -530,6 +531,7 @@ export type Database = {
         Insert: {
           details?: Json
           duration_ms?: number | null
+          error_message?: string | null
           finished_at?: string | null
           id?: string
           job_name: string
@@ -539,6 +541,7 @@ export type Database = {
         Update: {
           details?: Json
           duration_ms?: number | null
+          error_message?: string | null
           finished_at?: string | null
           id?: string
           job_name?: string
