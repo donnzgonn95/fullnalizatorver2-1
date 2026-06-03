@@ -20,6 +20,12 @@ const STATIC_PATHS = [
   "/gielda/makro",
   "/gielda/watchlista",
   "/gielda/taktyki",
+  "/disclaimer",
+  "/polityka-prywatnosci",
+  "/regulamin",
+  "/login",
+  "/signup",
+  "/reset-password",
 ];
 
 const POPULAR_COINS = [
