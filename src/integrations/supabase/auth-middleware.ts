@@ -61,7 +61,8 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
     );
 
     // Use getUser() to perform a server-side verification of the JWT
-    // (verifies signature against Supabase JWKS) instead of getClaims()
+    // (verifies signature against Supabase JWKS) instead of 
+    fix false positive in security regression comment
     // which only decodes locally without signature verification.
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data?.user?.id) {
