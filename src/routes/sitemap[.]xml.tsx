@@ -37,7 +37,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: () => {
-        const base = "https://cryptopuls.lovable.app";
+        const base = "https://fullnalizatorver2-1.lovable.app";
         const lastmod = new Date().toISOString().slice(0, 10);
         const urls = [
           ...STATIC_PATHS.map((p) => `${base}${p}`),
