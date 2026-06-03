@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /ustawienia
 Disallow: /historia-alertow
+Disallow: /admin
 
-Sitemap: https://cryptopuls.lovable.app/sitemap.xml
+Sitemap: https://fullnalizatorver2-1.lovable.app/sitemap.xml
