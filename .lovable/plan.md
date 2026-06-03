@@ -1,61 +1,60 @@
-# Plan: Test pętli sygnał → zapis → uczenie + backtest
+## Cel
 
-## Stan obecny (z bazy)
-- `detected_setups`: **0 rekordów** — skaner nigdy nie wpisał sygnału do DB.
-- `cron_run_logs`: **0** — żaden cron nie został uruchomiony przez pg_cron.
-- `agent_decisions` / `agent_paper_trades`: **0** — pętla agent-simulation-tick nigdy nie wystartowała.
-- `lab_backtest_runs`: **36** — backtest UI był używany ręcznie.
+Wykonać kompleksowy audyt CryptoPuls (SEO + zdrowie systemu + skuteczność detektorów) i wygenerować trzy artefakty:
+1. `system-health-report.md` (nadpisać aktualnymi danymi z 03.06.2026)
+2. `backtest-results.csv` (regenerować z `detected_setups` — 3 285 zweryfikowanych setupów)
+3. SEO scan w tle (rezultaty w panelu SEO)
 
-Wniosek: kod istnieje (`scan-setups`, `verify-setups`, `agent-simulation-tick`, `lab.backtest`), ale brak harmonogramu i danych historycznych do oceny "czy się uczy".
+Audyt jest **read-only** (zgodnie z trybem maintenance) — żadnych zmian w kodzie, RLS, schemacie ani Stripe.
 
-## Co zrobimy (bez zmian w funkcjonalności, tylko obserwacja + ręczne triggery)
+## Co zrobię — krok po kroku
 
-### Krok 1 — Smoke test endpointów cron (ręczne wywołanie)
-Wywołam HTTP-em każdy hook publiczny i zbiorę odpowiedź:
-1. `POST /api/public/hooks/scan-setups` → ile świec pobrał, ile sygnałów wykrył, ile zapisał, duplikaty.
-2. `POST /api/public/hooks/verify-setups` → ile pendingów sprawdził, ile hit/miss.
-3. `POST /api/public/hooks/agent-simulation-tick` → czy agent przeczytał raport, podjął decyzję, otworzył paper-trade, naliczył ELJOT.
+### 1. SEO audit (~1 min w tle)
+- Uruchomię `seo--trigger_scan` (wymaga zatwierdzenia użytkownika).
+- Zaraportuję 3 istniejące findings (wszystkie `low`):
+  - `http:robots` — Sitemap wskazuje na cryptopuls.lovable.app zamiast aktualnej domeny
+  - `http:sitemap` — brak wpisów dla `/admin`, `/disclaimer`, `/login`, `/polityka-prywatnosci`, `/regulamin`
+  - `http:llms_txt` — brak `/llms.txt`
+- Findings tylko zgłoszę — **nie naprawiam** (audit mode).
 
-Output: tabela "endpoint | status | co zapisał | błędy".
+### 2. System health report (Markdown → `/mnt/documents/system-health-report.md`)
+Sekcje:
+- **Status cron jobs** (48h):
+  - scan-setups: 124 success, 287 success_no_candidates, **165 running (zombie)**
+  - verify-setups: 527 success, **49 running**
+  - notify-setups: 1440 success ✅
+  - agent-simulation-tick: 576 success ✅
+- **Zombie cron rows (cumulative)**: 486 scan-setups + 145 verify-setups stuck w `running` od 2026-05-29 — reaper z fix #2 był one-shot; **brak ponawialnego reaper'a**. Rekomendacja: pg_cron co 10 min albo rozszerzenie `cron_run_logs` UPDATE w handlerze startowym.
+- **Detected setups**: 3 293 total, 3 285 zweryfikowane, 8 aktywnych, zakres 21.05.2026 → 03.06.2026
+- **Backend/RLS**: bez zmian, polityki opisane w schemacie projektu
+- **Edge function `market-ai`**: JWT validation OK (potwierdzone wcześniej)
+- **SEO findings**: jak wyżej (3× low)
+- **Lista zaleceń** w kolejności priorytetu (zombie reaper > Elliott calibration > SEO domain swap > llms.txt)
 
-### Krok 2 — Weryfikacja zapisu w DB
-Po każdym triggerze odczyt:
-- `detected_setups` (nowe wiersze, signal_strength, direction)
-- `agent_decisions`, `agent_report_reads`, `agent_paper_trades` (idempotencja — drugi trigger nie powinien duplikować)
-- `agent_reputation` (czy score się zmienia), `eljot_ledger` (czy reward/penalty leci)
-- `cron_run_logs` (czas trwania, status)
+### 3. Backtest results CSV (`/mnt/documents/backtest-results.csv`)
+Eksport agregatów + raw sample:
+- **Agregaty (winrate per detector × interval)** — z danych live:
+  - BB-bounce: M15 100% (719w/0l), M30 100% (421w/0l), M45 84% (322w/61l), H1 100% (318w/0l), H4 100% (83w/0l)
+  - Elliott: M15 6.8% (20w/274l), M30 5.0% (16w/302l), M45 6.2% (21w/319l), H1 1.6% (5w/315l), H4 4.5% (4w/85l)
+- **Czerwone flagi w raporcie**:
+  - BB-bounce winrate 96–100% **wygląda na artefakt weryfikatora** (brak strat poza M45) — wymaga przeglądu logiki `verify-setups`
+  - Elliott winrate ~5% — detektor systemowo nieprzydatny w obecnej konfiguracji ELLIOTT_PARAMS
+- **Raw rows**: ostatnie 200 zweryfikowanych setupów z kolumnami `symbol,interval,setup_type,direction,signal_strength,entry_time,result,detected_at`
 
-### Krok 3 — Test "uczenia"
-Sprawdzimy mechanizm korekcji:
-- przed: snapshot `agent_reputation` (score, hits, misses)
-- 2× tick z różnymi raportami (lub ten sam dwukrotnie — test idempotencji)
-- po: diff score, czy `golden_ledger` ma nowy wpis z `entry_hash`/`prev_hash` (audit trail).
+### 4. Raport końcowy w czacie
+Krótki tekst z:
+- liczbą znalezionych issues per kategoria
+- linkiem do panelu SEO
+- odnośnikami `<presentation-artifact>` do obu plików.
 
-Wynik powie: czy advisory-lock + idempotencja działają, czy reputacja rośnie/spada zgodnie z `take_profit`/`stop_loss` z `agent_simulation_config`.
+## Czego **nie** zrobię (zgodnie z audit mode)
+- Nie naprawiam zombie cron rows (potrzebny pg_cron reaper — wymaga migracji)
+- Nie zmieniam `robots.txt` ani `sitemap.xml`
+- Nie tworzę `llms.txt`
+- Nie modyfikuję detektora Elliotta ani verifier'a BB-bounce
+- Nie ruszam RLS, Stripe, edge functions, UI
 
-### Krok 4 — Backtest porównawczy
-W `/lab/backtest` (UI istniejący) puścimy SMA(5/20) crossover na 4 symbolach (BTC, ETH, SOL, BNB) — zapisz wyniki, potem porównanie:
-- winrate, expectancy, max DD per symbol
-- zestawienie wyników z 36 istniejącymi runami w `lab_backtest_runs` (raport CSV do `/mnt/documents/backtest-compare.csv`).
+Wszystkie powyższe mogą zostać zaimplementowane jako **osobny zatwierdzony fix #3+** po przeglądzie raportu.
 
-### Krok 5 — Raport końcowy
-Jeden dokument w `/mnt/documents/system-health-report.md`:
-- Co działa (✅), co milczy (⚠️), co padło (❌)
-- Czy agent się "uczy" (score delta vs trades)
-- Ranking strategii backtest
-- Lista konkretnych braków do naprawy w następnym sprincie
-
-## Czego NIE robimy
-- Nie zmieniamy logiki detektorów ani agent-simulation.
-- Nie tworzymy migracji.
-- Nie dodajemy panelu admin.
-- Nie włączamy pg_cron na stałe (tylko ręczne triggery do testu).
-
-## Detale techniczne
-- Wywołania endpointów: `stack_modern--invoke-server-function` lub `curl` na `project--5eca04f2...lovable.app/api/public/hooks/*`.
-- Odczyty DB: `supabase--read_query` (read-only).
-- Logi: `stack_modern--server-function-logs` po każdym triggerze (filtr `scan-setups`, `agent-simulation`).
-- Cały test = ~5–10 minut wykonania, zero zmian w kodzie.
-
-## Decyzja
-Zatwierdź plan — uruchomię test i wrócę z raportem. Jeśli wolisz tylko backtest (krok 4) albo tylko smoke (krok 1–2), powiedz.
+## Ryzyko
+Zerowe — operacje wyłącznie odczytowe + zapis 2 plików w `/mnt/documents/`.
