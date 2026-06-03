@@ -20,6 +20,12 @@ const STATIC_PATHS = [
   "/gielda/makro",
   "/gielda/watchlista",
   "/gielda/taktyki",
+  "/disclaimer",
+  "/polityka-prywatnosci",
+  "/regulamin",
+  "/login",
+  "/signup",
+  "/reset-password",
 ];
 
 const POPULAR_COINS = [
@@ -31,7 +37,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: () => {
-        const base = "https://cryptopuls.lovable.app";
+        const base = "https://fullnalizatorver2-1.lovable.app";
         const lastmod = new Date().toISOString().slice(0, 10);
         const urls = [
           ...STATIC_PATHS.map((p) => `${base}${p}`),
