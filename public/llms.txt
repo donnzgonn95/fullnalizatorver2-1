@@ -1,0 +1,22 @@
+# CryptoPuls
+
+> Polski dashboard rynku krypto: skanery setupów (BB-bounce, Elliott), alerty, dziennik i AI-asystent.
+
+CryptoPuls dostarcza widoki siły relatywnej, przepływu kapitału, kompresji zmienności (squeeze) i sentymentu oraz historię zweryfikowanych setupów. Treści mają charakter edukacyjny i nie stanowią porady inwestycyjnej.
+
+## Pages
+
+- [Strona główna](/): przegląd rynku i wejście do sekcji.
+- [Siła relatywna](/sila): ranking RS dla głównych coinów.
+- [Przepływ kapitału](/przeplyw): dokąd płynie kapitał między aktywami.
+- [Squeeze](/squeeze): kompresja zmienności (Bollinger Squeeze).
+- [Sentyment](/sentyment): wskaźniki sentymentu rynkowego.
+- [Setupy](/setupy): aktywne setupy wykryte przez skaner.
+- [Historia setupów](/setupy/historia): zweryfikowane setupy z win/loss.
+- [Słownik](/slownik): wyjaśnienia pojęć używanych w serwisie.
+
+## Optional
+
+- [Disclaimer](/disclaimer): zastrzeżenie ryzyka.
+- [Polityka prywatności](/polityka-prywatnosci)
+- [Regulamin](/regulamin)
