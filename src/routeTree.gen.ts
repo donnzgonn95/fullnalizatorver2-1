@@ -21,7 +21,6 @@ import { Route as RegulaminRouteImport } from './routes/regulamin'
 import { Route as PrzeplywRouteImport } from './routes/przeplyw'
 import { Route as PolitykaPrywatnosciRouteImport } from './routes/polityka-prywatnosci'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
 import { Route as LabRouteImport } from './routes/lab'
 import { Route as GieldaRouteImport } from './routes/gielda'
@@ -125,11 +124,6 @@ const PolitykaPrywatnosciRoute = PolitykaPrywatnosciRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
-  id: '/llms.txt',
-  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LikwidacjaRoute = LikwidacjaRouteImport.update({
@@ -366,7 +360,6 @@ export interface FileRoutesByFullPath {
   '/gielda': typeof GieldaRouteWithChildren
   '/lab': typeof LabRouteWithChildren
   '/likwidacja': typeof LikwidacjaRoute
-  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
   '/przeplyw': typeof PrzeplywRoute
@@ -422,7 +415,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/disclaimer': typeof DisclaimerRoute
   '/likwidacja': typeof LikwidacjaRoute
-  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
   '/przeplyw': typeof PrzeplywRoute
@@ -482,7 +474,6 @@ export interface FileRoutesById {
   '/gielda': typeof GieldaRouteWithChildren
   '/lab': typeof LabRouteWithChildren
   '/likwidacja': typeof LikwidacjaRoute
-  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/polityka-prywatnosci': typeof PolitykaPrywatnosciRoute
   '/przeplyw': typeof PrzeplywRoute
@@ -542,7 +533,6 @@ export interface FileRouteTypes {
     | '/gielda'
     | '/lab'
     | '/likwidacja'
-    | '/llms.txt'
     | '/login'
     | '/polityka-prywatnosci'
     | '/przeplyw'
@@ -598,7 +588,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/disclaimer'
     | '/likwidacja'
-    | '/llms.txt'
     | '/login'
     | '/polityka-prywatnosci'
     | '/przeplyw'
@@ -657,7 +646,6 @@ export interface FileRouteTypes {
     | '/gielda'
     | '/lab'
     | '/likwidacja'
-    | '/llms.txt'
     | '/login'
     | '/polityka-prywatnosci'
     | '/przeplyw'
@@ -717,7 +705,6 @@ export interface RootRouteChildren {
   GieldaRoute: typeof GieldaRouteWithChildren
   LabRoute: typeof LabRouteWithChildren
   LikwidacjaRoute: typeof LikwidacjaRoute
-  LlmsDottxtRoute: typeof LlmsDottxtRoute
   LoginRoute: typeof LoginRoute
   PolitykaPrywatnosciRoute: typeof PolitykaPrywatnosciRoute
   PrzeplywRoute: typeof PrzeplywRoute
@@ -824,13 +811,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/llms.txt': {
-      id: '/llms.txt'
-      path: '/llms.txt'
-      fullPath: '/llms.txt'
-      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/likwidacja': {
@@ -1246,7 +1226,6 @@ const rootRouteChildren: RootRouteChildren = {
   GieldaRoute: GieldaRouteWithChildren,
   LabRoute: LabRouteWithChildren,
   LikwidacjaRoute: LikwidacjaRoute,
-  LlmsDottxtRoute: LlmsDottxtRoute,
   LoginRoute: LoginRoute,
   PolitykaPrywatnosciRoute: PolitykaPrywatnosciRoute,
   PrzeplywRoute: PrzeplywRoute,
@@ -1272,3 +1251,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
