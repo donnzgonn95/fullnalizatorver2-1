@@ -7,21 +7,52 @@ const BINANCE_INTERVAL_MAP: Record<string, string> = {
   M15: "15m", M30: "30m", M45: "15m", H1: "1h", H4: "4h",
 };
 
-async function lastCandle(symbol: string, interval: string) {
+interface PostEntryCandle { openTime: number; high: number; low: number }
+
+async function candlesAfterEntry(symbol: string, interval: string, entryTimeIso: string): Promise<PostEntryCandle[] | null> {
   const itv = BINANCE_INTERVAL_MAP[interval] ?? "1h";
   const pair = BINANCE_PAIR[symbol as ScanSymbol] ?? `${symbol}USDT`;
-  const url = `https://api.binance.com/api/v3/klines?symbol=${pair}&interval=${itv}&limit=20`;
+  // Fetch up to 500 candles starting from entry_time so we can chronologically
+  // determine whether SL or TP was hit first (avoids the aggregate min/max
+  // artefact where a tight TP near entry is "won" by any future candle).
+  const startMs = Date.parse(entryTimeIso);
+  if (!Number.isFinite(startMs)) return null;
+  const url = `https://api.binance.com/api/v3/klines?symbol=${pair}&interval=${itv}&startTime=${startMs}&limit=500`;
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
     const data = (await res.json()) as Array<unknown[]>;
-    let high = -Infinity, low = Infinity;
-    for (const row of data) {
-      high = Math.max(high, parseFloat(row[2] as string));
-      low = Math.min(low, parseFloat(row[3] as string));
-    }
-    return { high, low };
+    return data.map((row) => ({
+      openTime: Number(row[0]),
+      high: parseFloat(row[2] as string),
+      low: parseFloat(row[3] as string),
+    }));
   } catch { return null; }
+}
+
+function resolveOutcome(
+  direction: string,
+  sl: number,
+  tp: number,
+  candles: PostEntryCandle[],
+): { result: "win" | "loss" | null; reason: string } {
+  for (const c of candles) {
+    if (direction === "long") {
+      const hitSl = c.low <= sl;
+      const hitTp = c.high >= tp;
+      // Ambiguous bar: assume worst case (SL first) — conservative verifier.
+      if (hitSl && hitTp) return { result: "loss", reason: `ambiguous bar @ ${c.openTime}: low ${c.low} ≤ SL ${sl} & high ${c.high} ≥ TP ${tp} (conservative=loss)` };
+      if (hitSl) return { result: "loss", reason: `low ${c.low} ≤ SL ${sl} @ ${c.openTime}` };
+      if (hitTp) return { result: "win", reason: `high ${c.high} ≥ TP ${tp} @ ${c.openTime}` };
+    } else {
+      const hitSl = c.high >= sl;
+      const hitTp = c.low <= tp;
+      if (hitSl && hitTp) return { result: "loss", reason: `ambiguous bar @ ${c.openTime}: high ${c.high} ≥ SL ${sl} & low ${c.low} ≤ TP ${tp} (conservative=loss)` };
+      if (hitSl) return { result: "loss", reason: `high ${c.high} ≥ SL ${sl} @ ${c.openTime}` };
+      if (hitTp) return { result: "win", reason: `low ${c.low} ≤ TP ${tp} @ ${c.openTime}` };
+    }
+  }
+  return { result: null, reason: "Cena nadal w korytarzu SL/TP" };
 }
 
 export const Route = createFileRoute("/api/public/hooks/verify-setups")({
