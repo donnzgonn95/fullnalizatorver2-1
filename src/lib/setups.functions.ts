@@ -18,7 +18,7 @@ const SetupInput = z.object({
 
 export const ingestSetup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => SetupInput.parse(input))
+  .validator((input: unknown) => SetupInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     // Dedup: check existing in 30-min bucket
@@ -75,7 +75,7 @@ const HistoryInput = z.object({
 
 export const listSetupHistory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => HistoryInput.parse(input ?? {}))
+  .validator((input: unknown) => HistoryInput.parse(input ?? {}))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     let q = supabase.from("detected_setups").select("*").order("detected_at", { ascending: false }).limit(data.limit);
