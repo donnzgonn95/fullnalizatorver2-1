@@ -11,7 +11,7 @@ const TestWebhookInput = z.object({
 
 export const testWebhook = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => TestWebhookInput.parse(input))
+  .validator((input) => TestWebhookInput.parse(input))
   .handler(async ({ data, context }) => {
     // Admin-only: prevents arbitrary authenticated users from using us as an SSRF proxy.
     const { data: roleRow } = await supabaseAdmin

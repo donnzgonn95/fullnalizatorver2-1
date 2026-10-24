@@ -9,141 +9,70 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SqueezeRouteImport } from './routes/squeeze'
-import { Route as SlownikRouteImport } from './routes/slownik'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SilaRouteImport } from './routes/sila'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as SetupyRouteImport } from './routes/setupy'
-import { Route as SentymentRouteImport } from './routes/sentyment'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RegulaminRouteImport } from './routes/regulamin'
-import { Route as PrzeplywRouteImport } from './routes/przeplyw'
-import { Route as PolitykaPrywatnosciRouteImport } from './routes/polityka-prywatnosci'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
-import { Route as LabRouteImport } from './routes/lab'
-import { Route as GieldaRouteImport } from './routes/gielda'
-import { Route as DisclaimerRouteImport } from './routes/disclaimer'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LabIndexRouteImport } from './routes/lab.index'
-import { Route as GieldaIndexRouteImport } from './routes/gielda.index'
-import { Route as SetupyHistoriaRouteImport } from './routes/setupy.historia'
-import { Route as LabTelegramRouteImport } from './routes/lab.telegram'
-import { Route as LabScannerRouteImport } from './routes/lab.scanner'
-import { Route as LabRiskRouteImport } from './routes/lab.risk'
-import { Route as LabRaportyRouteImport } from './routes/lab.raporty'
-import { Route as LabPaperRouteImport } from './routes/lab.paper'
-import { Route as LabMorningRouteImport } from './routes/lab.morning'
-import { Route as LabLedgerRouteImport } from './routes/lab.ledger'
-import { Route as LabJournalRouteImport } from './routes/lab.journal'
-import { Route as LabEveningRouteImport } from './routes/lab.evening'
-import { Route as LabBacktestRouteImport } from './routes/lab.backtest'
-import { Route as GieldaWatchlistaRouteImport } from './routes/gielda.watchlista'
-import { Route as GieldaUsaRouteImport } from './routes/gielda.usa'
-import { Route as GieldaTaktykiRouteImport } from './routes/gielda.taktyki'
-import { Route as GieldaSektoryRouteImport } from './routes/gielda.sektory'
-import { Route as GieldaMakroRouteImport } from './routes/gielda.makro'
-import { Route as GieldaEuropaRouteImport } from './routes/gielda.europa'
-import { Route as GieldaEtfRouteImport } from './routes/gielda.etf'
-import { Route as GieldaDziennikRouteImport } from './routes/gielda.dziennik'
-import { Route as GieldaBajtlikRouteImport } from './routes/gielda.bajtlik'
-import { Route as GieldaAgentRouteImport } from './routes/gielda.agent'
-import { Route as CoinSymbolRouteImport } from './routes/coin.$symbol'
-import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AuthenticatedUstawieniaRouteImport } from './routes/_authenticated/ustawienia'
-import { Route as AuthenticatedUlubioneRouteImport } from './routes/_authenticated/ulubione'
-import { Route as AuthenticatedKsiegaRouteImport } from './routes/_authenticated/ksiega'
-import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_authenticated/historia-alertow'
-import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as GieldaRouteImport } from './routes/gielda'
+import { Route as LabRouteImport } from './routes/lab'
+import { Route as LikwidacjaRouteImport } from './routes/likwidacja'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PolitykaPrywatnosciRouteImport } from './routes/polityka-prywatnosci'
+import { Route as PrzeplywRouteImport } from './routes/przeplyw'
+import { Route as RegulaminRouteImport } from './routes/regulamin'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SentymentRouteImport } from './routes/sentyment'
+import { Route as SetupyRouteImport } from './routes/setupy'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SilaRouteImport } from './routes/sila'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SlownikRouteImport } from './routes/slownik'
+import { Route as SqueezeRouteImport } from './routes/squeeze'
 import { Route as AuthenticatedAlertyRouteImport } from './routes/_authenticated/alerty'
-import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/public/hooks/verify-setups'
-import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
-import { Route as ApiPublicHooksScanSetupsRouteImport } from './routes/api/public/hooks/scan-setups'
-import { Route as ApiPublicHooksNotifySetupsRouteImport } from './routes/api/public/hooks/notify-setups'
-import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
+import { Route as AuthenticatedAsystentRouteImport } from './routes/_authenticated/asystent'
+import { Route as AuthenticatedHistoriaAlertowRouteImport } from './routes/_authenticated/historia-alertow'
+import { Route as AuthenticatedKsiegaRouteImport } from './routes/_authenticated/ksiega'
+import { Route as AuthenticatedUlubioneRouteImport } from './routes/_authenticated/ulubione'
+import { Route as AuthenticatedUstawieniaRouteImport } from './routes/_authenticated/ustawienia'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as CoinSymbolRouteImport } from './routes/coin.$symbol'
+import { Route as GieldaIndexRouteImport } from './routes/gielda.index'
+import { Route as GieldaAgentRouteImport } from './routes/gielda.agent'
+import { Route as GieldaBajtlikRouteImport } from './routes/gielda.bajtlik'
+import { Route as GieldaDziennikRouteImport } from './routes/gielda.dziennik'
+import { Route as GieldaEtfRouteImport } from './routes/gielda.etf'
+import { Route as GieldaEuropaRouteImport } from './routes/gielda.europa'
+import { Route as GieldaMakroRouteImport } from './routes/gielda.makro'
+import { Route as GieldaSektoryRouteImport } from './routes/gielda.sektory'
+import { Route as GieldaTaktykiRouteImport } from './routes/gielda.taktyki'
+import { Route as GieldaUsaRouteImport } from './routes/gielda.usa'
+import { Route as GieldaWatchlistaRouteImport } from './routes/gielda.watchlista'
+import { Route as LabIndexRouteImport } from './routes/lab.index'
+import { Route as LabBacktestRouteImport } from './routes/lab.backtest'
+import { Route as LabEveningRouteImport } from './routes/lab.evening'
+import { Route as LabJournalRouteImport } from './routes/lab.journal'
+import { Route as LabLedgerRouteImport } from './routes/lab.ledger'
+import { Route as LabMorningRouteImport } from './routes/lab.morning'
+import { Route as LabPaperRouteImport } from './routes/lab.paper'
+import { Route as LabRaportyRouteImport } from './routes/lab.raporty'
+import { Route as LabRiskRouteImport } from './routes/lab.risk'
+import { Route as LabScannerRouteImport } from './routes/lab.scanner'
+import { Route as LabTelegramRouteImport } from './routes/lab.telegram'
+import { Route as SetupyHistoriaRouteImport } from './routes/setupy.historia'
 import { Route as ApiPublicHooksAgentSimulationTickRouteImport } from './routes/api/public/hooks/agent-simulation-tick'
+import { Route as ApiPublicHooksLabReportsRouteImport } from './routes/api/public/hooks/lab-reports'
+import { Route as ApiPublicHooksNotifySetupsRouteImport } from './routes/api/public/hooks/notify-setups'
+import { Route as ApiPublicHooksScanSetupsRouteImport } from './routes/api/public/hooks/scan-setups'
+import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
+import { Route as ApiPublicHooksVerifySetupsRouteImport } from './routes/api/public/hooks/verify-setups'
 
-const SqueezeRoute = SqueezeRouteImport.update({
-  id: '/squeeze',
-  path: '/squeeze',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SlownikRoute = SlownikRouteImport.update({
-  id: '/slownik',
-  path: '/slownik',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SilaRoute = SilaRouteImport.update({
-  id: '/sila',
-  path: '/sila',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SetupyRoute = SetupyRouteImport.update({
-  id: '/setupy',
-  path: '/setupy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SentymentRoute = SentymentRouteImport.update({
-  id: '/sentyment',
-  path: '/sentyment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegulaminRoute = RegulaminRouteImport.update({
-  id: '/regulamin',
-  path: '/regulamin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrzeplywRoute = PrzeplywRouteImport.update({
-  id: '/przeplyw',
-  path: '/przeplyw',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PolitykaPrywatnosciRoute = PolitykaPrywatnosciRouteImport.update({
-  id: '/polityka-prywatnosci',
-  path: '/polityka-prywatnosci',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LikwidacjaRoute = LikwidacjaRouteImport.update({
-  id: '/likwidacja',
-  path: '/likwidacja',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LabRoute = LabRouteImport.update({
-  id: '/lab',
-  path: '/lab',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GieldaRoute = GieldaRouteImport.update({
-  id: '/gielda',
-  path: '/gielda',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DisclaimerRoute = DisclaimerRouteImport.update({
-  id: '/disclaimer',
-  path: '/disclaimer',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -151,153 +80,94 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const DisclaimerRoute = DisclaimerRouteImport.update({
+  id: '/disclaimer',
+  path: '/disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const GieldaRoute = GieldaRouteImport.update({
+  id: '/gielda',
+  path: '/gielda',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LabIndexRoute = LabIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => LabRoute,
-} as any)
-const GieldaIndexRoute = GieldaIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const SetupyHistoriaRoute = SetupyHistoriaRouteImport.update({
-  id: '/historia',
-  path: '/historia',
-  getParentRoute: () => SetupyRoute,
-} as any)
-const LabTelegramRoute = LabTelegramRouteImport.update({
-  id: '/telegram',
-  path: '/telegram',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabScannerRoute = LabScannerRouteImport.update({
-  id: '/scanner',
-  path: '/scanner',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabRiskRoute = LabRiskRouteImport.update({
-  id: '/risk',
-  path: '/risk',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabRaportyRoute = LabRaportyRouteImport.update({
-  id: '/raporty',
-  path: '/raporty',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabPaperRoute = LabPaperRouteImport.update({
-  id: '/paper',
-  path: '/paper',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabMorningRoute = LabMorningRouteImport.update({
-  id: '/morning',
-  path: '/morning',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabLedgerRoute = LabLedgerRouteImport.update({
-  id: '/ledger',
-  path: '/ledger',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabJournalRoute = LabJournalRouteImport.update({
-  id: '/journal',
-  path: '/journal',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabEveningRoute = LabEveningRouteImport.update({
-  id: '/evening',
-  path: '/evening',
-  getParentRoute: () => LabRoute,
-} as any)
-const LabBacktestRoute = LabBacktestRouteImport.update({
-  id: '/backtest',
-  path: '/backtest',
-  getParentRoute: () => LabRoute,
-} as any)
-const GieldaWatchlistaRoute = GieldaWatchlistaRouteImport.update({
-  id: '/watchlista',
-  path: '/watchlista',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaUsaRoute = GieldaUsaRouteImport.update({
-  id: '/usa',
-  path: '/usa',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaTaktykiRoute = GieldaTaktykiRouteImport.update({
-  id: '/taktyki',
-  path: '/taktyki',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaSektoryRoute = GieldaSektoryRouteImport.update({
-  id: '/sektory',
-  path: '/sektory',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaMakroRoute = GieldaMakroRouteImport.update({
-  id: '/makro',
-  path: '/makro',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaEuropaRoute = GieldaEuropaRouteImport.update({
-  id: '/europa',
-  path: '/europa',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaEtfRoute = GieldaEtfRouteImport.update({
-  id: '/etf',
-  path: '/etf',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaDziennikRoute = GieldaDziennikRouteImport.update({
-  id: '/dziennik',
-  path: '/dziennik',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaBajtlikRoute = GieldaBajtlikRouteImport.update({
-  id: '/bajtlik',
-  path: '/bajtlik',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const GieldaAgentRoute = GieldaAgentRouteImport.update({
-  id: '/agent',
-  path: '/agent',
-  getParentRoute: () => GieldaRoute,
-} as any)
-const CoinSymbolRoute = CoinSymbolRouteImport.update({
-  id: '/coin/$symbol',
-  path: '/coin/$symbol',
+const LabRoute = LabRouteImport.update({
+  id: '/lab',
+  path: '/lab',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
+const LikwidacjaRoute = LikwidacjaRouteImport.update({
+  id: '/likwidacja',
+  path: '/likwidacja',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedUstawieniaRoute = AuthenticatedUstawieniaRouteImport.update({
-  id: '/ustawienia',
-  path: '/ustawienia',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PolitykaPrywatnosciRoute = PolitykaPrywatnosciRouteImport.update({
+  id: '/polityka-prywatnosci',
+  path: '/polityka-prywatnosci',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrzeplywRoute = PrzeplywRouteImport.update({
+  id: '/przeplyw',
+  path: '/przeplyw',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegulaminRoute = RegulaminRouteImport.update({
+  id: '/regulamin',
+  path: '/regulamin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SentymentRoute = SentymentRouteImport.update({
+  id: '/sentyment',
+  path: '/sentyment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetupyRoute = SetupyRouteImport.update({
+  id: '/setupy',
+  path: '/setupy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SilaRoute = SilaRouteImport.update({
+  id: '/sila',
+  path: '/sila',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlownikRoute = SlownikRouteImport.update({
+  id: '/slownik',
+  path: '/slownik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SqueezeRoute = SqueezeRouteImport.update({
+  id: '/squeeze',
+  path: '/squeeze',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAlertyRoute = AuthenticatedAlertyRouteImport.update({
+  id: '/alerty',
+  path: '/alerty',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedUlubioneRoute = AuthenticatedUlubioneRouteImport.update({
-  id: '/ulubione',
-  path: '/ulubione',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedKsiegaRoute = AuthenticatedKsiegaRouteImport.update({
-  id: '/ksiega',
-  path: '/ksiega',
+const AuthenticatedAsystentRoute = AuthenticatedAsystentRouteImport.update({
+  id: '/asystent',
+  path: '/asystent',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedHistoriaAlertowRoute =
@@ -306,38 +176,150 @@ const AuthenticatedHistoriaAlertowRoute =
     path: '/historia-alertow',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedAsystentRoute = AuthenticatedAsystentRouteImport.update({
-  id: '/asystent',
-  path: '/asystent',
+const AuthenticatedKsiegaRoute = AuthenticatedKsiegaRouteImport.update({
+  id: '/ksiega',
+  path: '/ksiega',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAlertyRoute = AuthenticatedAlertyRouteImport.update({
-  id: '/alerty',
-  path: '/alerty',
+const AuthenticatedUlubioneRoute = AuthenticatedUlubioneRouteImport.update({
+  id: '/ulubione',
+  path: '/ulubione',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const ApiPublicHooksVerifySetupsRoute =
-  ApiPublicHooksVerifySetupsRouteImport.update({
-    id: '/api/public/hooks/verify-setups',
-    path: '/api/public/hooks/verify-setups',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksSyncCronSecretRoute =
-  ApiPublicHooksSyncCronSecretRouteImport.update({
-    id: '/api/public/hooks/sync-cron-secret',
-    path: '/api/public/hooks/sync-cron-secret',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksScanSetupsRoute =
-  ApiPublicHooksScanSetupsRouteImport.update({
-    id: '/api/public/hooks/scan-setups',
-    path: '/api/public/hooks/scan-setups',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksNotifySetupsRoute =
-  ApiPublicHooksNotifySetupsRouteImport.update({
-    id: '/api/public/hooks/notify-setups',
-    path: '/api/public/hooks/notify-setups',
+const AuthenticatedUstawieniaRoute = AuthenticatedUstawieniaRouteImport.update({
+  id: '/ustawienia',
+  path: '/ustawienia',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoinSymbolRoute = CoinSymbolRouteImport.update({
+  id: '/coin/$symbol',
+  path: '/coin/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GieldaIndexRoute = GieldaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaAgentRoute = GieldaAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaBajtlikRoute = GieldaBajtlikRouteImport.update({
+  id: '/bajtlik',
+  path: '/bajtlik',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaDziennikRoute = GieldaDziennikRouteImport.update({
+  id: '/dziennik',
+  path: '/dziennik',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaEtfRoute = GieldaEtfRouteImport.update({
+  id: '/etf',
+  path: '/etf',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaEuropaRoute = GieldaEuropaRouteImport.update({
+  id: '/europa',
+  path: '/europa',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaMakroRoute = GieldaMakroRouteImport.update({
+  id: '/makro',
+  path: '/makro',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaSektoryRoute = GieldaSektoryRouteImport.update({
+  id: '/sektory',
+  path: '/sektory',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaTaktykiRoute = GieldaTaktykiRouteImport.update({
+  id: '/taktyki',
+  path: '/taktyki',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaUsaRoute = GieldaUsaRouteImport.update({
+  id: '/usa',
+  path: '/usa',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const GieldaWatchlistaRoute = GieldaWatchlistaRouteImport.update({
+  id: '/watchlista',
+  path: '/watchlista',
+  getParentRoute: () => GieldaRoute,
+} as any)
+const LabIndexRoute = LabIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabBacktestRoute = LabBacktestRouteImport.update({
+  id: '/backtest',
+  path: '/backtest',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabEveningRoute = LabEveningRouteImport.update({
+  id: '/evening',
+  path: '/evening',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabJournalRoute = LabJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabLedgerRoute = LabLedgerRouteImport.update({
+  id: '/ledger',
+  path: '/ledger',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabMorningRoute = LabMorningRouteImport.update({
+  id: '/morning',
+  path: '/morning',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabPaperRoute = LabPaperRouteImport.update({
+  id: '/paper',
+  path: '/paper',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabRaportyRoute = LabRaportyRouteImport.update({
+  id: '/raporty',
+  path: '/raporty',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabRiskRoute = LabRiskRouteImport.update({
+  id: '/risk',
+  path: '/risk',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabScannerRoute = LabScannerRouteImport.update({
+  id: '/scanner',
+  path: '/scanner',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabTelegramRoute = LabTelegramRouteImport.update({
+  id: '/telegram',
+  path: '/telegram',
+  getParentRoute: () => LabRoute,
+} as any)
+const SetupyHistoriaRoute = SetupyHistoriaRouteImport.update({
+  id: '/historia',
+  path: '/historia',
+  getParentRoute: () => SetupyRoute,
+} as any)
+const ApiPublicHooksAgentSimulationTickRoute =
+  ApiPublicHooksAgentSimulationTickRouteImport.update({
+    id: '/api/public/hooks/agent-simulation-tick',
+    path: '/api/public/hooks/agent-simulation-tick',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksLabReportsRoute =
@@ -346,10 +328,28 @@ const ApiPublicHooksLabReportsRoute =
     path: '/api/public/hooks/lab-reports',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksAgentSimulationTickRoute =
-  ApiPublicHooksAgentSimulationTickRouteImport.update({
-    id: '/api/public/hooks/agent-simulation-tick',
-    path: '/api/public/hooks/agent-simulation-tick',
+const ApiPublicHooksNotifySetupsRoute =
+  ApiPublicHooksNotifySetupsRouteImport.update({
+    id: '/api/public/hooks/notify-setups',
+    path: '/api/public/hooks/notify-setups',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksScanSetupsRoute =
+  ApiPublicHooksScanSetupsRouteImport.update({
+    id: '/api/public/hooks/scan-setups',
+    path: '/api/public/hooks/scan-setups',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksSyncCronSecretRoute =
+  ApiPublicHooksSyncCronSecretRouteImport.update({
+    id: '/api/public/hooks/sync-cron-secret',
+    path: '/api/public/hooks/sync-cron-secret',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksVerifySetupsRoute =
+  ApiPublicHooksVerifySetupsRouteImport.update({
+    id: '/api/public/hooks/verify-setups',
+    path: '/api/public/hooks/verify-setups',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -729,123 +729,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/squeeze': {
-      id: '/squeeze'
-      path: '/squeeze'
-      fullPath: '/squeeze'
-      preLoaderRoute: typeof SqueezeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/slownik': {
-      id: '/slownik'
-      path: '/slownik'
-      fullPath: '/slownik'
-      preLoaderRoute: typeof SlownikRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sila': {
-      id: '/sila'
-      path: '/sila'
-      fullPath: '/sila'
-      preLoaderRoute: typeof SilaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/setupy': {
-      id: '/setupy'
-      path: '/setupy'
-      fullPath: '/setupy'
-      preLoaderRoute: typeof SetupyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sentyment': {
-      id: '/sentyment'
-      path: '/sentyment'
-      fullPath: '/sentyment'
-      preLoaderRoute: typeof SentymentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/regulamin': {
-      id: '/regulamin'
-      path: '/regulamin'
-      fullPath: '/regulamin'
-      preLoaderRoute: typeof RegulaminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/przeplyw': {
-      id: '/przeplyw'
-      path: '/przeplyw'
-      fullPath: '/przeplyw'
-      preLoaderRoute: typeof PrzeplywRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/polityka-prywatnosci': {
-      id: '/polityka-prywatnosci'
-      path: '/polityka-prywatnosci'
-      fullPath: '/polityka-prywatnosci'
-      preLoaderRoute: typeof PolitykaPrywatnosciRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/likwidacja': {
-      id: '/likwidacja'
-      path: '/likwidacja'
-      fullPath: '/likwidacja'
-      preLoaderRoute: typeof LikwidacjaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lab': {
-      id: '/lab'
-      path: '/lab'
-      fullPath: '/lab'
-      preLoaderRoute: typeof LabRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gielda': {
-      id: '/gielda'
-      path: '/gielda'
-      fullPath: '/gielda'
-      preLoaderRoute: typeof GieldaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disclaimer': {
-      id: '/disclaimer'
-      path: '/disclaimer'
-      fullPath: '/disclaimer'
-      preLoaderRoute: typeof DisclaimerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -855,214 +743,130 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lab/': {
-      id: '/lab/'
-      path: '/'
-      fullPath: '/lab/'
-      preLoaderRoute: typeof LabIndexRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/gielda/': {
-      id: '/gielda/'
-      path: '/'
-      fullPath: '/gielda/'
-      preLoaderRoute: typeof GieldaIndexRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/setupy/historia': {
-      id: '/setupy/historia'
-      path: '/historia'
-      fullPath: '/setupy/historia'
-      preLoaderRoute: typeof SetupyHistoriaRouteImport
-      parentRoute: typeof SetupyRoute
-    }
-    '/lab/telegram': {
-      id: '/lab/telegram'
-      path: '/telegram'
-      fullPath: '/lab/telegram'
-      preLoaderRoute: typeof LabTelegramRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/scanner': {
-      id: '/lab/scanner'
-      path: '/scanner'
-      fullPath: '/lab/scanner'
-      preLoaderRoute: typeof LabScannerRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/risk': {
-      id: '/lab/risk'
-      path: '/risk'
-      fullPath: '/lab/risk'
-      preLoaderRoute: typeof LabRiskRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/raporty': {
-      id: '/lab/raporty'
-      path: '/raporty'
-      fullPath: '/lab/raporty'
-      preLoaderRoute: typeof LabRaportyRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/paper': {
-      id: '/lab/paper'
-      path: '/paper'
-      fullPath: '/lab/paper'
-      preLoaderRoute: typeof LabPaperRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/morning': {
-      id: '/lab/morning'
-      path: '/morning'
-      fullPath: '/lab/morning'
-      preLoaderRoute: typeof LabMorningRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/ledger': {
-      id: '/lab/ledger'
-      path: '/ledger'
-      fullPath: '/lab/ledger'
-      preLoaderRoute: typeof LabLedgerRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/journal': {
-      id: '/lab/journal'
-      path: '/journal'
-      fullPath: '/lab/journal'
-      preLoaderRoute: typeof LabJournalRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/evening': {
-      id: '/lab/evening'
-      path: '/evening'
-      fullPath: '/lab/evening'
-      preLoaderRoute: typeof LabEveningRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/lab/backtest': {
-      id: '/lab/backtest'
-      path: '/backtest'
-      fullPath: '/lab/backtest'
-      preLoaderRoute: typeof LabBacktestRouteImport
-      parentRoute: typeof LabRoute
-    }
-    '/gielda/watchlista': {
-      id: '/gielda/watchlista'
-      path: '/watchlista'
-      fullPath: '/gielda/watchlista'
-      preLoaderRoute: typeof GieldaWatchlistaRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/usa': {
-      id: '/gielda/usa'
-      path: '/usa'
-      fullPath: '/gielda/usa'
-      preLoaderRoute: typeof GieldaUsaRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/taktyki': {
-      id: '/gielda/taktyki'
-      path: '/taktyki'
-      fullPath: '/gielda/taktyki'
-      preLoaderRoute: typeof GieldaTaktykiRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/sektory': {
-      id: '/gielda/sektory'
-      path: '/sektory'
-      fullPath: '/gielda/sektory'
-      preLoaderRoute: typeof GieldaSektoryRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/makro': {
-      id: '/gielda/makro'
-      path: '/makro'
-      fullPath: '/gielda/makro'
-      preLoaderRoute: typeof GieldaMakroRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/europa': {
-      id: '/gielda/europa'
-      path: '/europa'
-      fullPath: '/gielda/europa'
-      preLoaderRoute: typeof GieldaEuropaRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/etf': {
-      id: '/gielda/etf'
-      path: '/etf'
-      fullPath: '/gielda/etf'
-      preLoaderRoute: typeof GieldaEtfRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/dziennik': {
-      id: '/gielda/dziennik'
-      path: '/dziennik'
-      fullPath: '/gielda/dziennik'
-      preLoaderRoute: typeof GieldaDziennikRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/bajtlik': {
-      id: '/gielda/bajtlik'
-      path: '/bajtlik'
-      fullPath: '/gielda/bajtlik'
-      preLoaderRoute: typeof GieldaBajtlikRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/gielda/agent': {
-      id: '/gielda/agent'
-      path: '/agent'
-      fullPath: '/gielda/agent'
-      preLoaderRoute: typeof GieldaAgentRouteImport
-      parentRoute: typeof GieldaRoute
-    }
-    '/coin/$symbol': {
-      id: '/coin/$symbol'
-      path: '/coin/$symbol'
-      fullPath: '/coin/$symbol'
-      preLoaderRoute: typeof CoinSymbolRouteImport
+    '/disclaimer': {
+      id: '/disclaimer'
+      path: '/disclaimer'
+      fullPath: '/disclaimer'
+      preLoaderRoute: typeof DisclaimerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
+    '/gielda': {
+      id: '/gielda'
+      path: '/gielda'
+      fullPath: '/gielda'
+      preLoaderRoute: typeof GieldaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/ustawienia': {
-      id: '/_authenticated/ustawienia'
-      path: '/ustawienia'
-      fullPath: '/ustawienia'
-      preLoaderRoute: typeof AuthenticatedUstawieniaRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/lab': {
+      id: '/lab'
+      path: '/lab'
+      fullPath: '/lab'
+      preLoaderRoute: typeof LabRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/ulubione': {
-      id: '/_authenticated/ulubione'
-      path: '/ulubione'
-      fullPath: '/ulubione'
-      preLoaderRoute: typeof AuthenticatedUlubioneRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/likwidacja': {
+      id: '/likwidacja'
+      path: '/likwidacja'
+      fullPath: '/likwidacja'
+      preLoaderRoute: typeof LikwidacjaRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/ksiega': {
-      id: '/_authenticated/ksiega'
-      path: '/ksiega'
-      fullPath: '/ksiega'
-      preLoaderRoute: typeof AuthenticatedKsiegaRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/historia-alertow': {
-      id: '/_authenticated/historia-alertow'
-      path: '/historia-alertow'
-      fullPath: '/historia-alertow'
-      preLoaderRoute: typeof AuthenticatedHistoriaAlertowRouteImport
+    '/polityka-prywatnosci': {
+      id: '/polityka-prywatnosci'
+      path: '/polityka-prywatnosci'
+      fullPath: '/polityka-prywatnosci'
+      preLoaderRoute: typeof PolitykaPrywatnosciRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/przeplyw': {
+      id: '/przeplyw'
+      path: '/przeplyw'
+      fullPath: '/przeplyw'
+      preLoaderRoute: typeof PrzeplywRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/regulamin': {
+      id: '/regulamin'
+      path: '/regulamin'
+      fullPath: '/regulamin'
+      preLoaderRoute: typeof RegulaminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sentyment': {
+      id: '/sentyment'
+      path: '/sentyment'
+      fullPath: '/sentyment'
+      preLoaderRoute: typeof SentymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setupy': {
+      id: '/setupy'
+      path: '/setupy'
+      fullPath: '/setupy'
+      preLoaderRoute: typeof SetupyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sila': {
+      id: '/sila'
+      path: '/sila'
+      fullPath: '/sila'
+      preLoaderRoute: typeof SilaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/slownik': {
+      id: '/slownik'
+      path: '/slownik'
+      fullPath: '/slownik'
+      preLoaderRoute: typeof SlownikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/squeeze': {
+      id: '/squeeze'
+      path: '/squeeze'
+      fullPath: '/squeeze'
+      preLoaderRoute: typeof SqueezeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/alerty': {
+      id: '/_authenticated/alerty'
+      path: '/alerty'
+      fullPath: '/alerty'
+      preLoaderRoute: typeof AuthenticatedAlertyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/asystent': {
@@ -1072,39 +876,214 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAsystentRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/alerty': {
-      id: '/_authenticated/alerty'
-      path: '/alerty'
-      fullPath: '/alerty'
-      preLoaderRoute: typeof AuthenticatedAlertyRouteImport
+    '/_authenticated/historia-alertow': {
+      id: '/_authenticated/historia-alertow'
+      path: '/historia-alertow'
+      fullPath: '/historia-alertow'
+      preLoaderRoute: typeof AuthenticatedHistoriaAlertowRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/api/public/hooks/verify-setups': {
-      id: '/api/public/hooks/verify-setups'
-      path: '/api/public/hooks/verify-setups'
-      fullPath: '/api/public/hooks/verify-setups'
-      preLoaderRoute: typeof ApiPublicHooksVerifySetupsRouteImport
+    '/_authenticated/ksiega': {
+      id: '/_authenticated/ksiega'
+      path: '/ksiega'
+      fullPath: '/ksiega'
+      preLoaderRoute: typeof AuthenticatedKsiegaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ulubione': {
+      id: '/_authenticated/ulubione'
+      path: '/ulubione'
+      fullPath: '/ulubione'
+      preLoaderRoute: typeof AuthenticatedUlubioneRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ustawienia': {
+      id: '/_authenticated/ustawienia'
+      path: '/ustawienia'
+      fullPath: '/ustawienia'
+      preLoaderRoute: typeof AuthenticatedUstawieniaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/sync-cron-secret': {
-      id: '/api/public/hooks/sync-cron-secret'
-      path: '/api/public/hooks/sync-cron-secret'
-      fullPath: '/api/public/hooks/sync-cron-secret'
-      preLoaderRoute: typeof ApiPublicHooksSyncCronSecretRouteImport
+    '/coin/$symbol': {
+      id: '/coin/$symbol'
+      path: '/coin/$symbol'
+      fullPath: '/coin/$symbol'
+      preLoaderRoute: typeof CoinSymbolRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/scan-setups': {
-      id: '/api/public/hooks/scan-setups'
-      path: '/api/public/hooks/scan-setups'
-      fullPath: '/api/public/hooks/scan-setups'
-      preLoaderRoute: typeof ApiPublicHooksScanSetupsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/gielda/': {
+      id: '/gielda/'
+      path: '/'
+      fullPath: '/gielda/'
+      preLoaderRoute: typeof GieldaIndexRouteImport
+      parentRoute: typeof GieldaRoute
     }
-    '/api/public/hooks/notify-setups': {
-      id: '/api/public/hooks/notify-setups'
-      path: '/api/public/hooks/notify-setups'
-      fullPath: '/api/public/hooks/notify-setups'
-      preLoaderRoute: typeof ApiPublicHooksNotifySetupsRouteImport
+    '/gielda/agent': {
+      id: '/gielda/agent'
+      path: '/agent'
+      fullPath: '/gielda/agent'
+      preLoaderRoute: typeof GieldaAgentRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/bajtlik': {
+      id: '/gielda/bajtlik'
+      path: '/bajtlik'
+      fullPath: '/gielda/bajtlik'
+      preLoaderRoute: typeof GieldaBajtlikRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/dziennik': {
+      id: '/gielda/dziennik'
+      path: '/dziennik'
+      fullPath: '/gielda/dziennik'
+      preLoaderRoute: typeof GieldaDziennikRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/etf': {
+      id: '/gielda/etf'
+      path: '/etf'
+      fullPath: '/gielda/etf'
+      preLoaderRoute: typeof GieldaEtfRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/europa': {
+      id: '/gielda/europa'
+      path: '/europa'
+      fullPath: '/gielda/europa'
+      preLoaderRoute: typeof GieldaEuropaRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/makro': {
+      id: '/gielda/makro'
+      path: '/makro'
+      fullPath: '/gielda/makro'
+      preLoaderRoute: typeof GieldaMakroRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/sektory': {
+      id: '/gielda/sektory'
+      path: '/sektory'
+      fullPath: '/gielda/sektory'
+      preLoaderRoute: typeof GieldaSektoryRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/taktyki': {
+      id: '/gielda/taktyki'
+      path: '/taktyki'
+      fullPath: '/gielda/taktyki'
+      preLoaderRoute: typeof GieldaTaktykiRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/usa': {
+      id: '/gielda/usa'
+      path: '/usa'
+      fullPath: '/gielda/usa'
+      preLoaderRoute: typeof GieldaUsaRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/gielda/watchlista': {
+      id: '/gielda/watchlista'
+      path: '/watchlista'
+      fullPath: '/gielda/watchlista'
+      preLoaderRoute: typeof GieldaWatchlistaRouteImport
+      parentRoute: typeof GieldaRoute
+    }
+    '/lab/': {
+      id: '/lab/'
+      path: '/'
+      fullPath: '/lab/'
+      preLoaderRoute: typeof LabIndexRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/backtest': {
+      id: '/lab/backtest'
+      path: '/backtest'
+      fullPath: '/lab/backtest'
+      preLoaderRoute: typeof LabBacktestRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/evening': {
+      id: '/lab/evening'
+      path: '/evening'
+      fullPath: '/lab/evening'
+      preLoaderRoute: typeof LabEveningRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/journal': {
+      id: '/lab/journal'
+      path: '/journal'
+      fullPath: '/lab/journal'
+      preLoaderRoute: typeof LabJournalRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/ledger': {
+      id: '/lab/ledger'
+      path: '/ledger'
+      fullPath: '/lab/ledger'
+      preLoaderRoute: typeof LabLedgerRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/morning': {
+      id: '/lab/morning'
+      path: '/morning'
+      fullPath: '/lab/morning'
+      preLoaderRoute: typeof LabMorningRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/paper': {
+      id: '/lab/paper'
+      path: '/paper'
+      fullPath: '/lab/paper'
+      preLoaderRoute: typeof LabPaperRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/raporty': {
+      id: '/lab/raporty'
+      path: '/raporty'
+      fullPath: '/lab/raporty'
+      preLoaderRoute: typeof LabRaportyRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/risk': {
+      id: '/lab/risk'
+      path: '/risk'
+      fullPath: '/lab/risk'
+      preLoaderRoute: typeof LabRiskRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/scanner': {
+      id: '/lab/scanner'
+      path: '/scanner'
+      fullPath: '/lab/scanner'
+      preLoaderRoute: typeof LabScannerRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/telegram': {
+      id: '/lab/telegram'
+      path: '/telegram'
+      fullPath: '/lab/telegram'
+      preLoaderRoute: typeof LabTelegramRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/setupy/historia': {
+      id: '/setupy/historia'
+      path: '/historia'
+      fullPath: '/setupy/historia'
+      preLoaderRoute: typeof SetupyHistoriaRouteImport
+      parentRoute: typeof SetupyRoute
+    }
+    '/api/public/hooks/agent-simulation-tick': {
+      id: '/api/public/hooks/agent-simulation-tick'
+      path: '/api/public/hooks/agent-simulation-tick'
+      fullPath: '/api/public/hooks/agent-simulation-tick'
+      preLoaderRoute: typeof ApiPublicHooksAgentSimulationTickRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/lab-reports': {
@@ -1114,11 +1093,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksLabReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/agent-simulation-tick': {
-      id: '/api/public/hooks/agent-simulation-tick'
-      path: '/api/public/hooks/agent-simulation-tick'
-      fullPath: '/api/public/hooks/agent-simulation-tick'
-      preLoaderRoute: typeof ApiPublicHooksAgentSimulationTickRouteImport
+    '/api/public/hooks/notify-setups': {
+      id: '/api/public/hooks/notify-setups'
+      path: '/api/public/hooks/notify-setups'
+      fullPath: '/api/public/hooks/notify-setups'
+      preLoaderRoute: typeof ApiPublicHooksNotifySetupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/scan-setups': {
+      id: '/api/public/hooks/scan-setups'
+      path: '/api/public/hooks/scan-setups'
+      fullPath: '/api/public/hooks/scan-setups'
+      preLoaderRoute: typeof ApiPublicHooksScanSetupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/sync-cron-secret': {
+      id: '/api/public/hooks/sync-cron-secret'
+      path: '/api/public/hooks/sync-cron-secret'
+      fullPath: '/api/public/hooks/sync-cron-secret'
+      preLoaderRoute: typeof ApiPublicHooksSyncCronSecretRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/verify-setups': {
+      id: '/api/public/hooks/verify-setups'
+      path: '/api/public/hooks/verify-setups'
+      fullPath: '/api/public/hooks/verify-setups'
+      preLoaderRoute: typeof ApiPublicHooksVerifySetupsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
