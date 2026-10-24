@@ -110,8 +110,15 @@ Deno.serve(async (req) => {
       ? null
       : `Dane wejściowe (JSON):\n\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``;
 
+    const safeMessages = (Array.isArray(messages) ? messages : [])
+      .filter((m) => m && typeof m === "object" && typeof m.content === "string")
+      .slice(-50)
+      .map((m) => ({
+        role: m.role === "assistant" ? "assistant" : "user",
+        content: m.content.slice(0, 20000),
+      }));
     const reqMessages = isChatLike
-      ? [{ role: "system", content: system }, ...(messages ?? [])]
+      ? [{ role: "system", content: system }, ...safeMessages]
       : [
           { role: "system", content: system },
           { role: "user", content: userContent! },
