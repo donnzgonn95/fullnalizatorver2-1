@@ -57,7 +57,7 @@ export const Route = createFileRoute("/coin/$symbol")({
   component: CoinPage,
   errorComponent: ({ error }) => (
     <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
-      Nie udało się załadować: {error.message}
+      Nie udało się załadować: {error instanceof Error ? error.message : String(error)}
     </div>
   ),
   notFoundComponent: () => (
