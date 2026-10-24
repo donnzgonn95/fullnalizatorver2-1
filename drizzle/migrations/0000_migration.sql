@@ -1,0 +1,14 @@
+DROP POLICY IF EXISTS apt_select ON public.agent_paper_trades;
+CREATE POLICY apt_select ON public.agent_paper_trades FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS aj_select ON public.agent_journal;
+CREATE POLICY aj_select ON public.agent_journal FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS rp_select ON public.reports;
+CREATE POLICY rp_select ON public.reports FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS ag_select ON public.agent_guidelines;
+CREATE POLICY ag_select ON public.agent_guidelines FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS asc_select ON public.agent_simulation_config;
+CREATE POLICY asc_select ON public.agent_simulation_config FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS ad_select ON public.agent_decisions;
+CREATE POLICY ad_select ON public.agent_decisions FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS sc_select ON public.scanner_config;
+CREATE POLICY sc_select ON public.scanner_config FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
