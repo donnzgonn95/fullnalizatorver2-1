@@ -1,12 +1,52 @@
+DE: 
+
+Fullanalizator – Datenanalyse und Entscheidungsunterstützung
+
+Projektbeschreibung
+
+Dieses Projekt ist eine webbasierte Analyseplattform zur strukturierten Erfassung, Verarbeitung und Auswertung von Marktdaten. Ziel ist es, unterschiedliche Datenquellen, Analyseverfahren und Visualisierungen in einer gemeinsamen Anwendung zusammenzuführen.
+
+Der Schwerpunkt liegt auf datengetriebenen Auswertungen, der Erkennung von Mustern, der Analyse von Marktregimen und der nachvollziehbaren Aufbereitung von Informationen.
+
+Technische Schwerpunkte
+
+- Verarbeitung und Visualisierung von Marktdaten
+- Analyse von Trends, relativer Stärke und Marktregimen
+- Regelbasierte Erkennung und Bewertung von Marktkonstellationen
+- KI-gestützte Analyse, Zusammenfassungen und Berichte
+- Webbasierte Benutzeroberfläche mit interaktiven Komponenten
+- Backend-Integration und serverseitige Verarbeitung
+- Datenbankgestützte Funktionen und Zugriffskontrolle
+
+Technologie
+
+- React 19 und TypeScript
+- TanStack Start und Vite
+- Tailwind CSS
+- Supabase
+- Datenvisualisierung mit Lightweight Charts und Recharts
+- Serverseitige KI-Integration
+
+Entwicklungsstand
+
+Das Repository dokumentiert einen entwickelten Stand des Projekts mit mehreren Analyse- und Anwendungsmodulen. Der aktuelle Betriebsstatus, die Verfügbarkeit externer Dienste und die vollständige Funktionsfähigkeit aller Komponenten müssen separat geprüft werden.
+
+Das Projekt dient der Analyse und Simulation. Es führt keine realen Handelsaufträge aus.
+
+Zielsetzung
+
+Die Entwicklung konzentriert sich auf die strukturierte Verarbeitung von Informationen, die Kombination verschiedener Analyseverfahren und die Unterstützung datenbasierter Entscheidungen.
+
+Hinweis: Die dargestellten Analyseergebnisse sind keine Garantie für zukünftige Entwicklungen und keine Anlageberatung.
 # CryptoPuls — AI Quant Cockpit
 
-Polski dashboard tradingowy do krypto z **globalnym skanerem setupów 24/7**, panelem admina, ryzykiem, AI reasoningiem i powiadomieniami webhook. Zbudowany w stylu **Orange Institutional Quant** (dark cockpit + light institutional).
+Polski dashboard tradingowy do rynków z **globalnym skanerem setupów 24/7**, panelem admina, ryzykiem, AI reasoningiem i powiadomieniami webhook. Zbudowany w stylu **Orange Institutional Quant** (dark cockpit + light institutional).
 
 ---
 
-## 1. Czym jest CryptoPuls
+## 1. Czym jest analizator
 
-CryptoPuls to **operating system tradera krypto**. Łączy:
+Analizator 2.1 to **operating system tradera**. Łączy:
 
 - **Live feed** cen i świec (Binance + CoinGecko)
 - **Globalny skaner setupów** (BB-bounce, Elliott Wave) działający w tle 24/7 — niezależnie od tego, czy masz otwartą kartę
